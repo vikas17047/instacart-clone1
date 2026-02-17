@@ -36,40 +36,23 @@
             </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-            authDomain: "instacart-clone-91062.firebaseapp.com",
-            projectId: "instacart-clone-91062",
-            storageBucket: "instacart-clone-91062.firebasestorage.app",
-            messagingSenderId: "232217818928",
-            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-        };
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+// Login button click par redirect hoga
+document.getElementById('googleLoginBtn').onclick = () => {
+    signInWithRedirect(auth, provider);
+};
 
-        // Login Check
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                localStorage.setItem('user_uid', user.uid);
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                document.getElementById('userName').innerText = "Hello, " + user.displayName;
-            } else {
-                document.getElementById('loginOverlay').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'none';
-            }
-        });
+// Jab login se wapas aaye toh check karein
+getRedirectResult(auth).then((result) => {
+    if (result && result.user) {
+        localStorage.setItem('user_uid', result.user.uid);
+        location.reload();
+    }
+});
 
-        // Login Button Click
-        document.getElementById('googleLoginBtn').onclick = () => {
-            signInWithPopup(auth, provider).catch(err => alert(err.message));
-        };
-    </script>
 </body>
 </html>
