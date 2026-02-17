@@ -4,53 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instacart - Home</title>
-    <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Login Parde ka Style */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        /* 1. Login Screen Style */
         #loginOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; z-index: 99999; display: flex;
+            background: white; z-index: 9999; display: flex;
             flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; font-family: 'Inter', sans-serif;
         }
         .login-btn {
             background: #4285F4; color: white; border: none; padding: 12px 25px;
-            border-radius: 30px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; gap: 10px; font-size: 1rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px;
         }
+
+        /* 2. Home Page Style */
+        .navbar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: #000; }
+        .nav-btns { display: flex; gap: 15px; }
+        .btn-store { background: #000; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        
+        .hero { padding: 40px 20px; text-align: center; background: #f9f9f9; }
+        .hero h1 { font-size: 2rem; margin-bottom: 10px; }
+        
+        .product-grid { padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .p-card { background: white; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+        .p-img { width: 100%; height: 150px; background: #eee; object-fit: cover; }
+        .p-info { padding: 10px; }
+        .p-name { font-weight: 600; font-size: 0.9rem; }
+        .p-price { color: #666; font-size: 0.85rem; margin-top: 5px; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay" style="display: none;">
-        <h1 style="font-weight: 800; letter-spacing: -1px;">INSTACART</h1>
-        <p style="color: #666; margin-bottom: 25px;">Apna store manage karne aur shopping ke liye login karein</p>
+        <h1 style="margin-bottom:10px;">INSTACART</h1>
+        <p style="color:#666; margin-bottom:20px;">Welcome! Please login to continue.</p>
         <button class="login-btn" onclick="loginUser()">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20">
-            Continue with Google
+            Login with Google
         </button>
     </div>
 
     <div id="mainContent" style="display: none;">
-        
         <nav class="navbar">
             <div class="logo">INSTACART</div>
-            <button onclick="window.location.href='seller_dashboard.html'">My Store</button>
+            <div class="nav-btns">
+                <a href="seller_dashboard.html" class="btn-store"><i class="fas fa-store"></i> My Store</a>
+                <a href="cart.html" style="color:black; font-size:1.2rem;"><i class="fas fa-shopping-bag"></i></a>
+            </div>
         </nav>
 
         <div class="hero">
-            <h1>Welcome Back!</h1>
-            </div>
+            <h1 id="welcomeUser">Welcome!</h1>
+            <p>Sellers se direct kharidein ya apna store banayein.</p>
+        </div>
 
+        <div style="padding: 20px 20px 0;"><h3>Explore Products</h3></div>
+        
+        <div class="product-grid" id="allProducts">
+            <p style="color:#999;">Loading products...</p>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Aapki Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
             authDomain: "instacart-clone-91062.firebaseapp.com",
@@ -62,30 +84,48 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Page load hote hi check karein login status
+        // 1. Check Login Status
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User login hai
                 localStorage.setItem('user_uid', user.uid);
-                localStorage.setItem('user_name', user.displayName);
+                document.getElementById('welcomeUser').innerText = "Hello, " + user.displayName;
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
+                loadAllProducts(); // Products dikhao
             } else {
-                // User login nahi hai
                 document.getElementById('loginOverlay').style.display = 'flex';
                 document.getElementById('mainContent').style.display = 'none';
             }
         });
 
-        // Login Function
-        window.loginUser = function() {
-            signInWithPopup(auth, provider).catch((error) => {
-                alert("Login Error: " + error.message);
-            });
+        // 2. Load All Sellers Products
+        async function loadAllProducts() {
+            const grid = document.getElementById('allProducts');
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                grid.innerHTML = "";
+                if(querySnapshot.empty) {
+                    grid.innerHTML = "<p>Abhi koi products nahi hain.</p>";
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    grid.innerHTML += `
+                        <div class="p-card">
+                            <img src="${data.image}" class="p-img">
+                            <div class="p-info">
+                                <div class="p-name">${data.name}</div>
+                                <div class="p-price">₹${data.price}</div>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) { console.error(e); }
         }
-    </script>
 
+        window.loginUser = () => signInWithPopup(auth, provider);
+    </script>
 </body>
 </html>
