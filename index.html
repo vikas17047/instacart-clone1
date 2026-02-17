@@ -6,78 +6,133 @@
     <title>Instacart Home</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* LOGIN PAGE STYLE (Extra Layer) */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; z-index: 9999; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .login-btn {
+            background: #000; color: white; border: none; padding: 15px 30px;
+            border-radius: 30px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div style="display:flex; align-items:center;">
-            <div class="logo">Instacart</div>
-            <div class="seller-btn" onclick="window.location.href='seller_dashboard.html'">
-                <i class="fas fa-store-alt"></i> My Store
+    <div id="loginOverlay" style="display: none;">
+        <h1 style="font-weight: 900; font-size: 2.5rem; margin-bottom: 10px;">INSTACART</h1>
+        <p style="color: #666; margin-bottom: 25px;">Login to explore top creators & products</p>
+        <button class="login-btn" onclick="loginWithGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20">
+            Continue with Google
+        </button>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <nav class="navbar">
+            <div style="display:flex; align-items:center;">
+                <div class="logo">Instacart</div>
+                <div class="seller-btn" onclick="window.location.href='seller_dashboard.html'">
+                    <i class="fas fa-store-alt"></i> My Store
+                </div>
             </div>
-        </div>
-        <div class="icon-group">
-            <i class="fas fa-bell"></i>
-            <div style="position:relative;" onclick="window.location.href='cart.html'">
-                <i class="fas fa-shopping-bag"></i>
-                <span id="cartCount" style="position:absolute; top:-8px; right:-8px; background:red; color:white; font-size:0.7rem; width:15px; height:15px; border-radius:50%; display:none; align-items:center; justify-content:center;">0</span>
+            <div class="icon-group">
+                <i class="fas fa-bell"></i>
+                <div style="position:relative;" onclick="window.location.href='cart.html'">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span id="cartCount" style="position:absolute; top:-8px; right:-8px; background:red; color:white; font-size:0.7rem; width:15px; height:15px; border-radius:50%; display:none; align-items:center; justify-content:center;">0</span>
+                </div>
             </div>
+        </nav>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search brands, products...">
         </div>
-    </nav>
 
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="searchInput" placeholder="Search brands, products...">
+        <div class="hero">
+            <h2>Mega Fashion Sale</h2>
+            <p>Min 60% Off on Top Brands</p>
+            <button class="btn-shop">Explore</button>
+        </div>
+
+        <div class="section-title">Shop by Category</div>
+        <div class="horizontal-scroll">
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
+        </div>
+
+        <div class="section-title">Top Creators (52)</div>
+        <div class="creator-grid" id="creatorContainer"></div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
+            <div class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i> Profile</div>
+        </div>
     </div>
 
-    <div class="hero">
-        <h2>Mega Fashion Sale</h2>
-        <p>Min 60% Off on Top Brands</p>
-        <button class="btn-shop">Explore</button>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    <div class="section-title">Shop by Category</div>
-    <div class="horizontal-scroll">
-        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
-        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
-        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
-        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
-    </div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
 
-    <div class="section-title">Top Creators (52)</div>
-    <div class="creator-grid" id="creatorContainer"></div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
-        <div class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i> Profile</div>
-    </div>
+        // Check Login Status
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User login hai, Home page dikhao
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                loadCreators(); // Original creator list load karo
+                updateCartBadge();
+            } else {
+                // User login nahi hai, Login page dikhao
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+        });
 
-    <script>
-        const container = document.getElementById('creatorContainer');
-        const brands = ["Zara Official", "H&M Fashion", "Nike Store", "Adidas Originals", "Puma India", "Gucci"];
-        const images = ["https://randomuser.me/api/portraits/women/44.jpg", "https://randomuser.me/api/portraits/men/32.jpg", "https://randomuser.me/api/portraits/women/65.jpg", "https://randomuser.me/api/portraits/men/86.jpg"];
+        window.loginWithGoogle = () => {
+            signInWithPopup(auth, provider).catch(err => alert(err.message));
+        };
 
-        function visitStore(name, img, followers) {
-            localStorage.setItem('current_view_name', name);
-            localStorage.setItem('current_view_img', img);
-            window.location.href = 'my_store.html';
+        // --- ORIGINAL FUNCTIONS ---
+        function loadCreators() {
+            const container = document.getElementById('creatorContainer');
+            const brands = ["Zara Official", "H&M Fashion", "Nike Store", "Adidas Originals", "Puma India"];
+            const images = ["https://randomuser.me/api/portraits/women/44.jpg", "https://randomuser.me/api/portraits/men/32.jpg", "https://randomuser.me/api/portraits/women/65.jpg"];
+            
+            container.innerHTML = "";
+            for (let i = 0; i < brands.length; i++) {
+                let name = brands[i];
+                let img = images[i % images.length];
+                let followers = (Math.random() * 10 + 1).toFixed(1) + "M";
+                container.innerHTML += `
+                    <div class="seller-card" onclick="visitStore('${name}', '${img}', '${followers}')">
+                        <img src="${img}" class="seller-img">
+                        <div class="seller-name">${name}</div>
+                        <div class="seller-followers">${followers} Followers</div>
+                        <button class="btn-visit">View Store</button>
+                    </div>`;
+            }
         }
 
-        // Sellers Profile Grid
-        for (let i = 0; i < brands.length; i++) {
-            let name = brands[i];
-            let img = images[i % images.length];
-            let followers = (Math.random() * 10 + 1).toFixed(1) + "M";
-            container.innerHTML += `
-                <div class="seller-card" onclick="visitStore('${name}', '${img}', '${followers}')">
-                    <img src="${img}" class="seller-img">
-                    <div class="seller-name">${name}</div>
-                    <div class="seller-followers">${followers} Followers</div>
-                    <button class="btn-visit">View Store</button>
-                </div>`;
-        }
-
-        // Update Cart Badge
         function updateCartBadge() {
             let cart = JSON.parse(localStorage.getItem('myCart')) || [];
             let badge = document.getElementById('cartCount');
@@ -86,7 +141,6 @@
                 badge.style.display = 'flex';
             }
         }
-        window.onload = updateCartBadge;
     </script>
 </body>
 </html>
