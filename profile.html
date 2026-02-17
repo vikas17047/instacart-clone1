@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background:#f1f3f6;">
+    <div style="background:white; padding:20px; display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" style="width:70px; height:70px; border-radius:50%;">
+        <div><h2>Rahul Kumar</h2><p>+91 98765 43210</p></div>
+        <div style="margin-left:auto; color:#0c831f; font-weight:600;">Edit</div>
+    </div>
+
+    <div style="background:white; padding:15px; display:flex; text-align:center; margin-bottom:10px;">
+        <div style="flex:1;"><b>₹1,200</b><br><span style="font-size:0.8rem; color:#888;">Balance</span></div>
+        <div style="flex:1; border-left:1px solid #eee;"><b>500</b><br><span style="font-size:0.8rem; color:#888;">Coins</span></div>
+    </div>
+
+    <div onclick="window.location.href='seller_dashboard.html'" style="background:linear-gradient(90deg, #11998e, #38ef7d); padding:15px; margin:10px; border-radius:8px; color:white; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+        <div><b>Seller Dashboard</b><br><span style="font-size:0.85rem; opacity:0.9;">Manage orders & products</span></div>
+        <i class="fas fa-chevron-right"></i>
+    </div>
+
+    <div style="background:white; padding:20px; display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; text-align:center; margin-bottom:10px;">
+        <div><i class="fas fa-box" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Orders</span></div>
+        <div><i class="far fa-heart" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Wishlist</span></div>
+        <div><i class="fas fa-gift" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Refer</span></div>
+        <div><i class="fas fa-headset" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Help</span></div>
+    </div>
+
+    <div style="background:white; padding:15px; text-align:center; color:#ff3f6c; font-weight:700; cursor:pointer;">LOG OUT</div>
+
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
+        <div class="nav-item active"><i class="fas fa-user"></i> Profile</div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Default Theme: Pink (User can change this) */
+        :root { --store-color: #ff3f6c; --text-dark: #282c3f; }
+        
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background:#f5f5f6; padding-bottom:80px; }
+
+        /* HEADER */
+        .store-header { background:white; padding:15px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+        .store-hero { height:180px; background:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800') center/cover; position:relative; }
+        .store-avatar { width:85px; height:85px; border-radius:50%; border:4px solid white; position:absolute; bottom:-40px; left:20px; background:white; }
+        
+        /* INFO */
+        .store-info { padding:50px 20px 20px 20px; background:white; margin-bottom:10px; }
+        .follow-btn { float:right; margin-top:-30px; background:var(--store-color); color:white; padding:8px 25px; border-radius:20px; border:none; font-weight:600; cursor:pointer; transition:0.3s; }
+        
+        /* PRODUCTS */
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:15px; }
+        .card { background:white; border-radius:10px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.03); }
+        .add-btn { width:100%; padding:8px; margin-top:5px; background:white; border:1px solid var(--store-color); color:var(--store-color); border-radius:5px; font-weight:600; cursor:pointer; }
+        .add-btn:hover { background:var(--store-color); color:white; }
+
+        /* THEME EDITOR (Floating Tool) */
+        .theme-editor {
+            position: fixed; bottom: 20px; right: 20px;
+            background: white; padding: 10px 15px; border-radius: 50px;
+            display: flex; gap: 10px; align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 999;
+            border: 1px solid #eee;
+        }
+        .color-dot { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition:transform 0.2s; }
+        .color-dot:active { transform:scale(0.9); }
+        .editor-label { font-size:0.7rem; font-weight:700; color:#555; margin-right:5px; }
+    </style>
+</head>
+<body>
+
+    <header class="store-header">
+        <i class="fas fa-arrow-left" onclick="window.history.back()" style="cursor:pointer; font-size:1.2rem;"></i>
+        <div style="font-weight:700; color:var(--store-color); font-size:1.1rem; text-transform:uppercase;">ZARA OFFICIAL</div>
+        <div style="display:flex; gap:15px; color:#333;">
+            <i class="fas fa-search"></i>
+            <i class="fas fa-share-alt"></i>
+        </div>
+    </header>
+
+    <div class="store-hero">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" class="store-avatar">
+    </div>
+
+    <div class="store-info">
+        <button class="follow-btn">Follow</button>
+        <h2 style="margin:0; font-size:1.5rem;">Zara Official</h2>
+        <p style="color:#666; font-size:0.9rem; margin-top:5px;">⭐ 4.8 • 12.5k Followers • Fashion</p>
+        <p style="color:#888; font-size:0.85rem; margin-top:10px;">Premium quality fashion store. We sell the best outfits in India.</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400" style="width:100%; height:180px; object-fit:cover;">
+            <div style="padding:10px;">
+                <div style="font-weight:600;">Haldi Suit</div>
+                <div style="font-size:0.9rem;">₹1,299</div>
+                <button class="add-btn">ADD</button>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400" style="width:100%; height:180px; object-fit:cover;">
+            <div style="padding:10px;">
+                <div style="font-weight:600;">Sneakers</div>
+                <div style="font-size:0.9rem;">₹2,499</div>
+                <button class="add-btn">ADD</button>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1596462502278-27bfdd403348?w=400" style="width:100%; height:180px; object-fit:cover;">
+            <div style="padding:10px;">
+                <div style="font-weight:600;">Lipstick</div>
+                <div style="font-size:0.9rem;">₹499</div>
+                <button class="add-btn">ADD</button>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400" style="width:100%; height:180px; object-fit:cover;">
+            <div style="padding:10px;">
+                <div style="font-weight:600;">Leather Bag</div>
+                <div style="font-size:0.9rem;">₹1,200</div>
+                <button class="add-btn">ADD</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="theme-editor">
+        <span class="editor-label">EDIT THEME:</span>
+        <div class="color-dot" style="background:#ff3f6c;" onclick="changeTheme('#ff3f6c')"></div> <div class="color-dot" style="background:#0c831f;" onclick="changeTheme('#0c831f')"></div> <div class="color-dot" style="background:#2196f3;" onclick="changeTheme('#2196f3')"></div> <div class="color-dot" style="background:#000000;" onclick="changeTheme('#000000')"></div> </div>
+
+    <script>
+        function changeTheme(color) {
+            // CSS Variable Change se puri site ka color badal jayega
+            document.documentElement.style.setProperty('--store-color', color);
+            alert("Theme Updated! Store is looking fresh.");
+        }
+    </script>
+</body>
+</html>

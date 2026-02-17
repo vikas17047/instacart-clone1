@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f5f5f5; font-family: 'Inter', sans-serif; padding-bottom: 100px; margin:0; }
+        
+        .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; }
+        .title { font-weight: 700; text-transform: uppercase; }
+
+        .form-box { background: white; padding: 20px; margin-top: 10px; }
+        .inp-label { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; display: block; color: #555; }
+        .inp-field { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; border-radius: 4px; font-family: 'Inter'; }
+        
+        .summary-box { padding: 20px; background: white; margin-top: 10px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+
+        .btn-pay {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: black; color: white; padding: 15px; border: none;
+            font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <div class="title">Confirm Address</div>
+    </div>
+
+    <div class="form-box">
+        <label class="inp-label">Full Name</label>
+        <input type="text" id="name" class="inp-field" value="Rahul Kumar">
+
+        <label class="inp-label">Phone Number</label>
+        <input type="text" id="phone" class="inp-field" value="+91 98765 43210">
+
+        <label class="inp-label">Pincode</label>
+        <input type="text" id="pincode" class="inp-field" value="232104">
+
+        <label class="inp-label">Address (House No, Building, Street)</label>
+        <textarea id="address" class="inp-field" rows="3">123, Sakaldiha, Chandauli, Uttar Pradesh</textarea>
+
+        <label class="inp-label">City / State</label>
+        <input type="text" id="city" class="inp-field" value="Chandauli, UP">
+    </div>
+
+    <div class="summary-box">
+        <div class="row"><b>Total Items</b> <span id="itemCount">0</span></div>
+        <div class="row"><b>To Pay</b> <span id="payAmt" style="font-weight:700;">₹0</span></div>
+    </div>
+
+    <button class="btn-pay" onclick="proceedToPayment()">PROCEED TO PAYMENT</button>
+
+    <script>
+        // Load Data
+        window.onload = function() {
+            let savedAddr = localStorage.getItem('user_address');
+            if(savedAddr) document.getElementById('address').value = savedAddr;
+
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            let total = localStorage.getItem('cartTotal') || 0;
+
+            document.getElementById('itemCount').innerText = cart.length;
+            document.getElementById('payAmt').innerText = "₹" + total;
+        }
+
+        function proceedToPayment() {
+            // Save New Address
+            let newAddr = document.getElementById('address').value;
+            let name = document.getElementById('name').value;
+            
+            if(newAddr === "") { alert("Please enter address"); return; }
+            
+            localStorage.setItem('user_address', newAddr); // Save for future
+            localStorage.setItem('user_name', name);
+
+            // Go to Payment Page
+            window.location.href = 'payment.html';
+        }
+    </script>
+</body>
+</html>
