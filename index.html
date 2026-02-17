@@ -3,117 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INSTACART - Seller Dashboard</title>
+    <title>Instacart Home</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f0f2f5; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2ecc71; margin-bottom: 20px; font-size: 24px; font-weight: 800; }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        
-        .btn-add { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-add:hover { background: #27ae60; }
-
-        .product-list { margin-top: 30px; }
-        .product-card { background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; position: relative; }
-        .product-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #f9f9f9; }
-        .product-info h4 { font-size: 16px; color: #333; }
-        .product-info p { color: #2ecc71; font-weight: bold; margin-top: 2px; }
-        
-        .delete-btn { position: absolute; right: 15px; color: #ff4757; cursor: pointer; font-size: 18px; }
-    </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>INSTACART</h2>
-    
-    <div class="form-group">
-        <label>Product Name</label>
-        <input type="text" id="pName" placeholder="e.g. Fresh Tomatoes">
-    </div>
-    <div class="form-group">
-        <label>Price (₹)</label>
-        <input type="number" id="pPrice" placeholder="e.g. 40">
-    </div>
-    <div class="form-group">
-        <label>Image URL</label>
-        <input type="text" id="pImg" placeholder="Paste image link here">
-    </div>
-    <button class="btn-add" onclick="addProduct()">Add Product</button>
-
-    <div class="product-list" id="productList">
-        <h3 style="margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px;">My Products</h3>
+    <nav class="navbar">
+        <div style="display:flex; align-items:center;">
+            <div class="logo">Instacart</div>
+            <div class="seller-btn" onclick="window.location.href='seller_dashboard.html'">
+                <i class="fas fa-store-alt"></i> My Store
+            </div>
         </div>
-</div>
+        <div class="icon-group">
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-shopping-bag" onclick="window.location.href='cart.html'"></i>
+        </div>
+    </nav>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search brands, products..." onkeyup="searchProducts()">
+    </div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-        authDomain: "instacart-clone-91062.firebaseapp.com",
-        projectId: "instacart-clone-91062",
-        storageBucket: "instacart-clone-91062.firebasestorage.app",
-        messagingSenderId: "232217818928",
-        appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-    };
+    <div class="hero">
+        <h2>Mega Fashion Sale</h2>
+        <p>Min 60% Off on Top Brands</p>
+        <button class="btn-shop">Explore</button>
+    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    <div class="section-title">Shop by Category</div>
+    <div class="horizontal-scroll">
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1596462502278-27bfdd403348?w=200" class="scroll-img"><div class="scroll-txt">Beauty</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200" class="scroll-img"><div class="scroll-txt">Bags</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200" class="scroll-img"><div class="scroll-txt">Jewelry</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=200" class="scroll-img"><div class="scroll-txt">Decor</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200" class="scroll-img"><div class="scroll-txt">Tech</div></div>
+        <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?w=200" class="scroll-img"><div class="scroll-txt">Kids</div></div>
+    </div>
 
-    // Add Product Function
-    window.addProduct = async () => {
-        const name = document.getElementById('pName').value;
-        const price = document.getElementById('pPrice').value;
-        const image = document.getElementById('pImg').value;
+    <div class="section-title">Top Creators (52)</div>
+    
+    <div class="creator-grid" id="creatorContainer"></div>
 
-        if(!name || !price) return alert("Please fill details");
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i> Home
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <i class="fas fa-user"></i> Profile
+        </div>
+    </div>
 
-        try {
-            await addDoc(collection(db, "products"), {
-                name: name,
-                price: price,
-                image: image || "https://via.placeholder.com/150"
-            });
-            location.reload();
-        } catch (e) { alert("Error adding product"); }
-    }
+    <script src="script.js"></script>
 
-    // Load Products Function
-    async function loadProducts() {
-        const list = document.getElementById('productList');
-        const querySnapshot = await getDocs(collection(db, "products"));
+        <script>
+        const container = document.getElementById('creatorContainer');
+        const brands = [
+            "Zara Official", "H&M Fashion", "Nike Store", "Adidas Originals", "Puma India", 
+            "Gucci", "Prada Milan", "Louis Vuitton", "Chanel Paris", "Hermes", "Rolex Watches"
+        ];
         
-        querySnapshot.forEach((product) => {
-            const data = product.data();
-            list.innerHTML += `
-                <div class="product-card">
-                    <img src="${data.image}">
-                    <div class="product-info">
-                        <h4>${data.name}</h4>
-                        <p>₹${data.price}</p>
-                    </div>
-                    <i class="fas fa-trash delete-btn" onclick="deleteProduct('${product.id}')"></i>
+        // Random Images for diversity
+        const images = [
+            "https://randomuser.me/api/portraits/women/44.jpg", 
+            "https://randomuser.me/api/portraits/men/32.jpg",
+            "https://randomuser.me/api/portraits/women/65.jpg", 
+            "https://randomuser.me/api/portraits/men/86.jpg"
+        ];
+
+        // 1. Function to Handle Clicks
+        function visitStore(name, img, followers) {
+            // Save the clicked seller's details to browser memory
+            localStorage.setItem('current_view_name', name);
+            localStorage.setItem('current_view_img', img);
+            localStorage.setItem('current_view_followers', followers);
+            
+            // Go to the store page
+            window.location.href = 'my_store.html';
+        }
+
+        // 2. Generate Grid
+        for (let i = 0; i < brands.length; i++) {
+            let name = brands[i];
+            let img = images[i % images.length];
+            let followers = (Math.random() * 10 + 1).toFixed(1) + "M"; // Random followers e.g. 5.2M
+
+            // Note the onclick function here:
+            container.innerHTML += `
+                <div class="seller-card" onclick="visitStore('${name}', '${img}', '${followers}')">
+                    <img src="${img}" class="seller-img">
+                    <div class="seller-name">${name}</div>
+                    <div class="seller-followers">${followers} Followers</div>
+                    <button class="btn-visit">View Store</button>
                 </div>
             `;
-        });
-    }
-
-    window.deleteProduct = async (id) => {
-        if(confirm("Delete this product?")) {
-            await deleteDoc(doc(db, "products", id));
-            location.reload();
         }
-    }
-
-    loadProducts();
-</script>
-
+    </script>
 </body>
 </html>
+
+
