@@ -6,39 +6,84 @@
     <title>Instacart - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #f8f9fa; }
-        #loginOverlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .login-btn { background: #4285F4; color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .navbar { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .btn-seller { background: black; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 0.8rem; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f8f9fa; color: #333; }
+
+        /* Navbar Design */
+        .navbar { 
+            background: white; 
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #eee; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: #2ecc71; text-decoration: none; }
+        
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .btn-seller { 
+            background: #000; 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+        }
+
+        /* Hero Section */
+        .hero { background: white; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee; }
+        .hero h1 { font-size: 2rem; color: #111; }
+        .hero p { color: #666; margin-top: 10px; }
+
+        /* Product Grid */
+        .section-title { padding: 20px 20px 10px; font-size: 1.2rem; font-weight: 700; }
+        .product-grid { 
+            padding: 0 15px 20px; 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
+        }
+        .p-card { 
+            background: white; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid #eee; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
+        .p-img { width: 100%; height: 140px; background: #f9f9f9; object-fit: cover; }
+        .p-info { padding: 12px; }
+        .p-name { font-weight: 600; font-size: 0.95rem; }
+        .p-price { color: #2ecc71; font-weight: 700; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="loginOverlay" style="display: none;">
-        <h1 style="color:#2ecc71; font-size: 2.5rem;">INSTACART</h1>
-        <p style="margin: 10px 0 20px; color: #666;">Aage badhne ke liye login karein</p>
-        <button class="login-btn" onclick="loginWithGoogle()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20">
-            Login with Google
-        </button>
+    <nav class="navbar">
+        <a href="index.html" class="logo">INSTACART</a>
+        <div class="nav-right">
+            <a href="seller_dashboard.html" class="btn-seller"><i class="fas fa-store"></i> My Store</a>
+            <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Welcome to Instacart</h1>
+        <p>Sellers se direct products kharidein ya apna store banayein.</p>
     </div>
 
-    <div id="mainContent" style="display: none;">
-        <nav class="navbar">
-            <b style="font-size: 1.2rem;">INSTACART</b>
-            <a href="./seller_dashboard.html" class="btn-seller">My Store</a>
-        </nav>
-        <div style="padding: 40px; text-align: center;">
-            <h2 id="userNameDisplay">Welcome!</h2>
-            <p style="margin-top: 10px; color: #888;">Shop products or manage your store.</p>
-        </div>
+    <div class="section-title">Latest Products</div>
+
+    <div class="product-grid" id="allProducts">
+        <p style="grid-column: span 2; text-align: center; padding: 50px; color: #999;">Products load ho rahe hain...</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -50,33 +95,34 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        const db = getFirestore(app);
 
-        // **DUBLE PROTECTION**: Login ko browser ki memory mein lock karna
-        setPersistence(auth, browserLocalPersistence);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("User Logged In");
-                localStorage.setItem('user_uid', user.uid);
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                document.getElementById('userNameDisplay').innerText = "Hello, " + user.displayName;
-            } else {
-                console.log("No User Found");
-                document.getElementById('loginOverlay').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'none';
+        async function loadProducts() {
+            const grid = document.getElementById('allProducts');
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                grid.innerHTML = "";
+                if(querySnapshot.empty) {
+                    grid.innerHTML = "<p style='grid-column: span 2; text-align: center;'>Koi product nahi mila.</p>";
+                    return;
+                }
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    grid.innerHTML += `
+                        <div class="p-card">
+                            <img src="${data.image || 'https://via.placeholder.com/150'}" class="p-img">
+                            <div class="p-info">
+                                <div class="p-name">${data.name}</div>
+                                <div class="p-price">₹${data.price}</div>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) {
+                grid.innerHTML = "<p>Error loading products.</p>";
             }
-        });
-
-        window.loginWithGoogle = function() {
-            signInWithPopup(auth, provider).then((result) => {
-                location.reload();
-            }).catch((err) => {
-                alert("Login Error: " + err.message + "\nKripya check karein ki cookies enabled hain.");
-            });
         }
+
+        loadProducts();
     </script>
 </body>
 </html>
