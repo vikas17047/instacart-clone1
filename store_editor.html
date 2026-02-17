@@ -3,132 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Editor</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Edit Store - Free Version</title>
+    <script>window.onerror = function(msg, url, line) { alert("Error: " + msg + "\nLine: " + line); }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { padding-bottom: 100px; background: #f8f9fa; }
-        .editor-section { background: white; padding: 20px; margin: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .lbl { font-size: 0.85rem; font-weight: 700; color: #555; margin-bottom: 8px; display: block; text-transform: uppercase; }
-        .inp, .select-box { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; margin-bottom: 15px; background: #fff; font-size: 0.95rem; }
-        
-        /* FIX: Colors visible clearly */
-        .color-row { 
-            display: flex; gap: 15px; margin-top: 10px; 
-            flex-wrap: wrap; /* Allows wrapping if screen is small */
-        }
-        .color-circle { 
-            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; 
-            border: 2px solid #ddd; /* Light grey border so light colors are visible */
-            transition: transform 0.2s; 
-        }
-        .color-circle:hover { transform: scale(1.1); }
-        .color-circle.active { 
-            border: 3px solid #000; /* Selected border */
-            transform: scale(1.1); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .save-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        body { padding-bottom: 100px; background: #f8f9fa; font-family: sans-serif; margin: 0; }
+        .navbar { background: white; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
+        .editor-section { background: white; padding: 20px; margin: 15px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .lbl { font-size: 0.85rem; font-weight: 700; color: #555; display: block; margin-bottom: 8px; }
+        .inp { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        .upload-box { border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; background: #fafafa; margin-bottom: 15px; }
+        .preview-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; display: none; margin-top: 10px; }
+        .save-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; display: flex; gap: 10px; border-top: 1px solid #eee; box-sizing: border-box; }
+        .btn-shop { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-            <b>Store Editor</b>
-        </div>
+        <i class="fas fa-arrow-left" onclick="window.location.href='seller_dashboard.html'"></i>
+        <b>Store Settings (Free)</b>
     </nav>
 
     <div class="editor-section">
-        <h3 style="margin-bottom:15px; font-size:1.1rem;">Store Identity</h3>
+        <h3>Basic Info</h3>
         <label class="lbl">Store Name</label>
-        <input type="text" id="sName" class="inp" placeholder="e.g. Rahul Fashion">
-        
+        <input type="text" id="sName" class="inp" placeholder="My Awesome Store">
         <label class="lbl">Tagline</label>
-        <textarea id="sDesc" class="inp" rows="2" placeholder="e.g. Best quality clothes..."></textarea>
+        <input type="text" id="sDesc" class="inp" placeholder="Best fashion store...">
     </div>
 
     <div class="editor-section">
-        <h3 style="margin-bottom:15px; font-size:1.1rem;">Look & Feel</h3>
-        
-        <label class="lbl">Product Layout</label>
-        <select id="sLayout" class="select-box">
-            <option value="grid">Grid View (2 Columns)</option>
-            <option value="list">List View (Instagram Style)</option>
-        </select>
-
-        <label class="lbl">Font Style</label>
-        <select id="sFont" class="select-box">
-            <option value="Inter">Modern (Clean & Simple)</option>
-            <option value="Playfair Display">Classic (Luxury)</option>
-            <option value="Courier Prime">Retro</option>
-        </select>
-
-        <label class="lbl">Brand Color</label>
-        <div class="color-row">
-            <div class="color-circle" style="background:#000000;" onclick="pickColor('#000000', this)"></div>
-            <div class="color-circle" style="background:#ff3f6c;" onclick="pickColor('#ff3f6c', this)"></div>
-            <div class="color-circle" style="background:#0c831f;" onclick="pickColor('#0c831f', this)"></div>
-            <div class="color-circle" style="background:#2196f3;" onclick="pickColor('#2196f3', this)"></div>
-            <div class="color-circle" style="background:#ff9800;" onclick="pickColor('#ff9800', this)"></div>
+        <h3>Visuals (Direct Upload)</h3>
+        <label class="lbl">Banner Image</label>
+        <div class="upload-box" onclick="document.getElementById('bannerInput').click()">
+            <i class="fas fa-image"></i> Click to Choose Banner
+            <input type="file" id="bannerInput" hidden accept="image/*" onchange="encodeImageFileAsURL(this, 'bannerPreview')">
+            <img id="bannerPreview" class="preview-img">
         </div>
-        <input type="hidden" id="selectedColor" value="#000000">
-    </div>
-
-    <div class="editor-section">
-        <h3 style="margin-bottom:15px; font-size:1.1rem;">Visuals</h3>
-        <label class="lbl">Banner Image URL</label>
-        <input type="text" id="sBanner" class="inp" placeholder="https://...">
     </div>
 
     <div class="save-bar">
-        <button class="btn-shop" style="background:#eee; color:#333; flex:1;" onclick="window.history.back()">Cancel</button>
-        <button class="btn-shop" style="flex:2; background:black; color:white;" onclick="saveSettings()">Save Changes</button>
+        <button class="btn-shop" style="background:black; color:white;" onclick="saveStore()">SAVE & PUBLISH</button>
     </div>
 
-    <script>
-        window.onload = function() {
-            if(localStorage.getItem('store_name')) document.getElementById('sName').value = localStorage.getItem('store_name');
-            if(localStorage.getItem('store_desc')) document.getElementById('sDesc').value = localStorage.getItem('store_desc');
-            if(localStorage.getItem('store_banner')) document.getElementById('sBanner').value = localStorage.getItem('store_banner');
-            
-            if(localStorage.getItem('store_layout')) document.getElementById('sLayout').value = localStorage.getItem('store_layout');
-            if(localStorage.getItem('store_font')) document.getElementById('sFont').value = localStorage.getItem('store_font');
-            
-            let savedColor = localStorage.getItem('store_color') || '#000000';
-            document.getElementById('selectedColor').value = savedColor;
-            
-            // Highlight selected color visually
-            document.querySelectorAll('.color-circle').forEach(c => {
-                c.classList.remove('active');
-                // Simple check for hex match or RGB
-                if(c.style.backgroundColor.includes('rgb(0, 0, 0)') && savedColor === '#000000') c.classList.add('active');
-                if(c.style.backgroundColor.includes('rgb(255, 63, 108)') && savedColor === '#ff3f6c') c.classList.add('active');
-                // Default fallback
-                if(savedColor === '#000000' && c.style.backgroundColor === '') c.classList.add('active');
-            });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Demo User ID (Jab tak login fully setup na ho)
+        const sellerId = localStorage.getItem('seller_uid') || "demo-seller-123";
+
+        let base64Banner = "";
+
+        // Function: Image ko Code (Base64) me badalna
+        window.encodeImageFileAsURL = function(element, imgId) {
+            var file = element.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                base64Banner = reader.result;
+                document.getElementById(imgId).src = reader.result;
+                document.getElementById(imgId).style.display = 'block';
+            }
+            reader.readAsDataURL(file);
         }
 
-        function pickColor(color, elem) {
-            document.getElementById('selectedColor').value = color;
-            document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
-            elem.classList.add('active');
-        }
+        window.saveStore = async function() {
+            const btn = document.querySelector('.btn-shop');
+            btn.innerText = "Saving to Cloud...";
+            btn.disabled = true;
 
-        function saveSettings() {
-            localStorage.setItem('store_name', document.getElementById('sName').value);
-            localStorage.setItem('store_desc', document.getElementById('sDesc').value);
-            localStorage.setItem('store_layout', document.getElementById('sLayout').value);
-            localStorage.setItem('store_font', document.getElementById('sFont').value);
-            localStorage.setItem('store_color', document.getElementById('selectedColor').value);
-            localStorage.setItem('store_banner', document.getElementById('sBanner').value);
+            const name = document.getElementById('sName').value;
+            const desc = document.getElementById('sDesc').value;
 
-            alert("Store Updated!");
-            window.location.href = 'my_store.html'; 
+            try {
+                // Save directly to Firestore (No Storage needed!)
+                await setDoc(doc(db, "sellers", sellerId), {
+                    storeName: name,
+                    storeDesc: desc,
+                    bannerUrl: base64Banner, // Ye pura image code hai
+                    sellerId: sellerId
+                }, { merge: true });
+
+                alert("Settings Saved FREE on Cloud!");
+                window.location.href = 'my_store.html';
+            } catch (error) {
+                alert("Save Failed: " + error.message);
+                btn.innerText = "TRY AGAIN";
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
 </html>
-
