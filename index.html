@@ -6,46 +6,22 @@
     <title>Instacart - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f4f7f6; color: #333; }
-
-        /* 1. Login Screen (Parda) */
-        #loginOverlay {
-            position: fixed; inset: 0; background: white; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .login-btn {
-            background: #4285F4; color: white; border: none; padding: 12px 25px;
-            border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        /* 2. Home Page Layout */
-        .navbar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 1.4rem; font-weight: 800; color: #000; text-decoration: none; }
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-        
-        /* My Store Button */
-        .btn-seller { background: #000; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .btn-seller:hover { background: #333; }
-
-        .hero { background: white; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee; }
-        .hero h1 { font-size: 2rem; margin-bottom: 10px; color: #111; }
-        .hero p { color: #666; font-size: 0.95rem; }
-
-        .product-grid { padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .p-img { width: 100%; height: 140px; background: #fafafa; object-fit: cover; border-bottom: 1px solid #f5f5f5; }
-        .p-info { padding: 12px; }
-        .p-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 5px; }
-        .p-price { color: #27ae60; font-weight: 700; font-size: 0.9rem; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #f8f9fa; }
+        #loginOverlay { position: fixed; inset: 0; background: white; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .login-btn { background: #4285F4; color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .navbar { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
+        .btn-seller { background: black; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 0.8rem; }
+        .hero { padding: 30px; text-align: center; background: white; border-bottom: 1px solid #eee; }
+        .product-grid { padding: 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .p-card { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; padding: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="loginOverlay" style="display: none;">
-        <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 10px;">INSTACART</div>
-        <p style="color:#666; margin-bottom:25px; text-align: center; padding: 0 20px;">Apna store manage karne aur shopping ke liye login karein.</p>
+    <div id="loginOverlay">
+        <h1 style="color:#2ecc71;">INSTACART</h1>
+        <p style="margin: 10px 0 20px; color: #666;">Continue karne ke liye login karein</p>
         <button class="login-btn" onclick="loginUser()">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20">
             Login with Google
@@ -54,31 +30,23 @@
 
     <div id="mainContent" style="display: none;">
         <nav class="navbar">
-            <a href="index.html" class="logo">INSTACART</a>
-            <div class="nav-right">
-                <a href="./seller_dashboard.html" class="btn-seller"><i class="fas fa-store"></i> My Store</a>
-                <a href="#" style="color:black;"><i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i></a>
-            </div>
+            <b style="font-size: 1.2rem;">INSTACART</b>
+            <a href="seller_dashboard.html" class="btn-seller">My Store</a>
         </nav>
-
         <div class="hero">
-            <h1 id="welcomeUser">Welcome!</h1>
-            <p>Direct sellers se judiye aur behtareen deals paiye.</p>
+            <h2 id="userName">Hello!</h2>
+            <p>Direct sellers se products kharidein.</p>
         </div>
-
-        <h3 style="padding: 20px 20px 0;">All Products</h3>
-        
         <div class="product-grid" id="allProducts">
-             <p style="text-align:center; grid-column: span 2; color:#999; padding:50px;">Products load ho rahe hain...</p>
+            <p style="grid-column: span 2; text-align: center; color: #999;">Products load ho rahe hain...</p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
             authDomain: "instacart-clone-91062.firebaseapp.com",
@@ -93,55 +61,41 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // 1. Authentication Status Check
+        // Login Status Check
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User login hai
+                // Agar user login hai, toh seedha content dikhao
                 localStorage.setItem('user_uid', user.uid);
-                document.getElementById('welcomeUser').innerText = "Hello, " + user.displayName;
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
-                loadAllProducts(); // Products load karein
+                document.getElementById('userName').innerText = "Hello, " + user.displayName;
+                loadProducts();
             } else {
-                // User login nahi hai
+                // Agar login nahi hai, toh login screen dikhao
                 document.getElementById('loginOverlay').style.display = 'flex';
                 document.getElementById('mainContent').style.display = 'none';
             }
         });
 
-        // Redirect result handle karein
-        getRedirectResult(auth).catch(err => console.error(err.message));
-
-        // 2. Load Products Function
-        async function loadAllProducts() {
-            const grid = document.getElementById('allProducts');
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                grid.innerHTML = "";
-                if(querySnapshot.empty) {
-                    grid.innerHTML = "<p style='grid-column: span 2; text-align: center;'>Abhi koi products nahi hain.</p>";
-                    return;
-                }
-                querySnapshot.forEach((doc) => {
-                    let data = doc.data();
-                    grid.innerHTML += `
-                        <div class="p-card">
-                            <img src="${data.image || 'https://via.placeholder.com/150'}" class="p-img">
-                            <div class="p-info">
-                                <div class="p-name">${data.name}</div>
-                                <div class="p-price">₹${data.price}</div>
-                            </div>
-                        </div>`;
-                });
-            } catch (e) { 
-                grid.innerHTML = "<p>Loading error...</p>";
-            }
+        // Login Function (Ab ye popup use karega)
+        window.loginUser = function() {
+            signInWithPopup(auth, provider).then((result) => {
+                localStorage.setItem('user_uid', result.user.uid);
+            }).catch((err) => alert("Error: " + err.message));
         }
 
-        // 3. Login Trigger
-        window.loginUser = () => {
-            signInWithRedirect(auth, provider);
-        };
+        // Load Products
+        async function loadProducts() {
+            const grid = document.getElementById('allProducts');
+            try {
+                const snap = await getDocs(collection(db, "products"));
+                grid.innerHTML = "";
+                snap.forEach(doc => {
+                    let d = doc.data();
+                    grid.innerHTML += `<div class="p-card"><b>${d.name}</b><br>₹${d.price}</div>`;
+                });
+            } catch(e) { grid.innerHTML = "Products nahi mil rahe."; }
+        }
     </script>
 </body>
 </html>
