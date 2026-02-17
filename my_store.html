@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<head>
     <script>window.onerror = function(msg, url, line) { alert("Error: " + msg + "\nLine: " + line); }</script>
-    
-    <meta charset="UTF-8">
-    ... (baaki code)
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -197,23 +193,4 @@
         }
 
         window.addToCart = function(name, price, img) {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            cart.push({ name, price, img, qty: 1 });
-            localStorage.setItem('myCart', JSON.stringify(cart));
-            updateCartCount();
-            document.getElementById('cartPopup').style.display = 'flex';
-        }
-
-        window.closePopup = function() { document.getElementById('cartPopup').style.display = 'none'; }
-
-        window.updateCartCount = function() {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            let badge = document.getElementById('cartCount');
-            if(cart.length > 0) {
-                badge.innerText = cart.length;
-                badge.style.display = 'flex';
-            }
-        }
-    </script>
-</body>
-</html>
+            let cart
