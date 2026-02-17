@@ -1,257 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Inventory</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { background: #f2f5f8; padding-bottom: 90px; }
+<script type="module">
+    // 1. Firebase Imports (Internet se connection)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // 2. Aapki Keys (Jo aapne copy ki thi)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+      authDomain: "instacart-clone-91062.firebaseapp.com",
+      projectId: "instacart-clone-91062",
+      storageBucket: "instacart-clone-91062.firebasestorage.app",
+      messagingSenderId: "232217818928",
+      appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+    };
+
+    // 3. Start Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 4. Modal Functions (Popup kholne/band karne ke liye)
+    window.openModal = function() { document.getElementById('addModal').style.display = 'flex'; }
+    window.closeModal = function() { document.getElementById('addModal').style.display = 'none'; }
+    
+    // File Name Dikhana
+    window.updateFileLabel = function(inputId, labelId, limit) {
+        const input = document.getElementById(inputId);
+        const label = document.getElementById(labelId);
+        if (input.files.length > 0) {
+            label.innerText = `${input.files.length} file(s) selected`;
+            label.style.color = "green";
+        }
+    }
+
+    // 5. MAIN FUNCTION: Product Save Karna
+    window.addProduct = async function() {
+        const btn = document.querySelector('.save-btn');
+        btn.innerText = "Saving..."; 
+        btn.disabled = true;
+
+        let title = document.getElementById('newTitle').value;
+        let price = document.getElementById('newPrice').value;
+        let desc = document.getElementById('newDesc').value;
         
-        /* HEADER (Black Theme) */
-        .page-header {
-            background: white; padding: 15px; position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-bottom: 1px solid #eee;
-        }
-
-        /* PRODUCT LIST ITEM */
-        .prod-item {
-            background: white; padding: 15px; margin: 10px 15px; border-radius: 0; /* Sharp Edges */
-            display: flex; gap: 15px; align-items: flex-start;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid #eee;
-        }
-        .prod-img {
-            width: 70px; height: 70px; object-fit: cover;
-            border: 1px solid #f0f0f0; background: #f9f9f9;
-        }
-        .prod-info { flex: 1; }
-        .prod-title { font-weight: 700; font-size: 1rem; color: black; margin-bottom: 2px; }
-        .prod-desc { font-size: 0.8rem; color: #777; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .prod-price { color: black; font-weight: 600; font-size: 0.9rem; }
-        .media-badge { font-size: 0.7rem; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; color: #555; margin-left: 5px; }
-
-        /* STOCK TOGGLE SWITCH (Black) */
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; margin-top: 5px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc; transition: .4s; border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
-            background-color: white; transition: .4s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: black; }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-        /* FLOATING ADD BUTTON (Black) */
-        .fab-btn {
-            position: fixed; bottom: 25px; right: 25px;
-            background: black; color: white; width: 60px; height: 60px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            cursor: pointer; z-index: 1000; border: none;
-        }
-
-        /* MODAL (Add Product Form) */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end;
-        }
-        .modal-content {
-            background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0;
-            animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        // Dummy Image (Kyunki real upload ke liye Storage setup karna padega)
+        let imgUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400"; 
         
-        .form-label { display: block; font-size: 0.85rem; font-weight: 700; color: #333; margin-bottom: 8px; margin-top: 15px; text-transform: uppercase; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 0; outline: none; font-size: 1rem; background: #f9f9f9; }
-        .form-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 0; outline: none; font-size: 0.95rem; background: #f9f9f9; resize: none; font-family: sans-serif; }
-        
-        /* File Upload Buttons */
-        .file-upload-box {
-            border: 2px dashed #ccc; padding: 20px; text-align: center; cursor: pointer;
-            margin-top: 5px; background: #fafafa;
+        if(title === "" || price === "") {
+            alert("Please enter Name and Price");
+            btn.innerText = "SAVE PRODUCT";
+            btn.disabled = false;
+            return;
         }
-        .file-upload-box i { font-size: 1.5rem; color: #888; margin-bottom: 5px; }
-        .file-upload-box p { font-size: 0.8rem; color: #555; margin: 0; }
-        
-        .save-btn {
-            width: 100%; background: black; color: white; padding: 15px;
-            border: none; border-radius: 0; font-weight: 700; margin-top: 25px; font-size: 1rem; text-transform: uppercase;
-        }
-        .delete-icon { color: #ff3f6c; padding: 10px; cursor: pointer; font-size: 1.1rem; }
-    </style>
-</head>
-<body>
 
-    <div class="page-header">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <i class="fas fa-arrow-left" onclick="window.history.back()" style="cursor:pointer; font-size:1.2rem;"></i>
-            <h2 style="font-size:1.1rem; margin:0; font-weight:700; text-transform:uppercase;">Inventory</h2>
-        </div>
-        <i class="fas fa-search" style="color:#333;"></i>
-    </div>
-
-    <div id="productList">
-        <div class="prod-item">
-            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=100" class="prod-img">
-            <div class="prod-info">
-                <div class="prod-title">Yellow Haldi Suit</div>
-                <div class="prod-desc">Premium cotton suit for weddings and festivals. Comes with dupatta.</div>
-                <div class="prod-price">₹1,299 <span class="media-badge"><i class="fas fa-image"></i> 4</span></div>
-            </div>
-            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-                <i class="far fa-trash-alt delete-icon" onclick="removeProduct(this)"></i>
-            </div>
-        </div>
-    </div>
-
-    <button class="fab-btn" onclick="openModal()">
-        <i class="fas fa-plus"></i>
-    </button>
-
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="margin:0; text-transform:uppercase;">Add Product</h3>
-                <i class="fas fa-times" onclick="closeModal()" style="font-size:1.5rem; color:#888; cursor:pointer;"></i>
-            </div>
-
-            <label class="form-label">Product Name</label>
-            <input type="text" id="newTitle" class="form-input" placeholder="e.g. Black Denim Jacket">
-
-            <div style="display:flex; gap:15px;">
-                <div style="flex:1;">
-                    <label class="form-label">Price (₹)</label>
-                    <input type="number" id="newPrice" class="form-input" placeholder="999">
-                </div>
-                <div style="flex:1;">
-                    <label class="form-label">Stock Qty</label>
-                    <input type="number" id="newStock" class="form-input" placeholder="10">
-                </div>
-            </div>
-
-            <label class="form-label">Description</label>
-            <textarea id="newDesc" class="form-textarea" rows="3" placeholder="Write details about fabric, size, fit..."></textarea>
-
-            <label class="form-label">Product Images (Max 4)</label>
-            <div class="file-upload-box" onclick="document.getElementById('imgInput').click()">
-                <i class="fas fa-camera"></i>
-                <p id="imgLabel">Click to upload photos</p>
-                <input type="file" id="imgInput" multiple accept="image/*" style="display:none" onchange="updateFileLabel('imgInput', 'imgLabel', 4)">
-            </div>
-
-            <label class="form-label">Product Video (Max 1)</label>
-            <div class="file-upload-box" onclick="document.getElementById('vidInput').click()">
-                <i class="fas fa-video"></i>
-                <p id="vidLabel">Click to upload video</p>
-                <input type="file" id="vidInput" accept="video/*" style="display:none" onchange="updateFileLabel('vidInput', 'vidLabel', 1)">
-            </div>
-
-            <button class="save-btn" onclick="addProduct()">SAVE PRODUCT</button>
-        </div>
-    </div>
-
-    <script>
-        function openModal() { document.getElementById('addModal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('addModal').style.display = 'none'; }
-        
-        // Show file names after selection
-        function updateFileLabel(inputId, labelId, limit) {
-            const input = document.getElementById(inputId);
-            const label = document.getElementById(labelId);
+        try {
+            // Data Cloud par bhejna
+            await addDoc(collection(db, "products"), {
+                name: title,
+                price: price,
+                desc: desc,
+                image: imgUrl,
+                date: new Date()
+            });
             
-            if (input.files.length > limit) {
-                alert(`You can only upload ${limit} files!`);
-                input.value = ""; // Clear
-                label.innerText = "Click to upload";
-            } else if (input.files.length > 0) {
-                label.innerText = `${input.files.length} file(s) selected`;
-                label.style.color = "green";
-                label.style.fontWeight = "bold";
-            }
-        }
-
-        function addProduct() {
-            // Get Values
-            let title = document.getElementById('newTitle').value;
-            let price = document.getElementById('newPrice').value;
-            let desc = document.getElementById('newDesc').value;
-            let stock = document.getElementById('newStock').value || 0;
-            
-            // Files Handling
-            let imgInput = document.getElementById('imgInput');
-            let vidInput = document.getElementById('vidInput');
-            
-            // Basic Validation
-            if(title === "" || price === "") {
-                alert("Please enter Product Name and Price");
-                return;
-            }
-
-            // Image Preview Logic (Use the first uploaded image)
-            let displayImg = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100"; // Fallback
-            let imgCount = 0;
-            let hasVideo = vidInput.files.length > 0;
-
-            if (imgInput.files && imgInput.files[0]) {
-                // Create a fake URL for the uploaded file to show it immediately
-                displayImg = URL.createObjectURL(imgInput.files[0]);
-                imgCount = imgInput.files.length;
-            }
-
-            // Create Badge Text (e.g., "4 Images + Video")
-            let badgeHtml = "";
-            if(imgCount > 0) badgeHtml += `<span class="media-badge"><i class="fas fa-image"></i> ${imgCount}</span>`;
-            if(hasVideo) badgeHtml += `<span class="media-badge"><i class="fas fa-video"></i> 1</span>`;
-
-            // HTML for New Product
-            let newItem = `
-                <div class="prod-item">
-                    <img src="${displayImg}" class="prod-img">
-                    <div class="prod-info">
-                        <div class="prod-title">${title}</div>
-                        <div class="prod-desc">${desc || "No description provided."}</div>
-                        <div class="prod-price">₹${price} ${badgeHtml}</div>
-                    </div>
-                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                        <i class="far fa-trash-alt delete-icon" onclick="removeProduct(this)"></i>
-                    </div>
-                </div>
-            `;
-
-            // Add to List
-            document.getElementById('productList').insertAdjacentHTML('afterbegin', newItem);
-            
-            // Clean up
+            alert("Product Live Ho Gaya!");
             closeModal();
-            // Reset fields
-            document.getElementById('newTitle').value = "";
-            document.getElementById('newPrice').value = "";
-            document.getElementById('newDesc').value = "";
-            document.getElementById('imgInput').value = "";
-            document.getElementById('vidInput').value = "";
-            document.getElementById('imgLabel').innerText = "Click to upload photos";
+            location.reload(); 
             
-            alert("Product Added Successfully!");
+        } catch (e) {
+            console.error("Error:", e);
+            alert("Error: " + e.message);
         }
-
-        function removeProduct(element) {
-            if(confirm("Are you sure you want to delete this product?")) {
-                element.parentElement.parentElement.remove();
-            }
-        }
-    </script>
-</body>
-</html>
+        
+        btn.innerText = "SAVE PRODUCT";
+        btn.disabled = false;
+    }
+</script>
