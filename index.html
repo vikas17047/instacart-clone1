@@ -3,126 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instacart - Home</title>
+    <title>INSTACART - Seller Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f8f9fa; color: #333; }
-
-        /* Navbar Design */
-        .navbar { 
-            background: white; 
-            padding: 15px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid #eee; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-        }
-        .logo { font-size: 1.5rem; font-weight: 800; color: #2ecc71; text-decoration: none; }
+        body { background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2ecc71; margin-bottom: 20px; font-size: 24px; font-weight: 800; }
         
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-        .btn-seller { 
-            background: #000; 
-            color: white; 
-            padding: 8px 15px; 
-            border-radius: 20px; 
-            text-decoration: none; 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        
+        .btn-add { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-add:hover { background: #27ae60; }
 
-        /* Hero Section */
-        .hero { background: white; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee; }
-        .hero h1 { font-size: 2rem; color: #111; }
-        .hero p { color: #666; margin-top: 10px; }
-
-        /* Product Grid */
-        .section-title { padding: 20px 20px 10px; font-size: 1.2rem; font-weight: 700; }
-        .product-grid { 
-            padding: 0 15px 20px; 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; 
-        }
-        .p-card { 
-            background: white; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            border: 1px solid #eee; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-        }
-        .p-img { width: 100%; height: 140px; background: #f9f9f9; object-fit: cover; }
-        .p-info { padding: 12px; }
-        .p-name { font-weight: 600; font-size: 0.95rem; }
-        .p-price { color: #2ecc71; font-weight: 700; margin-top: 5px; }
+        .product-list { margin-top: 30px; }
+        .product-card { background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; position: relative; }
+        .product-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #f9f9f9; }
+        .product-info h4 { font-size: 16px; color: #333; }
+        .product-info p { color: #2ecc71; font-weight: bold; margin-top: 2px; }
+        
+        .delete-btn { position: absolute; right: 15px; color: #ff4757; cursor: pointer; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="index.html" class="logo">INSTACART</a>
-        <div class="nav-right">
-            <a href="seller_dashboard.html" class="btn-seller"><i class="fas fa-store"></i> My Store</a>
-            <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
+<div class="container">
+    <h2>INSTACART</h2>
+    
+    <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="pName" placeholder="e.g. Fresh Tomatoes">
+    </div>
+    <div class="form-group">
+        <label>Price (₹)</label>
+        <input type="number" id="pPrice" placeholder="e.g. 40">
+    </div>
+    <div class="form-group">
+        <label>Image URL</label>
+        <input type="text" id="pImg" placeholder="Paste image link here">
+    </div>
+    <button class="btn-add" onclick="addProduct()">Add Product</button>
+
+    <div class="product-list" id="productList">
+        <h3 style="margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px;">My Products</h3>
         </div>
-    </nav>
+</div>
 
-    <div class="hero">
-        <h1>Welcome to Instacart</h1>
-        <p>Sellers se direct products kharidein ya apna store banayein.</p>
-    </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <div class="section-title">Latest Products</div>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+        authDomain: "instacart-clone-91062.firebaseapp.com",
+        projectId: "instacart-clone-91062",
+        storageBucket: "instacart-clone-91062.firebasestorage.app",
+        messagingSenderId: "232217818928",
+        appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+    };
 
-    <div class="product-grid" id="allProducts">
-        <p style="grid-column: span 2; text-align: center; padding: 50px; color: #999;">Products load ho rahe hain...</p>
-    </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    // Add Product Function
+    window.addProduct = async () => {
+        const name = document.getElementById('pName').value;
+        const price = document.getElementById('pPrice').value;
+        const image = document.getElementById('pImg').value;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-            authDomain: "instacart-clone-91062.firebaseapp.com",
-            projectId: "instacart-clone-91062",
-            storageBucket: "instacart-clone-91062.firebasestorage.app",
-            messagingSenderId: "232217818928",
-            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-        };
+        if(!name || !price) return alert("Please fill details");
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        try {
+            await addDoc(collection(db, "products"), {
+                name: name,
+                price: price,
+                image: image || "https://via.placeholder.com/150"
+            });
+            location.reload();
+        } catch (e) { alert("Error adding product"); }
+    }
 
-        async function loadProducts() {
-            const grid = document.getElementById('allProducts');
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                grid.innerHTML = "";
-                if(querySnapshot.empty) {
-                    grid.innerHTML = "<p style='grid-column: span 2; text-align: center;'>Koi product nahi mila.</p>";
-                    return;
-                }
-                querySnapshot.forEach((doc) => {
-                    let data = doc.data();
-                    grid.innerHTML += `
-                        <div class="p-card">
-                            <img src="${data.image || 'https://via.placeholder.com/150'}" class="p-img">
-                            <div class="p-info">
-                                <div class="p-name">${data.name}</div>
-                                <div class="p-price">₹${data.price}</div>
-                            </div>
-                        </div>`;
-                });
-            } catch (e) {
-                grid.innerHTML = "<p>Error loading products.</p>";
-            }
+    // Load Products Function
+    async function loadProducts() {
+        const list = document.getElementById('productList');
+        const querySnapshot = await getDocs(collection(db, "products"));
+        
+        querySnapshot.forEach((product) => {
+            const data = product.data();
+            list.innerHTML += `
+                <div class="product-card">
+                    <img src="${data.image}">
+                    <div class="product-info">
+                        <h4>${data.name}</h4>
+                        <p>₹${data.price}</p>
+                    </div>
+                    <i class="fas fa-trash delete-btn" onclick="deleteProduct('${product.id}')"></i>
+                </div>
+            `;
+        });
+    }
+
+    window.deleteProduct = async (id) => {
+        if(confirm("Delete this product?")) {
+            await deleteDoc(doc(db, "products", id));
+            location.reload();
         }
+    }
 
-        loadProducts();
-    </script>
+    loadProducts();
+</script>
+
 </body>
 </html>
