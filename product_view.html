@@ -3,108 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details</title>
+    <title>Product View</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: #f9f9f9; padding-bottom: 100px; }
 
-        /* HEADER */
-        .p-header {
-            position: absolute; top: 0; left: 0; width: 100%; padding: 15px;
-            display: flex; justify-content: space-between; z-index: 10;
-        }
-        .icon-btn {
-            background: white; width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); cursor: pointer; color: black;
-        }
-        .cart-badge-wrapper { position: relative; }
-        .cart-count {
-            position: absolute; top: -5px; right: -5px; background: red; color: white;
-            font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-weight: 700;
-        }
-
-        /* IMAGE AREA */
-        .image-container {
-            width: 100%; height: 420px; background: #fff;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .p-header { position: absolute; top: 0; left: 0; width: 100%; padding: 15px; display: flex; justify-content: space-between; z-index: 10; }
+        .icon-btn { background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); cursor: pointer; color: black; }
+        
+        .image-container { width: 100%; height: 420px; background: #fff; }
         .main-img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* INFO AREA */
         .info-box { padding: 20px; border-radius: 20px 20px 0 0; background: white; margin-top: -20px; position: relative; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
-        .brand-name { font-size: 0.85rem; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-        .prod-name { font-size: 1.4rem; font-weight: 700; color: black; margin-bottom: 5px; line-height: 1.2; }
-        
-        /* RATING BADGE */
-        .rating-box { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
-        .stars { background: #0c831f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 3px; }
-        .review-count { color: #666; font-size: 0.85rem; }
-
+        .prod-name { font-size: 1.4rem; font-weight: 700; color: black; margin-bottom: 5px; }
         .prod-price { font-size: 1.5rem; font-weight: 800; color: black; margin-bottom: 20px; }
-
-        /* NOT RETURNABLE BADGE */
-        .policy-tag {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: #fff0f0; color: #d32f2f; padding: 6px 12px;
-            border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; border: 1px solid #ffcdd2;
-        }
-
-        .desc-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; margin-top: 10px; }
         .desc-text { color: #555; font-size: 0.9rem; line-height: 1.6; }
 
-        /* REVIEWS SECTION */
-        .review-section { margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
-        .review-card { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-        .r-user { font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
-        .r-stars { color: #f8cb46; font-size: 0.8rem; margin-bottom: 5px; }
-        .r-text { font-size: 0.85rem; color: #555; }
-
-        /* BOTTOM BAR */
-        .bottom-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: white;
-            padding: 10px 15px; border-top: 1px solid #eee; display: flex; gap: 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100;
-        }
-        .btn-cart {
-            flex: 1; padding: 15px; border: 1px solid black; background: white;
-            color: black; font-weight: 700; font-size: 0.9rem; cursor: pointer; text-transform: uppercase;
-        }
-        .btn-buy {
-            flex: 1; padding: 15px; border: none; background: black;
-            color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; text-transform: uppercase;
-        }
-
-        /* POPUP MODAL (Add to Cart Success) */
-        .popup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000; display: none;
-            align-items: center; justify-content: center;
-        }
-        .popup-box {
-            background: white; width: 80%; padding: 25px; border-radius: 15px;
-            text-align: center; animation: popIn 0.3s ease-out;
-        }
-        @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .btn-cart { flex: 1; padding: 15px; border: 1px solid black; background: white; color: black; font-weight: 700; cursor: pointer; }
+        .btn-buy { flex: 1; padding: 15px; border: none; background: black; color: white; font-weight: 700; cursor: pointer; }
         
-        .popup-icon { font-size: 3rem; color: #0c831f; margin-bottom: 15px; }
-        .popup-btn {
-            background: black; color: white; padding: 12px; width: 100%;
-            border: none; border-radius: 8px; margin-top: 15px; font-weight: 700; cursor: pointer;
-        }
+        /* Popup */
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .popup-box { background: white; width: 80%; padding: 25px; border-radius: 15px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="p-header">
         <div class="icon-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></div>
-        <div class="cart-badge-wrapper" onclick="window.location.href='cart.html'">
-            <div class="icon-btn"><i class="fas fa-shopping-bag"></i></div>
-            <div class="cart-count" id="headerCartCount" style="display:none;">0</div>
-        </div>
+        <div class="icon-btn" onclick="window.location.href='cart.html'"><i class="fas fa-shopping-bag"></i></div>
     </div>
 
     <div class="image-container">
@@ -112,43 +42,11 @@
     </div>
 
     <div class="info-box">
-        <div class="brand-name">ZARA OFFICIAL</div>
         <div class="prod-name" id="pName">Loading...</div>
-        
-        <div class="rating-box">
-            <div class="stars">4.5 <i class="fas fa-star" style="font-size:0.7rem;"></i></div>
-            <div class="review-count">1,240 Ratings & 156 Reviews</div>
-        </div>
-
         <div class="prod-price" id="pPrice">₹0</div>
-
-        <div class="policy-tag">
-            <i class="fas fa-ban"></i> Not Returnable
-        </div>
-
-        <div style="height:1px; background:#eee; margin:15px 0;"></div>
-
-        <div class="desc-title">Description</div>
-        <p class="desc-text">
-            Premium quality fabric tailored for a perfect fit. Suitable for casual wear, parties, and daily use.
-            Made with breathable material to keep you comfortable all day long.
-        </p>
-
-        <div class="review-section">
-            <div class="desc-title" style="margin-bottom:15px;">Customer Reviews (3)</div>
-            
-            <div class="review-card">
-                <div class="r-user">Priya Sharma <i class="fas fa-check-circle" style="color:green; font-size:0.8rem;"></i></div>
-                <div class="r-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                <div class="r-text">Amazing quality! The fabric is very soft and fits perfectly. Loved it.</div>
-            </div>
-
-            <div class="review-card">
-                <div class="r-user">Rahul Verma <i class="fas fa-check-circle" style="color:green; font-size:0.8rem;"></i></div>
-                <div class="r-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></div>
-                <div class="r-text">Good product for the price. Delivery was fast.</div>
-            </div>
-        </div>
+        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+        <div style="font-weight:700; margin-bottom:10px;">Description</div>
+        <p class="desc-text" id="pDesc">No description.</p>
     </div>
 
     <div class="bottom-bar">
@@ -158,64 +56,47 @@
 
     <div id="cartPopup" class="popup-overlay">
         <div class="popup-box">
-            <i class="fas fa-check-circle popup-icon"></i>
-            <h3 style="margin-bottom:5px;">Added to Bag!</h3>
-            <p style="color:#666; font-size:0.9rem;">Item has been saved to your cart.</p>
-            <button class="popup-btn" onclick="window.location.href='cart.html'">GO TO CART</button>
-            <button style="background:transparent; border:none; color:#888; margin-top:10px; font-size:0.85rem;" onclick="closePopup()">Continue Shopping</button>
+            <h3>Added to Bag!</h3>
+            <button style="background:black; color:white; padding:10px 20px; border:none; border-radius:5px; margin-top:10px;" onclick="window.location.href='cart.html'">Go to Cart</button>
+            <br>
+            <button style="background:transparent; border:none; margin-top:10px;" onclick="document.getElementById('cartPopup').style.display='none'">Close</button>
         </div>
     </div>
 
     <script>
-        // 1. Load Data
         window.onload = function() {
-            document.getElementById('pName').innerText = localStorage.getItem('view_p_name') || "Product Name";
-            document.getElementById('pPrice').innerText = "₹" + (localStorage.getItem('view_p_price') || "0");
-            document.getElementById('pImg').src = localStorage.getItem('view_p_img') || "";
-            updateBadge();
-        }
+            // Retrieve Data from LocalStorage
+            const name = localStorage.getItem('view_p_name');
+            const price = localStorage.getItem('view_p_price');
+            const img = localStorage.getItem('view_p_img');
+            const desc = localStorage.getItem('view_p_desc');
 
-        function updateBadge() {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            let badge = document.getElementById('headerCartCount');
-            if(cart.length > 0) {
-                badge.innerText = cart.length;
-                badge.style.display = 'flex';
+            if(name) {
+                document.getElementById('pName').innerText = name;
+                document.getElementById('pPrice').innerText = "₹" + price;
+                document.getElementById('pImg').src = img;
+                document.getElementById('pDesc').innerText = desc;
+            } else {
+                document.getElementById('pName').innerText = "Product Not Found";
             }
         }
 
-        // 2. Add to Cart Logic
         function addToCart() {
             let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            
-            // Check if item exists (Optional logic)
-            let newItem = {
+            cart.push({
                 name: localStorage.getItem('view_p_name'),
                 price: localStorage.getItem('view_p_price'),
                 img: localStorage.getItem('view_p_img'),
                 qty: 1
-            };
-            
-            cart.push(newItem);
+            });
             localStorage.setItem('myCart', JSON.stringify(cart));
-            
-            updateBadge();
-            
-            // Show Popup
             document.getElementById('cartPopup').style.display = 'flex';
         }
 
-        // 3. Close Popup
-        function closePopup() {
-            document.getElementById('cartPopup').style.display = 'none';
-        }
-
-        // 4. Buy Now
         function buyNow() {
-            addToCart(); // Add first
-            window.location.href = 'cart.html'; // Go to cart
+            addToCart();
+            window.location.href = 'cart.html';
         }
     </script>
-
 </body>
 </html>
