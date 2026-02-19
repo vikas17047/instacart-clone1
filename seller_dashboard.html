@@ -6,60 +6,59 @@
     <title>Seller Dashboard - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f4f6f8; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; }
-        .dash-header { background: #1a1c1d; color: white; padding: 20px; text-align: center; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .menu-card { 
-            background: white; padding: 20px; border-radius: 15px; text-align: center; 
-            text-decoration: none; color: #1a1c1d; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            border: 1px solid #eee;
-        }
-        .menu-card i { font-size: 1.8rem; color: #008060; }
-        .menu-card b { font-size: 0.9rem; }
-        .section-title { padding-left: 20px; font-size: 0.8rem; color: #666; font-weight: 800; margin-top: 10px; }
-        .highlight { border: 2px solid #008060; } /* Naya seller ispe focus karega */
+        body { background: #f4f6f8; font-family: sans-serif; margin: 0; }
+        .header { background: #1a1c1d; color: white; padding: 20px; text-align: center; }
+        
+        /* Hidden by default */
+        #setupPrompt, #mainDashboard { display: none; padding: 20px; }
+
+        /* Setup Style */
+        .setup-box { background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .setup-btn { background: #008060; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+
+        /* Dashboard Grid */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-card { background: white; padding: 20px; border-radius: 12px; text-align: center; text-decoration: none; color: #1a1c1d; border: 1px solid #eee; }
+        .menu-card i { font-size: 1.5rem; color: #008060; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="dash-header">
-        <h2 style="margin:0;">Seller Hub</h2>
-        <p id="sellerEmail" style="font-size:0.8rem; opacity:0.7;"></p>
+    <div class="header">
+        <h2 id="welcomeText">Seller Hub</h2>
     </div>
 
-    <div class="section-title">REQUIRED STEPS</div>
-    <div class="menu-grid">
-        <a href="create_store.html" class="menu-card highlight">
-            <i class="fas fa-id-card"></i>
-            <b>Step 1: Store Identity</b>
-            <small style="font-size:0.6rem; color:#666;">Name, Bio, Logo</small>
-        </a>
-
-        <a href="manage_products.html" class="menu-card">
-            <i class="fas fa-box"></i>
-            <b>Step 2: Add Products</b>
-            <small style="font-size:0.6rem; color:#666;">Stock Management</small>
-        </a>
+    <div id="setupPrompt">
+        <div class="setup-box">
+            <i class="fas fa-store" style="font-size: 3rem; color: #ccc;"></i>
+            <h3>Activate Your Store</h3>
+            <p>Aapko apna store manage karne se pehle basic details fill karni hongi.</p>
+            <button class="setup-btn" onclick="window.location.href='create_store.html'">
+                FILL STORE DETAILS
+            </button>
+        </div>
     </div>
 
-    <div class="section-title">STORE CUSTOMIZATION</div>
-    <div class="menu-grid">
-        <a href="store_editor.html" class="menu-card">
-            <i class="fas fa-paint-brush"></i>
-            <b>Design Studio</b>
-            <small style="font-size:0.6rem; color:#666;">Theme & Layout</small>
-        </a>
-
-        <a id="viewStoreBtn" href="#" class="menu-card">
-            <i class="fas fa-external-link-alt"></i>
-            <b>View My Store</b>
-            <small style="font-size:0.6rem; color:#666;">Live Link</small>
-        </a>
+    <div id="mainDashboard">
+        <div class="menu-grid">
+            <a href="manage_products.html" class="menu-card">
+                <i class="fas fa-box"></i> <b>Products</b>
+            </a>
+            <a href="store_editor.html" class="menu-card">
+                <i class="fas fa-paint-brush"></i> <b>Design</b>
+            </a>
+            <a href="orders.html" class="menu-card">
+                <i class="fas fa-shopping-bag"></i> <b>Orders</b>
+            </a>
+            <a id="myStoreLink" href="#" class="menu-card" style="background: #f1f8f5;">
+                <i class="fas fa-eye"></i> <b>Live Store</b>
+            </a>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -72,13 +71,22 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
         const auth = getAuth(app);
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                document.getElementById('sellerEmail').innerText = user.email;
-                // Live Store link set karein seller ID ke saath
-                document.getElementById('viewStoreBtn').href = `my_store.html?seller=${user.uid}`;
+                // Check if Identity exists
+                const idDoc = await getDoc(doc(db, "seller_identity", user.uid));
+                
+                if (idDoc.exists()) {
+                    // Agar data hai toh Dashboard dikhao
+                    document.getElementById('mainDashboard').style.display = 'block';
+                    document.getElementById('myStoreLink').href = `my_store.html?seller=${user.uid}`;
+                } else {
+                    // Agar data nahi hai toh Setup dikhao
+                    document.getElementById('setupPrompt').style.display = 'block';
+                }
             } else {
                 window.location.href = "login.html";
             }
