@@ -21,13 +21,13 @@
         .welcome-sec h2 { margin: 0; font-size: 1.25rem; color: #202223; }
         .welcome-sec p { margin: 5px 0 0; color: #6d7175; font-size: 0.85rem; }
 
-        /* Stats Cards */
+        /* Stats Section - Balanced 4 Grid */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
         .stat-card { background: white; padding: 18px; border-radius: 10px; box-shadow: var(--card-shadow); border: 1px solid #e3e3e3; }
         .stat-title { font-size: 0.7rem; font-weight: 700; color: #6d7175; text-transform: uppercase; margin-bottom: 8px; }
         .stat-main { font-size: 1.3rem; font-weight: 800; color: #202223; }
 
-        /* Action List */
+        /* Action Menu List */
         .shopify-actions { padding: 0 15px; }
         .action-item { 
             background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;
@@ -48,29 +48,28 @@
 
     <div class="top-bar">
         <div class="logo-text">INSTACART <span style="font-weight:400; opacity:0.6;">Admin</span></div>
-        <i class="fas fa-bars" style="opacity:0.6;"></i>
     </div>
 
     <div class="welcome-sec">
-        <h2 id="greeting">Hi, Rahul!</h2>
-        <p>Your store overview for today.</p>
+        <h2>Hi, Rahul!</h2>
+        <p>Manage your store efficiency today.</p>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-title">Revenue</div>
+            <div class="stat-title">Total Revenue</div>
             <div class="stat-main" id="totalSales">₹0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-title">Orders</div>
+            <div class="stat-title">New Orders</div>
             <div class="stat-main" id="orderCount">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-title">Products</div>
+            <div class="stat-title">Live Products</div>
             <div class="stat-main" id="productCount">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-title">Visitors</div>
+            <div class="stat-title">Total Visits</div>
             <div class="stat-main">1.2k</div>
         </div>
     </div>
@@ -79,7 +78,7 @@
         <div class="action-item" onclick="window.location.href='orders.html'">
             <div style="display:flex; align-items:center; gap:12px;">
                 <div class="action-icon green-lite"><i class="fas fa-shopping-cart"></i></div>
-                <div><div style="font-weight:700; font-size:0.9rem;">Orders</div></div>
+                <div style="font-weight:700; font-size:0.9rem;">View Orders</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
         </div>
@@ -87,7 +86,7 @@
         <div class="action-item" onclick="window.location.href='manage_products.html'">
             <div style="display:flex; align-items:center; gap:12px;">
                 <div class="action-icon blue-lite"><i class="fas fa-box"></i></div>
-                <div><div style="font-weight:700; font-size:0.9rem;">Products</div></div>
+                <div style="font-weight:700; font-size:0.9rem;">Manage Products</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
         </div>
@@ -95,15 +94,15 @@
         <div class="action-item" onclick="window.location.href='store_editor.html'">
             <div style="display:flex; align-items:center; gap:12px;">
                 <div class="action-icon purple-lite"><i class="fas fa-brush"></i></div>
-                <div><div style="font-weight:700; font-size:0.9rem;">Design Store</div></div>
+                <div style="font-weight:700; font-size:0.9rem;">Edit Store Design</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
         </div>
 
         <div class="action-item" onclick="window.location.href='profile.html'">
             <div style="display:flex; align-items:center; gap:12px;">
-                <div class="action-icon red-lite"><i class="fas fa-user-gear"></i></div>
-                <div><div style="font-weight:700; font-size:0.9rem;">Account Settings</div></div>
+                <div class="action-icon red-lite"><i class="fas fa-user-circle"></i></div>
+                <div style="font-weight:700; font-size:0.9rem;">My Profile</div>
             </div>
             <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
         </div>
@@ -130,19 +129,21 @@
         const db = getFirestore(app);
 
         async function updateStats() {
-            // Products
-            const prodSnap = await getDocs(collection(db, "products"));
-            document.getElementById('productCount').innerText = prodSnap.size;
+            try {
+                // Products Count
+                const prodSnap = await getDocs(collection(db, "products"));
+                document.getElementById('productCount').innerText = prodSnap.size;
 
-            // Orders & Revenue
-            const orderSnap = await getDocs(collection(db, "orders"));
-            let total = 0;
-            orderSnap.forEach(doc => {
-                total += Number(doc.data().totalAmount || 0);
-            });
+                // Orders & Revenue calculation
+                const orderSnap = await getDocs(collection(db, "orders"));
+                let total = 0;
+                orderSnap.forEach(doc => {
+                    total += Number(doc.data().totalAmount || 0);
+                });
 
-            document.getElementById('totalSales').innerText = "₹" + total.toLocaleString();
-            document.getElementById('orderCount').innerText = orderSnap.size;
+                document.getElementById('totalSales').innerText = "₹" + total.toLocaleString();
+                document.getElementById('orderCount').innerText = orderSnap.size;
+            } catch (e) { console.error("Error updating stats:", e); }
         }
 
         window.onload = updateStats;
