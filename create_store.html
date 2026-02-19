@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Store - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f6f8; font-family: sans-serif; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+        .inp { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Setup Store Identity</h2>
+        <p style="color:#666; font-size:0.9rem;">Ye details customer ko aapke profile par dikhengi.</p>
+        <label>Store Name</label>
+        <input type="text" id="sName" class="inp" placeholder="e.g. Vikas Collection">
+        <label>Store Bio</label>
+        <textarea id="sBio" class="inp" rows="3" placeholder="Write about your brand..."></textarea>
+        <label>Logo URL</label>
+        <input type="text" id="sLogo" class="inp" placeholder="https://...">
+        <button class="btn" id="saveIdentity">CREATE MY STORE</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = { /* Aapka Config */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        document.getElementById('saveIdentity').onclick = async () => {
+            const user = auth.currentUser;
+            if(!user) return alert("Login first");
+            
+            await setDoc(doc(db, "seller_identity", user.uid), {
+                sName: document.getElementById('sName').value,
+                sBio: document.getElementById('sBio').value,
+                sLogo: document.getElementById('sLogo').value,
+                sellerEmail: user.email
+            }, { merge: true });
+
+            alert("Store Identity Created!");
+            window.location.href = 'seller_dashboard.html';
+        };
+    </script>
+</body>
+</html>
