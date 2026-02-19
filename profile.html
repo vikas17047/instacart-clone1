@@ -3,39 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>My Profile - Instacart</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f1f3f6; font-family: 'Inter', sans-serif; padding-bottom: 80px; margin: 0; }
+        .profile-card { background: white; padding: 25px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .user-img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
+        
+        .section-title { padding: 15px; font-weight: 700; font-size: 0.9rem; color: #555; }
+        
+        /* ORDER HISTORY STYLE */
+        .history-card {
+            background: white; margin: 0 10px 10px 10px; padding: 15px; border-radius: 10px;
+            display: flex; gap: 12px; align-items: center; border: 1px solid #eee;
+        }
+        .order-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; }
+        .order-details { flex: 1; }
+        .order-name { font-weight: 700; font-size: 0.9rem; }
+        .order-status { color: #0c831f; font-size: 0.75rem; font-weight: 700; margin-top: 3px; }
+
+        .btn-seller-dash {
+            background: linear-gradient(90deg, #11998e, #38ef7d); color: white;
+            padding: 15px; margin: 10px; border-radius: 10px; font-weight: 700;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        }
+    </style>
 </head>
-<body style="background:#f1f3f6;">
-    <div style="background:white; padding:20px; display:flex; align-items:center; gap:15px; margin-bottom:10px;">
-        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" style="width:70px; height:70px; border-radius:50%;">
-        <div><h2>Rahul Kumar</h2><p>+91 98765 43210</p></div>
-        <div style="margin-left:auto; color:#0c831f; font-weight:600;">Edit</div>
+<body>
+
+    <div class="profile-card">
+        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" class="user-img" id="userPhoto">
+        <div>
+            <h2 style="margin:0; font-size:1.2rem;" id="userName">Rahul Kumar</h2>
+            <p style="color:#888; font-size:0.85rem;" id="userPhone">+91 98765 43210</p>
+        </div>
     </div>
 
-    <div style="background:white; padding:15px; display:flex; text-align:center; margin-bottom:10px;">
-        <div style="flex:1;"><b>₹1,200</b><br><span style="font-size:0.8rem; color:#888;">Balance</span></div>
-        <div style="flex:1; border-left:1px solid #eee;"><b>500</b><br><span style="font-size:0.8rem; color:#888;">Coins</span></div>
-    </div>
-
-    <div onclick="window.location.href='seller_dashboard.html'" style="background:linear-gradient(90deg, #11998e, #38ef7d); padding:15px; margin:10px; border-radius:8px; color:white; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-        <div><b>Seller Dashboard</b><br><span style="font-size:0.85rem; opacity:0.9;">Manage orders & products</span></div>
+    <div class="btn-seller-dash" onclick="window.location.href='seller_dashboard.html'">
+        <div>
+            <div>Go to Seller Dashboard</div>
+            <span style="font-size:0.7rem; opacity:0.9;">Manage your own products & orders</span>
+        </div>
         <i class="fas fa-chevron-right"></i>
     </div>
 
-    <div style="background:white; padding:20px; display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; text-align:center; margin-bottom:10px;">
-        <div><i class="fas fa-box" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Orders</span></div>
-        <div><i class="far fa-heart" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Wishlist</span></div>
-        <div><i class="fas fa-gift" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Refer</span></div>
-        <div><i class="fas fa-headset" style="font-size:1.5rem; color:#0c831f; margin-bottom:5px;"></i><br><span style="font-size:0.75rem;">Help</span></div>
+    <div class="section-title">MY ORDERS</div>
+    <div id="orderHistoryContainer">
+        <p style="text-align:center; padding:30px; color:#999; font-size:0.8rem;">Loading your orders...</p>
     </div>
-
-    <div style="background:white; padding:15px; text-align:center; color:#ff3f6c; font-weight:700; cursor:pointer;">LOG OUT</div>
 
     <div class="bottom-nav">
         <div class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
         <div class="nav-item active"><i class="fas fa-user"></i> Profile</div>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Update Profile Info
+                document.getElementById('userName').innerText = user.displayName;
+                document.getElementById('userPhoto').src = user.photoURL;
+                document.getElementById('userPhone').innerText = user.email; // Email as fallback
+                
+                loadUserOrders(user.displayName);
+            } else {
+                window.location.href = 'index.html'; // Login ke liye wapas bhej dena
+            }
+        });
+
+        async function loadUserOrders(name) {
+            const container = document.getElementById('orderHistoryContainer');
+            // Customer ke naam se orders filter karna
+            const q = query(collection(db, "orders"), where("customerName", "==", name));
+            const snap = await getDocs(q);
+            
+            container.innerHTML = "";
+            if(snap.empty) {
+                container.innerHTML = "<p style='text-align:center; padding:30px; color:#999;'>No orders yet. Start shopping!</p>";
+                return;
+            }
+
+            snap.forEach(doc => {
+                const d = doc.data();
+                container.innerHTML += `
+                    <div class="history-card">
+                        <img src="${d.productImg}" class="order-img">
+                        <div class="order-details">
+                            <div class="order-name">${d.productName}</div>
+                            <div style="font-size:0.8rem; color:#666;">Price: ₹${d.totalAmount}</div>
+                            <div class="order-status"><i class="fas fa-truck"></i> Out for Delivery</div>
+                        </div>
+                    </div>`;
+            });
+        }
+    </script>
 </body>
 </html>
