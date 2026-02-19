@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Store Studio - Instacart</title>
+    <title>Master Store Studio - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --shopify-green: #008060; --bg: #f4f6f8; }
         body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
@@ -13,14 +14,11 @@
         .save-btn { background: var(--shopify-green); color: white; border: none; padding: 10px 25px; border-radius: 5px; font-weight: 700; cursor: pointer; }
         
         .panel { background: white; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #e3e3e3; }
-        .panel-title { font-weight: 800; font-size: 0.9rem; color: #202223; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .panel-title { font-weight: 800; font-size: 0.9rem; color: #202223; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px; text-transform: uppercase; }
         
-        label { display: block; font-size: 0.7rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; }
-        .inp, .select { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 6px; box-sizing: border-box; background: #fff; margin-bottom: 15px; font-size: 0.9rem; }
-        
-        .temp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .temp-card { border: 2px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; }
-        .temp-card.active { border-color: var(--shopify-green); background: #f1f8f5; }
+        label { display: block; font-size: 0.7rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; margin-top: 15px; }
+        .inp, .select { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 6px; box-sizing: border-box; background: #fff; font-size: 0.9rem; }
+        .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
@@ -28,51 +26,99 @@
     <div class="studio-header">
         <div style="display:flex; align-items:center; gap:10px;">
             <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-            <b>STORE CUSTOMIZER</b>
+            <b>ADVANCED CUSTOMIZER</b>
         </div>
-        <button class="save-btn" id="publishBtn">SAVE & PUBLISH</button>
+        <button class="save-btn" id="publishBtn">PUBLISH CHANGES</button>
     </div>
 
     <div class="panel">
-        <div class="panel-title"><i class="fas fa-id-card"></i> Store Identity</div>
-        
+        <div class="panel-title"><i class="fas fa-id-card"></i> Branding & Identity</div>
         <label>Store Name</label>
-        <input type="text" id="sName" class="inp" placeholder="e.g. Vikas Fashion Hub">
-        
-        <label>Store Bio / Tagline</label>
-        <textarea id="sBio" class="inp" rows="2" placeholder="Tell customers what you sell..."></textarea>
-        
-        <label>Profile Picture URL (Logo)</label>
-        <input type="text" id="sLogo" class="inp" placeholder="https://image-link.com/logo.jpg">
+        <input type="text" id="sName" class="inp" placeholder="Brand Name">
+        <label>Store Bio</label>
+        <textarea id="sBio" class="inp" rows="2" placeholder="Brand Tagline"></textarea>
+        <label>Logo URL</label>
+        <input type="text" id="sLogo" class="inp" placeholder="https://...">
+        <label>Favicon URL (Browser Icon)</label>
+        <input type="text" id="sFavicon" class="inp" placeholder="https://...">
     </div>
 
     <div class="panel">
-        <div class="panel-title"><i class="fas fa-palette"></i> Visuals & Theme</div>
-        
-        <label>Primary Theme Color</label>
-        <input type="color" id="pColor" class="inp" style="height:45px;" value="#008060">
+        <div class="panel-title"><i class="fas fa-palette"></i> Visual Customization</div>
+        <div class="color-row">
+            <div>
+                <label>Primary Color</label>
+                <input type="color" id="pColor" class="inp" style="height:45px;">
+            </div>
+            <div>
+                <label>Secondary Color</label>
+                <input type="color" id="sColor" class="inp" style="height:45px;">
+            </div>
+        </div>
 
-        <label>Cover Banner URL</label>
-        <input type="text" id="sBanner" class="inp" placeholder="https://image-link.com/banner.jpg">
+        <label>Font Family</label>
+        <select id="fFamily" class="select">
+            <option value="'Inter', sans-serif">Modern (Inter)</option>
+            <option value="'Playfair Display', serif">Luxury (Playfair)</option>
+            <option value="'Poppins', sans-serif">Trendy (Poppins)</option>
+        </select>
+
+        <label>Font Size (Body)</label>
+        <select id="fSize" class="select">
+            <option value="14px">Small</option>
+            <option value="16px">Medium</option>
+            <option value="18px">Large</option>
+        </select>
 
         <label>Button Style</label>
         <select id="bStyle" class="select">
-            <option value="50px">Rounded (Modern)</option>
-            <option value="5px">Square (Classic)</option>
+            <option value="50px">Fully Rounded</option>
+            <option value="8px">Slightly Rounded</option>
+            <option value="0px">Square</option>
+        </select>
+
+        <label>Store Background</label>
+        <input type="text" id="sBgImg" class="inp" placeholder="Background Image/Video URL">
+
+        <label>Dark Mode Toggle</label>
+        <select id="darkMode" class="select">
+            <option value="light">Off (Light Mode)</option>
+            <option value="dark">On (Dark Mode)</option>
         </select>
     </div>
 
     <div class="panel">
-        <div class="panel-title"><i class="fas fa-th-large"></i> Layout Control</div>
+        <div class="panel-title"><i class="fas fa-layer-group"></i> Layout Control</div>
         
+        <label>Header Style</label>
+        <select id="hStyle" class="select">
+            <option value="classic">Classic (Center)</option>
+            <option value="modern">Modern (Left Aligned)</option>
+        </select>
+
         <label>Announcement Bar Text</label>
-        <input type="text" id="annText" class="inp" placeholder="e.g. FREE SHIPPING ON ALL ORDERS">
-        
-        <label>Product Layout</label>
+        <input type="text" id="annText" class="inp" placeholder="e.g. 10% Off">
+
+        <label>Product Display</label>
         <select id="pLayout" class="select">
             <option value="grid">Grid (2 Columns)</option>
-            <option value="list">List (Instagram Style)</option>
+            <option value="list">List (1 Column)</option>
         </select>
+
+        <label>Cover Banner URL</label>
+        <input type="text" id="sBanner" class="inp" placeholder="https://...">
+
+        <label>Banner Position</label>
+        <select id="bPos" class="select">
+            <option value="top">Top</option>
+            <option value="below-nav">Below Navigation</option>
+        </select>
+
+        <label>Section Visibility</label>
+        <div style="display:flex; gap:15px; font-size: 0.8rem; margin-top:10px;">
+            <span><input type="checkbox" id="vBanner" checked> Banner</span>
+            <span><input type="checkbox" id="vBio" checked> Bio</span>
+        </div>
     </div>
 
     <script type="module">
@@ -95,7 +141,6 @@
 
         let sellerUid = null;
 
-        // Load existing data from Firebase
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 sellerUid = user.uid;
@@ -105,33 +150,48 @@
                     document.getElementById('sName').value = d.sName || "";
                     document.getElementById('sBio').value = d.sBio || "";
                     document.getElementById('sLogo').value = d.sLogo || "";
+                    document.getElementById('sFavicon').value = d.sFavicon || "";
                     document.getElementById('pColor').value = d.pColor || "#008060";
-                    document.getElementById('sBanner').value = d.sBanner || "";
+                    document.getElementById('sColor').value = d.sColor || "#000000";
+                    document.getElementById('fFamily').value = d.fFamily || "'Inter', sans-serif";
+                    document.getElementById('fSize').value = d.fSize || "16px";
                     document.getElementById('bStyle').value = d.bStyle || "50px";
+                    document.getElementById('sBgImg').value = d.sBgImg || "";
+                    document.getElementById('darkMode').value = d.darkMode || "light";
+                    document.getElementById('hStyle').value = d.hStyle || "classic";
                     document.getElementById('annText').value = d.annText || "";
                     document.getElementById('pLayout').value = d.pLayout || "grid";
+                    document.getElementById('sBanner').value = d.sBanner || "";
+                    document.getElementById('bPos').value = d.bPos || "top";
                 }
             }
         });
 
-        // Save to Firebase
         document.getElementById('publishBtn').onclick = async () => {
-            if(!sellerUid) return alert("Please Login!");
-
+            if(!sellerUid) return;
             const settings = {
                 sName: document.getElementById('sName').value,
                 sBio: document.getElementById('sBio').value,
                 sLogo: document.getElementById('sLogo').value,
+                sFavicon: document.getElementById('sFavicon').value,
                 pColor: document.getElementById('pColor').value,
-                sBanner: document.getElementById('sBanner').value,
+                sColor: document.getElementById('sColor').value,
+                fFamily: document.getElementById('fFamily').value,
+                fSize: document.getElementById('fSize').value,
                 bStyle: document.getElementById('bStyle').value,
+                sBgImg: document.getElementById('sBgImg').value,
+                darkMode: document.getElementById('darkMode').value,
+                hStyle: document.getElementById('hStyle').value,
                 annText: document.getElementById('annText').value,
                 pLayout: document.getElementById('pLayout').value,
-                updatedAt: new Date()
+                sBanner: document.getElementById('sBanner').value,
+                bPos: document.getElementById('bPos').value,
+                vBanner: document.getElementById('vBanner').checked,
+                vBio: document.getElementById('vBio').checked,
+                sellerId: sellerUid
             };
-
             await setDoc(doc(db, "store_designs", sellerUid), settings);
-            alert("Identity & Design Updated!");
+            alert("Master Settings Published!");
             window.location.href = `my_store.html?seller=${sellerUid}`;
         };
     </script>
