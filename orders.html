@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #f8f9fa; font-family: sans-serif; margin: 0; padding-bottom: 50px; }
+        .header { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; }
+        
+        /* ORDER CARD STYLE */
+        .order-card {
+            background: white; margin: 12px; padding: 15px; border-radius: 12px;
+            border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .order-head { display: flex; justify-content: space-between; border-bottom: 1px solid #f5f5f5; padding-bottom: 10px; margin-bottom: 10px; }
+        .order-id { font-weight: 800; font-size: 0.9rem; color: #333; }
+        .order-status { background: #e8f5e9; color: #2ecc71; padding: 3px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; }
+
+        .cust-info { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .cust-name { font-weight: 700; font-size: 1rem; }
+        .cust-addr { font-size: 0.85rem; color: #666; margin-top: 5px; line-height: 1.4; }
+        
+        .item-row { display: flex; gap: 10px; margin-top: 15px; background: #fafafa; padding: 10px; border-radius: 8px; }
+        .item-img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
+        
+        .btn-shipped { width: 100%; background: black; color: white; border: none; padding: 12px; margin-top: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <h2 style="font-size:1.1rem; margin:0; text-transform:uppercase;">Manage Orders</h2>
+    </div>
+
+    <div id="ordersContainer">
+        <p style="text-align:center; padding:50px; color:#999;">Searching for orders...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadOrders() {
+            const container = document.getElementById('ordersContainer');
+            const snap = await getDocs(collection(db, "orders"));
+            container.innerHTML = "";
+
+            if(snap.empty) {
+                container.innerHTML = "<p style='text-align:center; padding:50px;'>No orders found yet.</p>";
+                return;
+            }
+
+            snap.forEach((order) => {
+                const d = order.data();
+                container.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-head">
+                            <span class="order-id">#ORD-${order.id.substring(0,6).toUpperCase()}</span>
+                            <span class="order-status">PAID</span>
+                        </div>
+                        <div class="cust-info">
+                            <i class="fas fa-user-circle" style="font-size:1.5rem; color:#888;"></i>
+                            <div class="cust-name">${d.customerName || 'Rahul Kumar'}</div>
+                        </div>
+                        <div class="cust-addr">
+                            <i class="fas fa-map-marker-alt"></i> ${d.address || 'Sakaldiha, Chandauli'}
+                        </div>
+                        <div class="cust-addr">
+                            <i class="fas fa-phone"></i> ${d.phone || '+91 9876543210'}
+                        </div>
+                        
+                        <div class="item-row">
+                            <img src="${d.productImg || 'https://via.placeholder.com/50'}" class="item-img">
+                            <div>
+                                <div style="font-weight:700;">${d.productName || 'Yellow Haldi Suit'}</div>
+                                <div style="font-size:0.9rem;">Total: ₹${d.totalAmount || '1,299'}</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-shipped" onclick="markShipped('${order.id}')">MARK AS SHIPPED</button>
+                    </div>`;
+            });
+        }
+
+        window.markShipped = async (id) => {
+            if(confirm("Mark this order as shipped? It will be removed from active orders.")) {
+                await deleteDoc(doc(db, "orders", id));
+                location.reload();
+            }
+        }
+
+        loadOrders();
+    </script>
+</body>
+</html>
