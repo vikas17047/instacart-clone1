@@ -6,84 +6,99 @@
     <title>My Live Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style id="studioStyle">
-        /* Dynamic Styles Studio se aayenge */
-        :root { --p-color: #008060; --radius: 8px; --bg: #ffffff; --text: #000000; }
-        body { margin:0; background: var(--bg); color: var(--text); padding-bottom: 80px; transition: 0.3s; }
+        :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
+        body { margin:0; background: var(--bg); color: var(--text); padding-bottom: 80px; font-family: sans-serif; transition: 0.3s; }
         
         .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
-        .hero { height: 250px; background-size: cover; background-position: center; position: relative; }
-        .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+        .hero { height: 200px; background-size: cover; background-position: center; position: relative; }
+        .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
         
+        /* Filter Bar */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px; scrollbar-width: none; background: var(--bg); position: sticky; top: 0; z-index: 10; }
+        .filter-btn { padding: 8px 20px; border: 1px solid #ddd; border-radius: 20px; background: white; white-space: nowrap; font-size: 0.8rem; font-weight: 700; cursor: pointer; color: black; }
+        .filter-btn.active { background: var(--p-color); color: white; border-color: var(--p-color); }
+
         .p-grid { display: grid; padding: 15px; gap: 15px; }
         .p-grid.grid { grid-template-columns: 1fr 1fr; }
         .p-grid.list { grid-template-columns: 1fr; }
 
-        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; color: #000; }
+        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: #000; border: 1px solid #eee; }
         .p-img { width: 100%; height: 180px; object-fit: cover; }
-        .buy-btn { width: 100%; padding: 12px; background: var(--p-color); color: white; border: none; font-weight: 700; border-radius: var(--radius); margin-top: 10px; cursor: pointer; }
+        .buy-btn { width: 100%; padding: 12px; background: var(--p-color); color: white; border: none; font-weight: 700; cursor: pointer; border-radius: 5px; margin-top: 10px; }
     </style>
 </head>
-<body id="storeBody">
+<body>
 
-    <div class="ann-bar" id="annDisplay">SUMMER SALE IS LIVE!</div>
+    <div class="ann-bar" id="annDisplay">SUMMER SALE!</div>
 
     <div class="hero" id="bannerDisplay">
-        <div class="hero-overlay">
-            <img id="logoDisplay" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid white; display:none;">
-        </div>
+        <div class="hero-overlay"><h1 id="sTitle">STORE NAME</h1></div>
     </div>
 
-    <div class="p-grid" id="mainGrid">
-        </div>
+    <div class="filter-bar" id="categoryFilter">
+        <button class="filter-btn active" onclick="filterProducts('All', this)">All</button>
+        <button class="filter-btn" onclick="filterProducts('Men', this)">Men</button>
+        <button class="filter-btn" onclick="filterProducts('Women', this)">Women</button>
+        <button class="filter-btn" onclick="filterProducts('Shoes', this)">Shoes</button>
+    </div>
+
+    <div class="p-grid" id="mainGrid"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 1. APPLY STUDIO SETTINGS
+        // 1. Apply Studio Settings
         const s = JSON.parse(localStorage.getItem('studio_settings')) || {};
         const root = document.documentElement;
-        
         if(s.pColor) root.style.setProperty('--p-color', s.pColor);
         if(s.fFamily) document.body.style.fontFamily = s.fFamily;
-        if(s.bStyle) root.style.setProperty('--radius', s.bStyle);
         if(s.annText) document.getElementById('annDisplay').innerText = s.annText;
         if(s.sBanner) document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner}')`;
-        if(s.sLogo) {
-            const logo = document.getElementById('logoDisplay');
-            logo.src = s.sLogo; logo.style.display = 'block';
-        }
-
-        // Dark Mode Toggle
         if(s.darkMode === 'dark') {
             root.style.setProperty('--bg', '#121212');
             root.style.setProperty('--text', '#ffffff');
+            document.getElementById('categoryFilter').style.background = '#121212';
         }
 
         const grid = document.getElementById('mainGrid');
         grid.className = "p-grid " + (s.pLayout || 'grid');
 
-        // 2. FIREBASE LOAD
+        // 2. Firebase Load & Filter
         const firebaseConfig = { /* Aapka Config */ };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let allProducts = [];
 
         async function load() {
             const snap = await getDocs(collection(db, "products"));
+            allProducts = [];
+            snap.forEach(doc => allProducts.push(doc.data()));
+            displayProducts(allProducts);
+        }
+
+        function displayProducts(products) {
             grid.innerHTML = "";
-            snap.forEach(doc => {
-                const d = doc.data();
+            products.forEach(d => {
                 grid.innerHTML += `
                     <div class="p-card">
                         <img src="${d.image}" class="p-img">
                         <div style="padding:15px;">
+                            <div style="font-size:0.7rem; color:var(--p-color); font-weight:800;">${d.category || 'ALL'}</div>
                             <div style="font-weight:700;">${d.name}</div>
-                            <div style="color:var(--p-color); font-weight:800; margin-top:5px;">₹${d.price}</div>
+                            <div style="font-weight:800; margin-top:5px;">₹${d.price}</div>
                             <button class="buy-btn">ADD TO BAG</button>
                         </div>
                     </div>`;
             });
         }
+
+        window.filterProducts = (cat, btn) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            displayProducts(cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat));
+        };
+
         load();
     </script>
 </body>
