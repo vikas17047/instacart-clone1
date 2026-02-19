@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #fff; padding-bottom: 80px; }
+        .back-nav { padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; background: white; z-index: 10; }
+        .p-image { width: 100%; height: 350px; object-fit: cover; }
+        .p-content { padding: 20px; }
+        .p-title { font-size: 1.5rem; font-weight: 800; margin: 0; }
+        .p-price { font-size: 1.3rem; color: #008060; font-weight: 800; margin: 10px 0; }
+        .rating { color: #ffcc00; font-size: 0.9rem; margin-bottom: 15px; }
+        .p-desc { color: #555; line-height: 1.6; font-size: 0.95rem; border-top: 1px solid #eee; padding-top: 15px; }
+        
+        /* Fixed Bottom Action Bar */
+        .action-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px; gap: 10px; background: white; border-top: 1px solid #eee; box-sizing: border-box; }
+        .cart-btn { flex: 1; padding: 15px; border: 1px solid #008060; background: white; color: #008060; border-radius: 8px; font-weight: 700; }
+        .buy-btn { flex: 1; padding: 15px; background: #008060; color: white; border: none; border-radius: 8px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <b>Product Details</b>
+    </div>
+
+    <img id="detailImg" class="p-image" src="">
+
+    <div class="p-content">
+        <h1 id="detailName" class="p-title">Loading Product...</h1>
+        <div class="rating">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i> 
+            <span style="color:#888;">(4.5 | 120 Reviews)</span>
+        </div>
+        <div id="detailPrice" class="p-price"></div>
+        <div id="detailDesc" class="p-desc"></div>
+    </div>
+
+    <div class="action-bar">
+        <button class="cart-btn">ADD TO CART</button>
+        <button class="buy-btn">BUY NOW</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { /* Aapka Config */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function loadProductDetails() {
+            if(!productId) return;
+            const docRef = doc(db, "products", productId);
+            const snap = await getDoc(docRef);
+
+            if(snap.exists()) {
+                const d = snap.data();
+                document.getElementById('detailName').innerText = d.name;
+                document.getElementById('detailPrice').innerText = "₹" + d.price;
+                document.getElementById('detailImg').src = d.image;
+                document.getElementById('detailDesc').innerText = d.description || "No description available for this product.";
+            }
+        }
+        loadProductDetails();
+    </script>
+</body>
+</html>
