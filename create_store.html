@@ -3,46 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Setup</title>
+    <title>Setup Store Identity</title>
     <style>
-        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 5px; font-weight: 700; cursor: pointer; }
+        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #1a1c1d; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        button { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
+
     <div class="card">
-        <h3>Basic Store Details</h3>
-        <input type="text" id="sName" placeholder="Store Name">
-        <textarea id="sBio" placeholder="Store Bio"></textarea>
-        <input type="text" id="sLogo" placeholder="Logo Image URL">
-        <button id="saveBtn">SAVE & CONTINUE</button>
+        <h3>Store Setup</h3>
+        <p style="font-size: 0.8rem; color: #666;">Pehle basic details bharein, fir baaki options khulenge.</p>
+        
+        <input type="text" id="sName" placeholder="Store Name (e.g. My Fashion Hub)">
+        <textarea id="sBio" placeholder="Store Bio (Aap kya bechte hain?)" rows="3"></textarea>
+        <input type="text" id="sLogo" placeholder="Logo URL (Optional)">
+        
+        <button id="saveBtn">CREATE MY STORE</button>
+        <p id="errMsg" style="color: red; font-size: 0.8rem; margin-top: 10px; display: none;"></p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = { /* Wahi Config */ };
+        // 🔥 APNA CONFIG CHECK KAREIN (Ye wahi hona chahiye jo login/signup mein hai)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        document.getElementById('saveBtn').onclick = async () => {
-            const user = auth.currentUser;
-            if(!user) return;
+        let currentUser = null;
 
-            await setDoc(doc(db, "seller_identity", user.uid), {
-                sName: document.getElementById('sName').value,
-                sBio: document.getElementById('sBio').value,
-                sLogo: document.getElementById('sLogo').value
-            });
+        // Check login status
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                console.log("User detected:", user.uid);
+            } else {
+                alert("Pehle login karein!");
+                window.location.href = "login.html";
+            }
+        });
 
-            alert("Store Created!");
-            window.location.href = "seller_dashboard.html"; // Redirect to dashboard to unlock options
-        };
+        // Button Click Event
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('saveBtn');
+            const name = document.getElementById('sName').value.trim();
+            const bio = document.getElementById('sBio').value.trim();
+            const logo = document.getElementById('sLogo').value.trim();
+            const errorText = document.getElementById('errMsg');
+
+            if (!currentUser) {
+                alert("User session load nahi hui, thoda wait karein.");
+                return;
+            }
+
+            if (!name) {
+                alert("Store Name bharna zaroori hai!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+            errorText.style.display = "none";
+
+            try {
+                // Data save karna
+                await setDoc(doc(db, "seller_identity", currentUser.uid), {
+                    sName: name,
+                    sBio: bio,
+                    sLogo: logo,
+                    sellerId: currentUser.uid,
+                    createdAt: new Date()
+                });
+
+                alert("Store Successfully Created!");
+                window.location.href = "seller_dashboard.html"; // Wapas dashboard bhejein
+
+            } catch (error) {
+                console.error("Firebase Error:", error);
+                btn.disabled = false;
+                btn.innerText = "CREATE MY STORE";
+                errorText.innerText = "Error: " + error.message;
+                errorText.style.display = "block";
+            }
+        });
     </script>
 </body>
 </html>
