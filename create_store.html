@@ -3,110 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setup Store Identity - Instacart</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Store Setup</title>
     <style>
-        body { background: #f4f7f9; font-family: sans-serif; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .setup-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; border: 1px solid #eee; }
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; }
-        .inp { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 8px; box-sizing: border-box; margin-bottom: 20px; font-size: 1rem; }
-        .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; }
-        .save-btn:disabled { background: #ccc; }
+        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 5px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="setup-card">
-        <h2>Store Identity</h2>
-        <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Apne store ka basic setup yahan karein.</p>
-        
-        <label>Store Name</label>
-        <input type="text" id="sName" class="inp" placeholder="e.g. Vikas Fashion Store">
-
-        <label>Store Bio / Description</label>
-        <textarea id="sBio" class="inp" rows="3" placeholder="Aap kya bechte hain?"></textarea>
-
-        <label>Store Logo (URL)</label>
-        <input type="text" id="sLogo" class="inp" placeholder="https://image-link.com/logo.jpg">
-
-        <button class="save-btn" id="saveIdBtn">CREATE MY IDENTITY</button>
+    <div class="card">
+        <h3>Basic Store Details</h3>
+        <input type="text" id="sName" placeholder="Store Name">
+        <textarea id="sBio" placeholder="Store Bio"></textarea>
+        <input type="text" id="sLogo" placeholder="Logo Image URL">
+        <button id="saveBtn">SAVE & CONTINUE</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-            authDomain: "instacart-clone-91062.firebaseapp.com",
-            projectId: "instacart-clone-91062",
-            storageBucket: "instacart-clone-91062.firebasestorage.app",
-            messagingSenderId: "232217818928",
-            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-        };
-
+        const firebaseConfig = { /* Wahi Config */ };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let uid = null;
+        document.getElementById('saveBtn').onclick = async () => {
+            const user = auth.currentUser;
+            if(!user) return;
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                uid = user.uid;
-                console.log("Logged in UID:", uid);
-                // Pehle se save data load karein
-                const snap = await getDoc(doc(db, "seller_identity", uid));
-                if (snap.exists()) {
-                    const d = snap.data();
-                    document.getElementById('sName').value = d.sName || "";
-                    document.getElementById('sBio').value = d.sBio || "";
-                    document.getElementById('sLogo').value = d.sLogo || "";
-                }
-            } else {
-                alert("Session expired! Please login again.");
-                window.location.href = "login.html";
-            }
-        });
+            await setDoc(doc(db, "seller_identity", user.uid), {
+                sName: document.getElementById('sName').value,
+                sBio: document.getElementById('sBio').value,
+                sLogo: document.getElementById('sLogo').value
+            });
 
-        document.getElementById('saveIdBtn').onclick = async () => {
-            const btn = document.getElementById('saveIdBtn');
-            const sName = document.getElementById('sName').value;
-            const sBio = document.getElementById('sBio').value;
-            const sLogo = document.getElementById('sLogo').value;
-
-            if (!uid) {
-                alert("User not identified!");
-                return;
-            }
-
-            if (!sName) {
-                alert("Store Name zaroori hai!");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "Saving...";
-
-            try {
-                // { merge: true } bahut zaroori hai taaki data update ho sake
-                await setDoc(doc(db, "seller_identity", uid), {
-                    sName: sName,
-                    sBio: sBio,
-                    sLogo: sLogo,
-                    updatedAt: new Date()
-                }, { merge: true });
-
-                console.log("Data successfully saved!");
-                alert("Store Identity Saved!");
-                window.location.href = "seller_dashboard.html"; // Dashboard par redirect
-            } catch (error) {
-                console.error("Firebase Save Error:", error);
-                alert("Error saving: " + error.message);
-                btn.disabled = false;
-                btn.innerText = "CREATE MY IDENTITY";
-            }
+            alert("Store Created!");
+            window.location.href = "seller_dashboard.html"; // Redirect to dashboard to unlock options
         };
     </script>
 </body>
