@@ -5,43 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Store - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style id="dynamicStyles">
-        :root { --p-color: #008060; --radius: 8px; --bg: #ffffff; --text: #000000; }
-        body { margin:0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 80px; transition: 0.3s; }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style id="studioStyle">
+        /* Default Styles */
+        :root { 
+            --p-color: #008060; 
+            --radius: 8px; 
+            --bg: #ffffff; 
+            --text: #000000; 
+            --f-size: 16px;
+        }
         
-        /* Identity Styles */
-        .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; }
-        .hero { height: 180px; background-size: cover; background-position: center; position: relative; }
-        .identity-sec { padding: 0 20px; margin-top: -40px; position: relative; text-align: center; }
-        .store-logo { width: 85px; height: 85px; border-radius: 50%; border: 4px solid white; object-fit: cover; background: #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .store-name { font-size: 1.4rem; font-weight: 800; margin-top: 10px; }
-        .store-bio { font-size: 0.85rem; color: #666; margin-top: 5px; line-height: 1.4; max-width: 80%; margin-left: auto; margin-right: auto; }
+        body { 
+            margin:0; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-size: var(--f-size);
+            padding-bottom: 80px; 
+            transition: 0.3s; 
+        }
 
-        /* Filter Bar */
-        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; background: var(--bg); position: sticky; top: 0; z-index: 10; }
-        .filter-btn { padding: 8px 18px; border: 1px solid #ddd; border-radius: 20px; background: white; white-space: nowrap; font-size: 0.8rem; font-weight: 700; cursor: pointer; color: black; }
+        /* Identity UI */
+        .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
+        .hero { height: 200px; background-size: cover; background-position: center; position: relative; }
+        .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.3); }
+        
+        .profile-sec { padding: 0 20px; margin-top: -50px; position: relative; text-align: center; }
+        .store-logo { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--bg); object-fit: cover; background: #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .store-name { font-size: 1.5rem; font-weight: 800; margin-top: 10px; }
+        .store-bio { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; line-height: 1.4; max-width: 85%; margin-left: auto; margin-right: auto; }
+
+        /* Navigation/Filter Bar */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 20px; scrollbar-width: none; background: var(--bg); position: sticky; top: 0; z-index: 10; }
+        .filter-btn { padding: 8px 20px; border: 1px solid #ddd; border-radius: 25px; background: transparent; white-space: nowrap; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text); }
         .filter-btn.active { background: var(--p-color); color: white; border-color: var(--p-color); }
 
-        /* Products Grid */
+        /* Product Display */
         .p-grid { display: grid; padding: 15px; gap: 15px; }
         .p-grid.grid { grid-template-columns: 1fr 1fr; }
         .p-grid.list { grid-template-columns: 1fr; }
 
-        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); color: #000; border: 1px solid #eee; }
-        .p-img { width: 100%; height: 170px; object-fit: cover; }
+        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; color: #000; }
+        .p-img { width: 100%; height: 180px; object-fit: cover; }
+        .p-details { padding: 15px; }
         .buy-btn { width: 100%; padding: 12px; background: var(--p-color); color: white; border: none; font-weight: 700; border-radius: var(--radius); margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="ann-bar" id="annDisplay">WELCOME TO OUR OFFICIAL STORE</div>
+    <div class="ann-bar" id="annDisplay">WELCOME TO OUR STORE</div>
 
-    <div class="hero" id="bannerDisplay"></div>
+    <div class="hero" id="bannerDisplay">
+        <div class="hero-overlay"></div>
+    </div>
 
-    <div class="identity-sec">
-        <img id="logoDisplay" src="https://via.placeholder.com/100" class="store-logo">
-        <div class="store-name" id="nameDisplay">Store Name</div>
-        <div class="store-bio" id="bioDisplay">This is the official bio of the store. Happy shopping!</div>
+    <div class="profile-sec">
+        <img id="logoDisplay" src="" class="store-logo" style="display: none;">
+        <div class="store-name" id="nameDisplay">Loading...</div>
+        <div class="store-bio" id="bioDisplay"></div>
     </div>
 
     <div class="filter-bar" id="categoryFilter">
@@ -70,43 +91,68 @@
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        const sellerId = urlParams.get('seller') || "default";
+        const sellerId = urlParams.get('seller');
 
         let allProducts = [];
 
         async function initStore() {
-            // 1. Load Store Identity & Design
-            const designSnap = await getDoc(doc(db, "store_designs", sellerId));
-            if(designSnap.exists()){
-                const s = designSnap.data();
-                const root = document.documentElement;
-                
-                // Visuals
-                root.style.setProperty('--p-color', s.pColor || '#008060');
-                root.style.setProperty('--radius', s.bStyle || '8px');
-                
-                // Identity Data
-                document.getElementById('nameDisplay').innerText = s.sName || "Instacart Store";
-                document.getElementById('bioDisplay').innerText = s.sBio || "Premium fashion and lifestyle products.";
-                document.getElementById('logoDisplay').src = s.sLogo || "https://via.placeholder.com/100";
-                document.getElementById('annDisplay').innerText = s.annText || "HAPPY SHOPPING!";
-                document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800'}')`;
-
-                const grid = document.getElementById('mainGrid');
-                grid.className = "p-grid " + (s.pLayout || 'grid');
+            if(!sellerId) {
+                document.getElementById('nameDisplay').innerText = "Store Not Found";
+                return;
             }
 
-            // 2. Load Products
-            const snap = await getDocs(collection(db, "products"));
-            allProducts = [];
-            snap.forEach(doc => {
-                const data = doc.data();
-                // Check if product belongs to this seller
-                if(data.sellerId === sellerId) {
-                    allProducts.push(data);
+            try {
+                // 1. Load Permanent Identity (Name, Bio, Logo)
+                const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
+                if(idSnap.exists()) {
+                    const d = idSnap.data();
+                    document.getElementById('nameDisplay').innerText = d.sName || "Unnamed Store";
+                    document.getElementById('bioDisplay').innerText = d.sBio || "";
+                    if(d.sLogo) {
+                        document.getElementById('logoDisplay').src = d.sLogo;
+                        document.getElementById('logoDisplay').style.display = 'inline-block';
+                    }
                 }
-            });
-            displayProducts(allProducts);
+
+                // 2. Load Visual Design (Customizer Settings)
+                const designSnap = await getDoc(doc(db, "store_designs", sellerId));
+                if(designSnap.exists()) {
+                    const s = designSnap.data();
+                    const root = document.documentElement;
+                    
+                    // Visuals
+                    root.style.setProperty('--p-color', s.pColor || '#008060');
+                    root.style.setProperty('--radius', s.bStyle || '8px');
+                    root.style.setProperty('--f-size', s.fSize || '16px');
+                    document.body.style.fontFamily = s.fFamily || 'Inter';
+                    
+                    // Banner & Announcement
+                    document.getElementById('annDisplay').innerText = s.annText || "HAPPY SHOPPING!";
+                    if(s.sBanner) {
+                        document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner}')`;
+                    }
+
+                    // Dark Mode Toggle
+                    if(s.darkMode === 'dark') {
+                        root.style.setProperty('--bg', '#121212');
+                        root.style.setProperty('--text', '#ffffff');
+                        document.getElementById('categoryFilter').style.background = '#121212';
+                    }
+
+                    // Layout (Grid vs List)
+                    document.getElementById('mainGrid').className = "p-grid " + (s.pLayout || 'grid');
+                }
+
+                // 3. Load This Seller's Products Only
+                const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
+                const prodSnap = await getDocs(q);
+                allProducts = [];
+                prodSnap.forEach(doc => allProducts.push(doc.data()));
+                displayProducts(allProducts);
+
+            } catch (err) {
+                console.error("Error loading store:", err);
+            }
         }
 
         function displayProducts(products) {
@@ -116,10 +162,10 @@
                 grid.innerHTML += `
                     <div class="p-card">
                         <img src="${d.image}" class="p-img">
-                        <div style="padding:15px;">
-                            <div style="font-size:0.7rem; color:var(--p-color); font-weight:800;">${d.category || 'ALL'}</div>
-                            <div style="font-weight:700;">${d.name}</div>
-                            <div style="font-weight:800; margin-top:5px;">₹${d.price}</div>
+                        <div class="p-details">
+                            <div style="font-size:0.7rem; color:var(--p-color); font-weight:800; text-transform:uppercase;">${d.category || 'ALL'}</div>
+                            <div style="font-weight:700; margin-top:2px;">${d.name}</div>
+                            <div style="font-weight:800; margin-top:5px; font-size:1.1rem;">₹${d.price}</div>
                             <button class="buy-btn">ADD TO BAG</button>
                         </div>
                     </div>`;
