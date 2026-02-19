@@ -3,63 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management - Instacart</title>
+    <title>Advanced Inventory - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f4f7f9; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
         .header { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; position: sticky; top:0; z-index:10; }
         .container { padding: 15px; }
-        
-        /* Product Card */
         .p-card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .p-card img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
         .p-info { flex: 1; }
         .p-name { font-weight: 700; font-size: 0.9rem; }
         .p-price { color: #008060; font-weight: 800; font-size: 0.85rem; }
-
-        /* FAB Button */
-        .add-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-
-        /* Modal */
+        .add-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 99; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; }
-        .modal-body { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; }
+        .modal-body { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .inp { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .auto-msg { font-size: 0.7rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 10px; display: none; }
+        label { font-size: 0.7rem; font-weight: 700; color: #5c5f62; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        .auto-status { background: #f1f8f5; color: #008060; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; display: none; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <h2 style="font-size: 1rem; margin: 0;">My Inventory</h2>
+        <h2 style="font-size: 1rem; margin: 0;">Inventory Management</h2>
     </div>
 
-    <div id="inventoryList" class="container">
-        </div>
+    <div id="inventoryList" class="container"></div>
 
     <button class="add-btn" onclick="toggleModal(true)"><i class="fas fa-plus"></i></button>
 
     <div id="addModal" class="modal">
         <div class="modal-body">
             <h3 style="margin-top: 0;">Add New Product</h3>
-            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Tip: Category select karte hi testing image lag jayegi.</p>
             
-            <input type="text" id="pName" class="inp" placeholder="Product Name">
-            <input type="number" id="pPrice" class="inp" placeholder="Price (₹)">
-            
-            <label style="font-size: 0.7rem; font-weight: 700; color: #5c5f62;">CHOOSE CATEGORY</label>
+            <label>Product Name</label>
+            <input type="text" id="pName" class="inp" placeholder="e.g. Nike Air Max">
+
+            <label>Category (Select to Auto-Add Image)</label>
             <select id="pCat" class="inp">
-                <option value="">Select Category</option>
+                <option value="">-- Choose Category --</option>
                 <option value="Shoes">Shoes</option>
-                <option value="Men">Men's Fashion</option>
-                <option value="Women">Women's Fashion</option>
+                <option value="Clothes">Clothes & Fashion</option>
+                <option value="Watch">Watches</option>
                 <option value="Electronics">Electronics</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Beauty">Beauty & Makeup</option>
+                <option value="Fitness">Gym & Fitness</option>
+                <option value="Furniture">Home Furniture</option>
+                <option value="Toys">Kids & Toys</option>
+                <option value="Accessories">Accessories</option>
             </select>
 
-            <label style="font-size: 0.7rem; font-weight: 700; color: #5c5f62;">PRODUCT IMAGE URL</label>
+            <div id="autoStatus" class="auto-status"><i class="fas fa-magic"></i> Testing image added automatically!</div>
+
+            <label>Product Image URL</label>
             <input type="text" id="pImg" class="inp" placeholder="https://...">
-            <div id="autoMsg" class="auto-msg"><i class="fas fa-magic"></i> Auto-image linked for testing!</div>
+
+            <label>Price (₹)</label>
+            <input type="number" id="pPrice" class="inp" placeholder="0.00">
 
             <button class="save-btn" onclick="saveProduct()">SAVE PRODUCT</button>
             <button onclick="toggleModal(false)" style="width:100%; border:none; background:none; margin-top:15px; color:#888;">Cancel</button>
@@ -87,34 +90,39 @@
         let sellerId = null;
 
         onAuthStateChanged(auth, (user) => {
-            if (user) { 
-                sellerId = user.uid; 
-                fetchProducts(); 
-            } else { 
-                window.location.href = "login.html"; 
-            }
+            if (user) { sellerId = user.uid; fetchProducts(); }
+            else { window.location.href = "login.html"; }
         });
 
-        // 🔥 AUTOMATIC IMAGE LOGIC FOR TESTING
+        // 🌟 AUTOMATIC IMAGE GENERATOR (10 Categories)
         document.getElementById('pCat').addEventListener('change', function() {
             const cat = this.value;
             const imgInput = document.getElementById('pImg');
-            const msg = document.getElementById('autoMsg');
+            const status = document.getElementById('autoStatus');
 
             if(!cat) return;
 
-            // Using Unsplash Source for high quality random images based on keywords
-            let keyword = cat === "Men" || cat === "Women" ? "fashion,clothes" : cat.toLowerCase();
-            let randomUrl = `https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80`; // Default Red Shoe
+            let imgUrl = "";
+            const randomID = Math.floor(Math.random() * 1000);
 
-            if(cat === "Shoes") randomUrl = `https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80`;
-            if(cat === "Men") randomUrl = `https://images.unsplash.com/photo-1505022663483-546e4effe1ef?w=400&q=80`;
-            if(cat === "Women") randomUrl = `https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80`;
-            if(cat === "Electronics") randomUrl = `https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80`;
+            // High Quality Specific Images for Testing
+            const library = {
+                "Shoes": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+                "Clothes": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b",
+                "Watch": "https://images.unsplash.com/photo-1524592091214-8c97af8c7db8",
+                "Electronics": "https://images.unsplash.com/photo-1498049794561-7780e7231661",
+                "Groceries": "https://images.unsplash.com/photo-1542838132-92c53300491e",
+                "Beauty": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9",
+                "Fitness": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+                "Furniture": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc",
+                "Toys": "https://images.unsplash.com/photo-1531323380765-a11963563d6b",
+                "Accessories": "https://images.unsplash.com/photo-1511406361295-0a5ff814c0ad"
+            };
 
-            // Adding a random parameter to avoid browser caching the same image
-            imgInput.value = randomUrl + "&sig=" + Math.floor(Math.random() * 1000);
-            msg.style.display = "block";
+            imgUrl = (library[cat] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e") + `?w=500&q=80&sig=${randomID}`;
+            
+            imgInput.value = imgUrl;
+            status.style.display = "block";
         });
 
         async function fetchProducts() {
@@ -129,7 +137,7 @@
                         <img src="${d.image}">
                         <div class="p-info">
                             <div class="p-name">${d.name}</div>
-                            <div class="p-price">₹${d.price}</div>
+                            <div class="p-price">₹${d.price} <small style="color:#888;">(${d.category})</small></div>
                         </div>
                         <i class="fas fa-trash" style="color:#ff4444;" onclick="deleteProd('${product.id}')"></i>
                     </div>`;
@@ -142,10 +150,10 @@
             const cat = document.getElementById('pCat').value;
             const img = document.getElementById('pImg').value;
 
-            if(!name || !price || !cat) return alert("Details bhariye!");
+            if(!name || !price || !cat) return alert("Please fill all details!");
 
             await addDoc(collection(db, "products"), {
-                name, price: Number(price), category: cat, image: img, sellerId: sellerId
+                name, price: Number(price), category: cat, image: img, sellerId: sellerId, createdAt: new Date()
             });
 
             toggleModal(false);
@@ -153,7 +161,7 @@
         };
 
         window.deleteProd = async (id) => {
-            if(confirm("Delete karein?")) {
+            if(confirm("Delete product?")) {
                 await deleteDoc(doc(db, "products", id));
                 fetchProducts();
             }
@@ -161,7 +169,13 @@
 
         window.toggleModal = (val) => {
             document.getElementById('addModal').style.display = val ? 'flex' : 'none';
-            if(!val) document.getElementById('autoMsg').style.display = 'none';
+            if(!val) {
+                document.getElementById('autoStatus').style.display = 'none';
+                document.getElementById('pName').value = "";
+                document.getElementById('pPrice').value = "";
+                document.getElementById('pImg').value = "";
+                document.getElementById('pCat').value = "";
+            }
         };
     </script>
 </body>
