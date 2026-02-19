@@ -3,161 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instacart - Marketplace</title>
+    <title>Instacart - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            background: #f8f9fa; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            padding-bottom: 80px; 
-            color: #1a1c1d;
-        }
-
-        /* Top Navigation */
-        .nav-header { 
-            background: white; 
-            padding: 15px 20px; 
+        body { margin: 0; font-family: sans-serif; background: #fff; padding-bottom: 70px; }
+        
+        /* 🌟 TOP CREATOR SECTION (Design Same Rakha Hai) */
+        .creators-section { padding: 20px 0; }
+        .creators-container { 
             display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        }
-        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -1px; }
-        .logo span { color: #008060; }
-
-        /* Search Bar */
-        .search-container { padding: 10px 20px; background: white; }
-        .search-box { 
-            background: #f1f3f5; 
-            padding: 12px; 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        .search-box input { 
-            border: none; 
-            background: none; 
-            outline: none; 
-            width: 100%; 
-            font-size: 0.9rem; 
-        }
-
-        /* 🌟 TOP CREATORS SECTION (Dynamic) */
-        .section-title { 
-            padding: 20px 20px 5px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .section-title h3 { font-size: 1rem; font-weight: 800; margin: 0; }
-        .section-title span { color: #008060; font-size: 0.75rem; font-weight: 700; }
-
-        .creators-wrapper { 
-            display: flex; 
-            gap: 15px; 
             overflow-x: auto; 
-            padding: 15px 20px; 
+            gap: 15px; 
+            padding: 10px 15px; 
             scrollbar-width: none; 
         }
-        .creators-wrapper::-webkit-scrollbar { display: none; }
-
-        .creator-card { 
+        .creators-container::-webkit-scrollbar { display: none; }
+        
+        .creator-item { 
+            text-align: center; 
             min-width: 75px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
             text-decoration: none; 
-            color: inherit; 
+            color: #000;
         }
-        .img-ring { 
-            width: 68px; 
-            height: 68px; 
+        .creator-img { 
+            width: 65px; 
+            height: 65px; 
             border-radius: 50%; 
+            border: 2px solid #008060; 
             padding: 2px; 
-            background: linear-gradient(45deg, #008060, #a1d8b1); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .img-ring img { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 2px solid white; 
+            object-fit: cover;
         }
         .creator-name { 
             font-size: 0.7rem; 
-            font-weight: 700; 
-            margin-top: 8px; 
-            text-align: center; 
-            width: 75px; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
+            font-weight: bold; 
+            margin-top: 5px; 
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* Bottom Tab Bar */
-        .tab-bar { 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            background: white; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 12px 0; 
-            border-top: 1px solid #eee; 
-            z-index: 1000;
-        }
-        .tab-item { text-align: center; color: #babec3; text-decoration: none; font-size: 0.65rem; }
-        .tab-item.active { color: #1a1c1d; }
-        .tab-item i { font-size: 1.2rem; display: block; margin-bottom: 3px; }
+        /* Baki saara purana design (Search, Banners, Tabs) yahan add kar lein */
     </style>
 </head>
 <body>
 
-    <div class="nav-header">
-        <div class="logo">INSTA<span>CART</span></div>
-        <div class="nav-icons">
-            <i class="far fa-heart" style="margin-right: 15px;"></i>
-            <i class="fas fa-shopping-cart"></i>
+    <div class="creators-section">
+        <h3 style="padding-left: 15px; font-size: 1rem;">Top Creators 🌟</h3>
+        <div class="creators-container" id="topCreatorsList">
+            <p style="font-size: 0.7rem; padding-left: 15px; color: #888;">Loading...</p>
         </div>
-    </div>
-
-    <div class="search-container">
-        <div class="search-box">
-            <i class="fas fa-search" style="color: #adb5bd;"></i>
-            <input type="text" placeholder="Search sellers or products...">
-        </div>
-    </div>
-
-    <div class="section-title">
-        <h3>Top Creators 🌟</h3>
-        <span>View All</span>
-    </div>
-    <div class="creators-wrapper" id="creatorsList">
-        <div style="font-size: 0.7rem; color: #888;">Discovering sellers...</div>
-    </div>
-
-    <div style="padding: 20px;">
-        <div style="background: #008060; border-radius: 15px; height: 150px; padding: 20px; color: white;">
-            <h2 style="margin: 0;">Summer Sale</h2>
-            <p>Get up to 50% off on top brands.</p>
-            <button style="background: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: 800; color: #008060;">Shop Now</button>
-        </div>
-    </div>
-
-    <div class="tab-bar">
-        <a href="index.html" class="tab-item active"><i class="fas fa-home"></i>Home</a>
-        <a href="#" class="tab-item"><i class="fas fa-search"></i>Explore</a>
-        <a href="seller_dashboard.html" class="tab-item"><i class="fas fa-store"></i>Seller Hub</a>
-        <a href="#" class="tab-item"><i class="fas fa-user"></i>Profile</a>
     </div>
 
     <script type="module">
@@ -176,40 +71,32 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function loadTopSellers() {
-            const listContainer = document.getElementById('creatorsList');
+        // Sirf Top Creators load karne ka logic
+        async function loadSellers() {
+            const list = document.getElementById('topCreatorsList');
             try {
-                // 'seller_identity' se data nikalna
-                const querySnapshot = await getDocs(collection(db, "seller_identity"));
-                listContainer.innerHTML = ""; // Clear loader
+                const snap = await getDocs(collection(db, "seller_identity"));
+                list.innerHTML = ""; // Clear loader
 
-                if(querySnapshot.empty) {
-                    listContainer.innerHTML = "<p style='font-size:0.7rem;'>No creators active right now.</p>";
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
+                snap.forEach(doc => {
                     const seller = doc.data();
                     const sellerId = doc.id;
-
-                    // HTML for each creator card
-                    listContainer.innerHTML += `
-                        <a href="my_store.html?seller=${sellerId}" class="creator-card">
-                            <div class="img-ring">
-                                <img src="${seller.sLogo || 'https://via.placeholder.com/100'}" alt="${seller.sName}">
-                            </div>
+                    
+                    // Wahi purana HTML structure
+                    list.innerHTML += `
+                        <a href="my_store.html?seller=${sellerId}" class="creator-item">
+                            <img src="${seller.sLogo || 'https://via.placeholder.com/65'}" class="creator-img">
                             <span class="creator-name">${seller.sName || 'Shop'}</span>
                         </a>
                     `;
                 });
-            } catch (error) {
-                console.error("Error fetching sellers: ", error);
-                listContainer.innerHTML = "<p style='font-size:0.7rem;'>Failed to load creators.</p>";
+            } catch (e) {
+                console.log("Error:", e);
+                list.innerHTML = "Error loading.";
             }
         }
 
-        // Run the function
-        loadTopSellers();
+        loadSellers();
     </script>
 </body>
 </html>
