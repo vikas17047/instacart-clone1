@@ -3,63 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Editor - Shopify Style</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Advanced Store Studio - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f4f6f8; font-family: sans-serif; padding-bottom: 100px; margin: 0; }
-        .editor-header { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100; }
-        .section { background: white; margin: 15px; padding: 20px; border-radius: 8px; border: 1px solid #e3e3e3; }
-        .lbl { font-size: 0.8rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; display: block; }
-        .inp { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 5px; margin-bottom: 15px; box-sizing: border-box; }
-        .save-btn { background: #008060; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 700; cursor: pointer; }
+        :root { --shopify-green: #008060; --bg: #f4f6f8; }
+        body { background: var(--bg); font-family: sans-serif; margin: 0; padding-bottom: 80px; }
+        
+        .studio-header { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100; }
+        .save-btn { background: var(--shopify-green); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 700; cursor: pointer; }
+        
+        .panel { background: white; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #e3e3e3; }
+        .panel-title { font-weight: 800; font-size: 0.9rem; color: #202223; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        
+        .control-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; }
+        .inp, .select { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 6px; box-sizing: border-box; background: #fff; }
+        
+        .color-row { display: flex; gap: 10px; align-items: center; }
+        .color-circle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ddd; cursor: pointer; }
+
+        /* Preview Tab */
+        .preview-bar { background: #1a1c1d; color: white; padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="editor-header">
-        <div style="font-weight:800;"><i class="fas fa-magic"></i> STORE CUSTOMIZER</div>
-        <button class="save-btn" onclick="saveStoreSettings()">SAVE CHANGES</button>
+    <div class="studio-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+            <b>DESIGN STUDIO</b>
+        </div>
+        <button class="save-btn" onclick="applySettings()">PUBLISH STORE</button>
     </div>
 
-    <div class="section">
-        <span class="lbl">STORE IDENTITY</span>
-        <input type="text" id="sName" class="inp" placeholder="Store Name">
-        <input type="text" id="sAnnounce" class="inp" placeholder="Announcement Bar (e.g. Free Shipping on all orders!)">
+    <div class="preview-bar"><i class="fas fa-mobile-alt"></i> Mobile Preview Enabled</div>
+
+    <div class="panel">
+        <div class="panel-title"><i class="fas fa-palette"></i> Visual Customization</div>
+        
+        <div class="control-group">
+            <label>Primary Theme Color</label>
+            <input type="color" id="pColor" class="inp" value="#008060">
+        </div>
+
+        <div class="control-group">
+            <label>Font Family</label>
+            <select id="fFamily" class="select">
+                <option value="'Inter', sans-serif">Modern Clean (Inter)</option>
+                <option value="'Playfair Display', serif">Luxury (Playfair)</option>
+                <option value="'Poppins', sans-serif">Trendy (Poppins)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Button Style</label>
+            <select id="bStyle" class="select">
+                <option value="50px">Rounded (Pill)</option>
+                <option value="8px">Standard (Slight Round)</option>
+                <option value="0px">Square (Sharp)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Dark Mode</label>
+            <select id="darkMode" class="select">
+                <option value="light">Disable (Default)</option>
+                <option value="dark">Enable (Premium Black)</option>
+            </select>
+        </div>
     </div>
 
-    <div class="section">
-        <span class="lbl">HERO BANNER & THEME</span>
-        <input type="text" id="sBanner" class="inp" placeholder="Banner Image URL">
-        <label class="lbl">Theme Color</label>
-        <input type="color" id="sColor" style="width:100%; height:40px; border:none; border-radius:5px; margin-bottom:15px;">
+    <div class="panel">
+        <div class="panel-title"><i class="fas fa-layer-group"></i> Layout & Sections</div>
+        
+        <div class="control-group">
+            <label>Product Display</label>
+            <select id="pLayout" class="select">
+                <option value="grid">Grid View (2 Columns)</option>
+                <option value="list">List View (Instagram Style)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Announcement Bar</label>
+            <input type="text" id="annText" class="inp" placeholder="e.g. 20% OFF TODAY ONLY">
+        </div>
+
+        <div class="control-group">
+            <label>Section Visibility</label>
+            <div style="display:flex; gap:10px; font-size: 0.8rem;">
+                <input type="checkbox" id="showBanner" checked> Show Banner
+                <input type="checkbox" id="showFollowers" checked> Show Followers
+            </div>
+        </div>
     </div>
 
-    <div class="section">
-        <span class="lbl">SOCIAL PRESENCE</span>
-        <input type="text" id="sInsta" class="inp" placeholder="Instagram Profile Link">
-        <input type="text" id="sWhatsapp" class="inp" placeholder="WhatsApp Number (with country code)">
+    <div class="panel">
+        <div class="panel-title"><i class="fas fa-tag"></i> Branding</div>
+        
+        <div class="control-group">
+            <label>Store Logo URL</label>
+            <input type="text" id="sLogo" class="inp" placeholder="https://logo-link.com">
+        </div>
+
+        <div class="control-group">
+            <label>Cover Banner URL</label>
+            <input type="text" id="sBanner" class="inp" placeholder="https://banner-image.jpg">
+        </div>
+
+        <div class="control-group">
+            <label>Custom Domain (Mock)</label>
+            <input type="text" id="sDomain" class="inp" placeholder="www.yourbrand.com">
+        </div>
     </div>
 
     <script>
-        // Load existing settings
         window.onload = () => {
-            document.getElementById('sName').value = localStorage.getItem('store_name') || "";
-            document.getElementById('sAnnounce').value = localStorage.getItem('store_announce') || "";
-            document.getElementById('sBanner').value = localStorage.getItem('store_banner') || "";
-            document.getElementById('sColor').value = localStorage.getItem('store_color') || "#008060";
-            document.getElementById('sInsta').value = localStorage.getItem('store_insta') || "";
-            document.getElementById('sWhatsapp').value = localStorage.getItem('store_whatsapp') || "";
+            const saved = JSON.parse(localStorage.getItem('studio_settings')) || {};
+            if(saved.pColor) document.getElementById('pColor').value = saved.pColor;
+            if(saved.fFamily) document.getElementById('fFamily').value = saved.fFamily;
+            if(saved.bStyle) document.getElementById('bStyle').value = saved.bStyle;
+            if(saved.annText) document.getElementById('annText').value = saved.annText;
+            if(saved.sLogo) document.getElementById('sLogo').value = saved.sLogo;
+            if(saved.sBanner) document.getElementById('sBanner').value = saved.sBanner;
         };
 
-        function saveStoreSettings() {
-            localStorage.setItem('store_name', document.getElementById('sName').value);
-            localStorage.setItem('store_announce', document.getElementById('sAnnounce').value);
-            localStorage.setItem('store_banner', document.getElementById('sBanner').value);
-            localStorage.setItem('store_color', document.getElementById('sColor').value);
-            localStorage.setItem('store_insta', document.getElementById('sInsta').value);
-            localStorage.setItem('store_whatsapp', document.getElementById('sWhatsapp').value);
-            
-            alert("Store Settings Saved!");
+        function applySettings() {
+            const settings = {
+                pColor: document.getElementById('pColor').value,
+                fFamily: document.getElementById('fFamily').value,
+                bStyle: document.getElementById('bStyle').value,
+                darkMode: document.getElementById('darkMode').value,
+                pLayout: document.getElementById('pLayout').value,
+                annText: document.getElementById('annText').value,
+                showBanner: document.getElementById('showBanner').checked,
+                sLogo: document.getElementById('sLogo').value,
+                sBanner: document.getElementById('sBanner').value,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem('studio_settings', JSON.stringify(settings));
+            alert("✨ Store Designed & Published!");
             window.location.href = 'my_store.html';
         }
     </script>
