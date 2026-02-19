@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Inventory - Instacart</title>
+    <title>Manage Inventory - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f4f7f9; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
         .header { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; position: sticky; top:0; z-index:10; }
         .container { padding: 15px; }
-        .p-card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .p-card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .p-card img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
         .p-info { flex: 1; }
-        .p-name { font-weight: 700; font-size: 0.9rem; }
+        .p-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 3px; }
         .p-price { color: #008060; font-weight: 800; font-size: 0.85rem; }
+        .actions { display: flex; gap: 15px; font-size: 1.1rem; }
+        
         .add-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 99; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; }
         .modal-body { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .inp { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         label { font-size: 0.7rem; font-weight: 700; color: #5c5f62; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .auto-status { background: #f1f8f5; color: #008060; padding: 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; display: none; text-align: center; }
+        .auto-status { background: #f1f8f5; color: #008060; padding: 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-bottom: 15px; display: none; text-align: center; }
     </style>
 </head>
 <body>
@@ -32,16 +34,16 @@
 
     <div id="inventoryList" class="container"></div>
 
-    <button class="add-btn" onclick="toggleModal(true)"><i class="fas fa-plus"></i></button>
+    <button class="add-btn" onclick="openAddModal()"><i class="fas fa-plus"></i></button>
 
     <div id="addModal" class="modal">
         <div class="modal-body">
-            <h3 style="margin-top: 0;">Add New Product</h3>
+            <h3 id="modalTitle" style="margin-top: 0;">Add New Product</h3>
             
             <label>Product Name</label>
             <input type="text" id="pName" class="inp" placeholder="e.g. Nike Air Max">
 
-            <label>Category (Select to Auto-Add Image)</label>
+            <label>Category</label>
             <select id="pCat" class="inp">
                 <option value="">-- Choose Category --</option>
                 <option value="Shoes">Shoes</option>
@@ -56,7 +58,7 @@
                 <option value="Accessories">Accessories</option>
             </select>
 
-            <div id="autoStatus" class="auto-status"><i class="fas fa-magic"></i> Testing image added automatically!</div>
+            <div id="autoStatus" class="auto-status"><i class="fas fa-magic"></i> Testing image added!</div>
 
             <label>Product Image URL</label>
             <input type="text" id="pImg" class="inp" placeholder="https://...">
@@ -64,14 +66,14 @@
             <label>Price (₹)</label>
             <input type="number" id="pPrice" class="inp" placeholder="0.00">
 
-            <button class="save-btn" onclick="saveProduct()">SAVE PRODUCT</button>
+            <button class="save-btn" id="mainActionBtn" onclick="saveProduct()">SAVE PRODUCT</button>
             <button onclick="toggleModal(false)" style="width:100%; border:none; background:none; margin-top:15px; color:#888;">Cancel</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -88,24 +90,21 @@
         const auth = getAuth(app);
 
         let sellerId = null;
+        let editId = null; // Track if we are editing
 
         onAuthStateChanged(auth, (user) => {
             if (user) { sellerId = user.uid; fetchProducts(); }
             else { window.location.href = "login.html"; }
         });
 
-        // 🌟 AUTOMATIC IMAGE GENERATOR (10 Categories)
+        // Auto Image Logic
         document.getElementById('pCat').addEventListener('change', function() {
+            if(editId) return; // Don't overwrite image if editing existing product
             const cat = this.value;
             const imgInput = document.getElementById('pImg');
             const status = document.getElementById('autoStatus');
-
             if(!cat) return;
 
-            let imgUrl = "";
-            const randomID = Math.floor(Math.random() * 1000);
-
-            // High Quality Specific Images for Testing
             const library = {
                 "Shoes": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
                 "Clothes": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b",
@@ -118,10 +117,7 @@
                 "Toys": "https://images.unsplash.com/photo-1531323380765-a11963563d6b",
                 "Accessories": "https://images.unsplash.com/photo-1511406361295-0a5ff814c0ad"
             };
-
-            imgUrl = (library[cat] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e") + `?w=500&q=80&sig=${randomID}`;
-            
-            imgInput.value = imgUrl;
+            imgInput.value = (library[cat] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e") + `?w=500&q=80&sig=${Math.random()}`;
             status.style.display = "block";
         });
 
@@ -139,10 +135,33 @@
                             <div class="p-name">${d.name}</div>
                             <div class="p-price">₹${d.price} <small style="color:#888;">(${d.category})</small></div>
                         </div>
-                        <i class="fas fa-trash" style="color:#ff4444;" onclick="deleteProd('${product.id}')"></i>
+                        <div class="actions">
+                            <i class="fas fa-edit" style="color:#2c6ecb;" onclick='openEditModal("${product.id}", ${JSON.stringify(d)})'></i>
+                            <i class="fas fa-trash" style="color:#ff4444;" onclick="deleteProd('${product.id}')"></i>
+                        </div>
                     </div>`;
             });
         }
+
+        window.openAddModal = () => {
+            editId = null;
+            document.getElementById('modalTitle').innerText = "Add New Product";
+            document.getElementById('mainActionBtn').innerText = "SAVE PRODUCT";
+            toggleModal(true);
+        };
+
+        window.openEditModal = (id, data) => {
+            editId = id;
+            document.getElementById('modalTitle').innerText = "Edit Product";
+            document.getElementById('mainActionBtn').innerText = "UPDATE PRODUCT";
+            
+            document.getElementById('pName').value = data.name;
+            document.getElementById('pPrice').value = data.price;
+            document.getElementById('pCat').value = data.category;
+            document.getElementById('pImg').value = data.image;
+            
+            toggleModal(true);
+        };
 
         window.saveProduct = async () => {
             const name = document.getElementById('pName').value;
@@ -150,11 +169,21 @@
             const cat = document.getElementById('pCat').value;
             const img = document.getElementById('pImg').value;
 
-            if(!name || !price || !cat) return alert("Please fill all details!");
+            if(!name || !price || !cat) return alert("Fill all details!");
 
-            await addDoc(collection(db, "products"), {
-                name, price: Number(price), category: cat, image: img, sellerId: sellerId, createdAt: new Date()
-            });
+            const productData = {
+                name, price: Number(price), category: cat, image: img, sellerId: sellerId, updatedAt: new Date()
+            };
+
+            if(editId) {
+                // UPDATE logic
+                await updateDoc(doc(db, "products", editId), productData);
+                alert("Product Updated!");
+            } else {
+                // ADD logic
+                await addDoc(collection(db, "products"), productData);
+                alert("Product Added!");
+            }
 
             toggleModal(false);
             fetchProducts();
