@@ -12,7 +12,31 @@
             --radius: 8px; 
             --bg: #ffffff; 
             --text: #000000; 
-        }
+        }<button id="shareStoreBtn" class="share-fab">
+    <i class="fas fa-share-alt"></i> Share Store
+</button>
+
+<style>
+    .share-fab {
+        position: fixed;
+        bottom: 100px; /* Cart button ke upar rahega */
+        right: 20px;
+        background: var(--p-color); /* Store ki theme color pakdega */
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        z-index: 99;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+
         
         body { 
             margin:0; 
