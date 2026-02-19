@@ -3,82 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instacart Home</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Instacart - Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* LOGIN PAGE STYLE (Extra Layer) */
-        #loginOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; z-index: 9999; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center;
+        body { 
+            background: #f8f9fa; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            padding-bottom: 80px; 
+            color: #1a1c1d;
         }
-        .login-btn {
-            background: #000; color: white; border: none; padding: 15px 30px;
-            border-radius: 30px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; gap: 10px; font-size: 1rem;
+
+        /* Top Navigation */
+        .nav-header { 
+            background: white; 
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
+        .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -1px; }
+        .logo span { color: #008060; }
+
+        /* Search Bar */
+        .search-container { padding: 10px 20px; background: white; }
+        .search-box { 
+            background: #f1f3f5; 
+            padding: 12px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .search-box input { 
+            border: none; 
+            background: none; 
+            outline: none; 
+            width: 100%; 
+            font-size: 0.9rem; 
+        }
+
+        /* 🌟 TOP CREATORS SECTION (Dynamic) */
+        .section-title { 
+            padding: 20px 20px 5px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .section-title h3 { font-size: 1rem; font-weight: 800; margin: 0; }
+        .section-title span { color: #008060; font-size: 0.75rem; font-weight: 700; }
+
+        .creators-wrapper { 
+            display: flex; 
+            gap: 15px; 
+            overflow-x: auto; 
+            padding: 15px 20px; 
+            scrollbar-width: none; 
+        }
+        .creators-wrapper::-webkit-scrollbar { display: none; }
+
+        .creator-card { 
+            min-width: 75px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            color: inherit; 
+        }
+        .img-ring { 
+            width: 68px; 
+            height: 68px; 
+            border-radius: 50%; 
+            padding: 2px; 
+            background: linear-gradient(45deg, #008060, #a1d8b1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .img-ring img { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid white; 
+        }
+        .creator-name { 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            margin-top: 8px; 
+            text-align: center; 
+            width: 75px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+
+        /* Bottom Tab Bar */
+        .tab-bar { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: white; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 12px 0; 
+            border-top: 1px solid #eee; 
+            z-index: 1000;
+        }
+        .tab-item { text-align: center; color: #babec3; text-decoration: none; font-size: 0.65rem; }
+        .tab-item.active { color: #1a1c1d; }
+        .tab-item i { font-size: 1.2rem; display: block; margin-bottom: 3px; }
     </style>
 </head>
 <body>
 
-    <div id="loginOverlay" style="display: none;">
-        <h1 style="font-weight: 900; font-size: 2.5rem; margin-bottom: 10px;">INSTACART</h1>
-        <p style="color: #666; margin-bottom: 25px;">Login to explore top creators & products</p>
-        <button class="login-btn" onclick="loginWithGoogle()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20">
-            Continue with Google
-        </button>
+    <div class="nav-header">
+        <div class="logo">INSTA<span>CART</span></div>
+        <div class="nav-icons">
+            <i class="far fa-heart" style="margin-right: 15px;"></i>
+            <i class="fas fa-shopping-cart"></i>
+        </div>
     </div>
 
-    <div id="mainContent" style="display: none;">
-        <nav class="navbar">
-            <div style="display:flex; align-items:center;">
-                <div class="logo">Instacart</div>
-                <div class="seller-btn" onclick="window.location.href='seller_dashboard.html'">
-                    <i class="fas fa-store-alt"></i> My Store
-                </div>
-            </div>
-            <div class="icon-group">
-                <i class="fas fa-bell"></i>
-                <div style="position:relative;" onclick="window.location.href='cart.html'">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span id="cartCount" style="position:absolute; top:-8px; right:-8px; background:red; color:white; font-size:0.7rem; width:15px; height:15px; border-radius:50%; display:none; align-items:center; justify-content:center;">0</span>
-                </div>
-            </div>
-        </nav>
-
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Search brands, products...">
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search" style="color: #adb5bd;"></i>
+            <input type="text" placeholder="Search sellers or products...">
         </div>
+    </div>
 
-        <div class="hero">
-            <h2>Mega Fashion Sale</h2>
-            <p>Min 60% Off on Top Brands</p>
-            <button class="btn-shop">Explore</button>
+    <div class="section-title">
+        <h3>Top Creators 🌟</h3>
+        <span>View All</span>
+    </div>
+    <div class="creators-wrapper" id="creatorsList">
+        <div style="font-size: 0.7rem; color: #888;">Discovering sellers...</div>
+    </div>
+
+    <div style="padding: 20px;">
+        <div style="background: #008060; border-radius: 15px; height: 150px; padding: 20px; color: white;">
+            <h2 style="margin: 0;">Summer Sale</h2>
+            <p>Get up to 50% off on top brands.</p>
+            <button style="background: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: 800; color: #008060;">Shop Now</button>
         </div>
+    </div>
 
-        <div class="section-title">Shop by Category</div>
-        <div class="horizontal-scroll">
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
-        </div>
-
-        <div class="section-title">Top Creators (52)</div>
-        <div class="creator-grid" id="creatorContainer"></div>
-
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
-            <div class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i> Profile</div>
-        </div>
+    <div class="tab-bar">
+        <a href="index.html" class="tab-item active"><i class="fas fa-home"></i>Home</a>
+        <a href="#" class="tab-item"><i class="fas fa-search"></i>Explore</a>
+        <a href="seller_dashboard.html" class="tab-item"><i class="fas fa-store"></i>Seller Hub</a>
+        <a href="#" class="tab-item"><i class="fas fa-user"></i>Profile</a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -90,57 +174,42 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        const db = getFirestore(app);
 
-        // Check Login Status
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User login hai, Home page dikhao
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                loadCreators(); // Original creator list load karo
-                updateCartBadge();
-            } else {
-                // User login nahi hai, Login page dikhao
-                document.getElementById('loginOverlay').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'none';
-            }
-        });
+        async function loadTopSellers() {
+            const listContainer = document.getElementById('creatorsList');
+            try {
+                // 'seller_identity' se data nikalna
+                const querySnapshot = await getDocs(collection(db, "seller_identity"));
+                listContainer.innerHTML = ""; // Clear loader
 
-        window.loginWithGoogle = () => {
-            signInWithPopup(auth, provider).catch(err => alert(err.message));
-        };
+                if(querySnapshot.empty) {
+                    listContainer.innerHTML = "<p style='font-size:0.7rem;'>No creators active right now.</p>";
+                    return;
+                }
 
-        // --- ORIGINAL FUNCTIONS ---
-        function loadCreators() {
-            const container = document.getElementById('creatorContainer');
-            const brands = ["Zara Official", "H&M Fashion", "Nike Store", "Adidas Originals", "Puma India"];
-            const images = ["https://randomuser.me/api/portraits/women/44.jpg", "https://randomuser.me/api/portraits/men/32.jpg", "https://randomuser.me/api/portraits/women/65.jpg"];
-            
-            container.innerHTML = "";
-            for (let i = 0; i < brands.length; i++) {
-                let name = brands[i];
-                let img = images[i % images.length];
-                let followers = (Math.random() * 10 + 1).toFixed(1) + "M";
-                container.innerHTML += `
-                    <div class="seller-card" onclick="visitStore('${name}', '${img}', '${followers}')">
-                        <img src="${img}" class="seller-img">
-                        <div class="seller-name">${name}</div>
-                        <div class="seller-followers">${followers} Followers</div>
-                        <button class="btn-visit">View Store</button>
-                    </div>`;
+                querySnapshot.forEach((doc) => {
+                    const seller = doc.data();
+                    const sellerId = doc.id;
+
+                    // HTML for each creator card
+                    listContainer.innerHTML += `
+                        <a href="my_store.html?seller=${sellerId}" class="creator-card">
+                            <div class="img-ring">
+                                <img src="${seller.sLogo || 'https://via.placeholder.com/100'}" alt="${seller.sName}">
+                            </div>
+                            <span class="creator-name">${seller.sName || 'Shop'}</span>
+                        </a>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error fetching sellers: ", error);
+                listContainer.innerHTML = "<p style='font-size:0.7rem;'>Failed to load creators.</p>";
             }
         }
 
-        function updateCartBadge() {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            let badge = document.getElementById('cartCount');
-            if(cart.length > 0) {
-                badge.innerText = cart.length;
-                badge.style.display = 'flex';
-            }
-        }
+        // Run the function
+        loadTopSellers();
     </script>
 </body>
 </html>
