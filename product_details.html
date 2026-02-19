@@ -6,70 +6,134 @@
     <title>Product Details - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; margin: 0; background: #fff; padding-bottom: 80px; }
-        .back-nav { padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; background: white; z-index: 10; }
-        .p-image { width: 100%; height: 350px; object-fit: cover; }
-        .p-content { padding: 20px; }
-        .p-title { font-size: 1.5rem; font-weight: 800; margin: 0; }
-        .p-price { font-size: 1.3rem; color: #008060; font-weight: 800; margin: 10px 0; }
-        .rating { color: #ffcc00; font-size: 0.9rem; margin-bottom: 15px; }
-        .p-desc { color: #555; line-height: 1.6; font-size: 0.95rem; border-top: 1px solid #eee; padding-top: 15px; }
+        :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 90px; transition: 0.3s; }
         
-        /* Fixed Bottom Action Bar */
-        .action-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px; gap: 10px; background: white; border-top: 1px solid #eee; box-sizing: border-box; }
-        .cart-btn { flex: 1; padding: 15px; border: 1px solid #008060; background: white; color: #008060; border-radius: 8px; font-weight: 700; }
-        .buy-btn { flex: 1; padding: 15px; background: #008060; color: white; border: none; border-radius: 8px; font-weight: 700; }
+        .nav-header { padding: 15px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid #eee; }
+        .p-main-img { width: 100%; height: 380px; object-fit: cover; background: #f9f9f9; }
+        
+        .p-info-sec { padding: 20px; }
+        .p-title { font-size: 1.6rem; font-weight: 800; margin: 0; }
+        .p-price { font-size: 1.4rem; color: var(--p-color); font-weight: 800; margin: 10px 0; }
+        
+        /* Star Rating */
+        .rating-box { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .stars { color: #ffcc00; font-size: 0.9rem; }
+        .rev-count { font-size: 0.8rem; opacity: 0.7; }
+
+        .p-desc-title { font-weight: 700; border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; }
+        .p-desc-text { font-size: 0.95rem; opacity: 0.8; line-height: 1.6; margin-top: 8px; }
+
+        /* Review Section */
+        .reviews-section { padding: 20px; border-top: 8px solid #f4f4f4; }
+        .review-card { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .rev-user { font-weight: 700; font-size: 0.85rem; }
+        .rev-comment { font-size: 0.85rem; opacity: 0.7; margin-top: 3px; }
+
+        /* Bottom Sticky Bar */
+        .bottom-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px; gap: 10px; background: var(--bg); border-top: 1px solid #eee; box-sizing: border-box; z-index: 1000; }
+        .btn-cart { flex: 1; padding: 14px; border: 1.5px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 10px; font-weight: 700; font-size: 0.9rem; }
+        .btn-buy { flex: 1; padding: 14px; background: var(--p-color); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <div class="back-nav">
+    <div class="nav-header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <b>Product Details</b>
+        <b style="font-size: 1.1rem;">Product Details</b>
     </div>
 
-    <img id="detailImg" class="p-image" src="">
+    <img id="pImg" class="p-main-img" src="https://via.placeholder.com/400x400?text=Loading...">
 
-    <div class="p-content">
-        <h1 id="detailName" class="p-title">Loading Product...</h1>
-        <div class="rating">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i> 
-            <span style="color:#888;">(4.5 | 120 Reviews)</span>
+    <div class="p-info-sec">
+        <h1 id="pName" class="p-title">---</h1>
+        <div class="rating-box">
+            <div class="stars">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+            </div>
+            <span class="rev-count">(4.5 | 128 Reviews)</span>
         </div>
-        <div id="detailPrice" class="p-price"></div>
-        <div id="detailDesc" class="p-desc"></div>
+        <div id="pPrice" class="p-price">₹0</div>
+        
+        <div class="p-desc-title">Description</div>
+        <div id="pDesc" class="p-desc-text">Product ki details yahan load hongi...</div>
     </div>
 
-    <div class="action-bar">
-        <button class="cart-btn">ADD TO CART</button>
-        <button class="buy-btn">BUY NOW</button>
+    <div class="reviews-section">
+        <b style="font-size: 1rem;">Customer Reviews</b>
+        <div style="margin-top: 15px;">
+            <div class="review-card">
+                <div class="rev-user">Vikas Gupta <span class="stars" style="font-size: 0.7rem;">★★★★★</span></div>
+                <div class="rev-comment">Bahut hi achhi quality hai, delivery bhi fast thi!</div>
+            </div>
+            <div class="review-card">
+                <div class="rev-user">Rahul Kumar <span class="stars" style="font-size: 0.7rem;">★★★★☆</span></div>
+                <div class="rev-comment">Price ke hisab se best product hai.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <button class="btn-cart">ADD TO CART</button>
+        <button class="btn-buy" onclick="buyNow()">BUY NOW</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = { /* Aapka Config */ };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
 
-        async function loadProductDetails() {
+        async function loadDetails() {
             if(!productId) return;
-            const docRef = doc(db, "products", productId);
-            const snap = await getDoc(docRef);
 
-            if(snap.exists()) {
-                const d = snap.data();
-                document.getElementById('detailName').innerText = d.name;
-                document.getElementById('detailPrice').innerText = "₹" + d.price;
-                document.getElementById('detailImg').src = d.image;
-                document.getElementById('detailDesc').innerText = d.description || "No description available for this product.";
-            }
+            try {
+                // 1. Get Product Data
+                const pSnap = await getDoc(doc(db, "products", productId));
+                if(pSnap.exists()) {
+                    const p = pSnap.data();
+                    document.getElementById('pName').innerText = p.name;
+                    document.getElementById('pPrice').innerText = "₹" + p.price;
+                    document.getElementById('pImg').src = p.image;
+                    document.getElementById('pDesc').innerText = p.description || "Is product ki koi description nahi di gayi hai.";
+                    
+                    // 2. Load Store Theme (Dynamic Background/Color)
+                    if(p.sellerId) {
+                        const dSnap = await getDoc(doc(db, "store_designs", p.sellerId));
+                        if(dSnap.exists()) {
+                            const s = dSnap.data();
+                            const root = document.documentElement;
+                            root.style.setProperty('--p-color', s.pColor || '#008060');
+                            
+                            if(s.darkMode === 'dark') {
+                                root.style.setProperty('--bg', '#121212');
+                                root.style.setProperty('--text', '#ffffff');
+                                document.querySelector('.nav-header').style.borderBottom = "1px solid #333";
+                            }
+                        }
+                    }
+                }
+            } catch (err) { console.error(err); }
         }
-        loadProductDetails();
+
+        window.buyNow = () => {
+            alert("Ordering system coming soon!");
+        };
+
+        loadDetails();
     </script>
 </body>
 </html>
