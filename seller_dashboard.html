@@ -13,35 +13,26 @@
             --card-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 3px 0 rgba(0,0,0,.15);
         }
         body { background: var(--bg-gray); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 50px; }
-        
         .top-bar { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo-text { font-weight: 800; letter-spacing: -1px; font-size: 1.1rem; }
-
         .welcome-sec { padding: 20px; background: white; border-bottom: 1px solid #e3e3e3; }
         .welcome-sec h2 { margin: 0; font-size: 1.25rem; color: #202223; }
-        .welcome-sec p { margin: 5px 0 0; color: #6d7175; font-size: 0.85rem; }
-
-        /* Stats Section - Balanced 4 Grid */
+        
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
         .stat-card { background: white; padding: 18px; border-radius: 10px; box-shadow: var(--card-shadow); border: 1px solid #e3e3e3; }
         .stat-title { font-size: 0.7rem; font-weight: 700; color: #6d7175; text-transform: uppercase; margin-bottom: 8px; }
         .stat-main { font-size: 1.3rem; font-weight: 800; color: #202223; }
 
-        /* Action Menu List */
+        /* Share Section */
+        .share-box { background: white; margin: 15px; padding: 15px; border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid #e3e3e3; }
+        .share-btn { border: none; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
+
         .shopify-actions { padding: 0 15px; }
-        .action-item { 
-            background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: var(--card-shadow); cursor: pointer; transition: 0.2s;
-        }
+        .action-item { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--card-shadow); cursor: pointer; }
         .action-icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-        
         .green-lite { background: #f1f8f5; color: var(--shopify-green); }
         .blue-lite { background: #f0f5ff; color: #2c6ecb; }
         .purple-lite { background: #f6f0ff; color: #9c6ade; }
-        .red-lite { background: #fff1f0; color: #d82c0d; }
-
-        .btn-live { background: var(--shopify-green); color: white; padding: 14px; width: calc(100% - 30px); margin: 20px 15px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
     </style>
 </head>
 <body>
@@ -52,65 +43,37 @@
 
     <div class="welcome-sec">
         <h2>Hi, Rahul!</h2>
-        <p>Manage your store efficiency today.</p>
+        <p>Manage and grow your business today.</p>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-title">Total Revenue</div>
-            <div class="stat-main" id="totalSales">₹0</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">New Orders</div>
-            <div class="stat-main" id="orderCount">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Live Products</div>
-            <div class="stat-main" id="productCount">0</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-title">Total Visits</div>
-            <div class="stat-main">1.2k</div>
+        <div class="stat-card"><div class="stat-title">Revenue</div><div class="stat-main" id="totalSales">₹0</div></div>
+        <div class="stat-card"><div class="stat-title">Orders</div><div class="stat-main" id="orderCount">0</div></div>
+    </div>
+
+    <div class="share-box">
+        <div style="font-weight: 800; font-size: 0.9rem; margin-bottom: 10px;"><i class="fas fa-share-alt" style="color: var(--shopify-green);"></i> Promote Store</div>
+        <input type="text" id="storeLink" readonly value="https://vikas17047.github.io/instacart-clone1/my_store.html" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:0.8rem; background:#f9f9f9; margin-bottom:10px; box-sizing:border-box;">
+        <div style="display:flex; gap:10px;">
+            <button class="share-btn" onclick="shareOnWhatsApp()" style="background:#25D366;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button class="share-btn" onclick="copyLink()" style="background:#202223;"><i class="fas fa-copy"></i> Copy Link</button>
         </div>
     </div>
 
     <div class="shopify-actions">
         <div class="action-item" onclick="window.location.href='orders.html'">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="action-icon green-lite"><i class="fas fa-shopping-cart"></i></div>
-                <div style="font-weight:700; font-size:0.9rem;">View Orders</div>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
+            <div style="display:flex; align-items:center; gap:12px;"><div class="action-icon green-lite"><i class="fas fa-shopping-cart"></i></div><div style="font-weight:700;">Orders</div></div>
+            <i class="fas fa-chevron-right"></i>
         </div>
-
         <div class="action-item" onclick="window.location.href='manage_products.html'">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="action-icon blue-lite"><i class="fas fa-box"></i></div>
-                <div style="font-weight:700; font-size:0.9rem;">Manage Products</div>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
+            <div style="display:flex; align-items:center; gap:12px;"><div class="action-icon blue-lite"><i class="fas fa-box"></i></div><div style="font-weight:700;">Products</div></div>
+            <i class="fas fa-chevron-right"></i>
         </div>
-
         <div class="action-item" onclick="window.location.href='store_editor.html'">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="action-icon purple-lite"><i class="fas fa-brush"></i></div>
-                <div style="font-weight:700; font-size:0.9rem;">Edit Store Design</div>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
-        </div>
-
-        <div class="action-item" onclick="window.location.href='profile.html'">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div class="action-icon red-lite"><i class="fas fa-user-circle"></i></div>
-                <div style="font-weight:700; font-size:0.9rem;">My Profile</div>
-            </div>
-            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.75rem;"></i>
+            <div style="display:flex; align-items:center; gap:12px;"><div class="action-icon purple-lite"><i class="fas fa-brush"></i></div><div style="font-weight:700;">Design Store</div></div>
+            <i class="fas fa-chevron-right"></i>
         </div>
     </div>
-
-    <button class="btn-live" onclick="window.location.href='my_store.html'">
-        <i class="fas fa-eye"></i> View Live Store
-    </button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -128,25 +91,25 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function updateStats() {
-            try {
-                // Products Count
-                const prodSnap = await getDocs(collection(db, "products"));
-                document.getElementById('productCount').innerText = prodSnap.size;
+        window.onload = async () => {
+            const orderSnap = await getDocs(collection(db, "orders"));
+            let total = 0;
+            orderSnap.forEach(doc => { total += Number(doc.data().totalAmount || 0); });
+            document.getElementById('totalSales').innerText = "₹" + total.toLocaleString();
+            document.getElementById('orderCount').innerText = orderSnap.size;
+        };
 
-                // Orders & Revenue calculation
-                const orderSnap = await getDocs(collection(db, "orders"));
-                let total = 0;
-                orderSnap.forEach(doc => {
-                    total += Number(doc.data().totalAmount || 0);
-                });
+        window.shareOnWhatsApp = () => {
+            const url = document.getElementById('storeLink').value;
+            window.open("https://wa.me/?text=" + encodeURIComponent("Check out my online store: " + url), "_blank");
+        };
 
-                document.getElementById('totalSales').innerText = "₹" + total.toLocaleString();
-                document.getElementById('orderCount').innerText = orderSnap.size;
-            } catch (e) { console.error("Error updating stats:", e); }
-        }
-
-        window.onload = updateStats;
+        window.copyLink = () => {
+            const link = document.getElementById('storeLink');
+            link.select();
+            navigator.clipboard.writeText(link.value);
+            alert("Link copied! Now paste on WhatsApp or Ads.");
+        };
     </script>
 </body>
 </html>
