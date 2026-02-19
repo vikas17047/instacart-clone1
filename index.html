@@ -3,143 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instacart - Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Instacart Home</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { margin: 0; font-family: sans-serif; background: #fff; padding-bottom: 80px; }
-        
-        /* 1. Header (Logo aur My Store button top par) */
-        .header { 
-            padding: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid #f1f1f1;
+        /* LOGIN PAGE STYLE (Extra Layer) */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; z-index: 9999; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center;
         }
-        .logo { font-size: 1.2rem; font-weight: 900; color: #000; text-decoration: none; }
-        .logo span { color: #008060; }
-        .my-store-link { 
-            text-decoration: none; 
-            color: #008060; 
-            font-weight: 800; 
-            font-size: 0.8rem; 
-            border: 1.5px solid #008060; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
+        .login-btn {
+            background: #000; color: white; border: none; padding: 15px 30px;
+            border-radius: 30px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; font-size: 1rem;
         }
-
-        /* 2. Search Bar (Header ke theek niche) */
-        .search-container { padding: 15px; }
-        .search-box { 
-            background: #f1f3f5; 
-            padding: 12px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        .search-box input { border: none; background: none; outline: none; width: 100%; font-size: 1rem; }
-
-        /* 3. Banner Section */
-        .banner-box { padding: 0 15px 15px; }
-        .main-banner { 
-            background: #008060; 
-            border-radius: 15px; 
-            height: 130px; 
-            color: white; 
-            padding: 20px; 
-            box-sizing: border-box; 
-        }
-
-        /* 4. Top Creators (Wahi Purana Design - Gol Profiles) */
-        .section-title { padding: 0 15px; font-size: 1rem; font-weight: bold; margin-bottom: 10px; }
-        .creators-scroll { 
-            display: flex; 
-            overflow-x: auto; 
-            gap: 15px; 
-            padding: 0 15px 20px; 
-            scrollbar-width: none; 
-        }
-        .creators-scroll::-webkit-scrollbar { display: none; }
-        
-        .creator-card { text-align: center; min-width: 70px; text-decoration: none; color: #000; }
-        .creator-img { 
-            width: 62px; 
-            height: 62px; 
-            border-radius: 50%; 
-            border: 2px solid #008060; 
-            padding: 2px; 
-            object-fit: cover; 
-            background: #fff;
-        }
-        .creator-name { 
-            font-size: 0.7rem; 
-            font-weight: bold; 
-            margin-top: 6px; 
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* 5. Bottom Tab Bar */
-        .tab-bar { 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            background: white; 
-            border-top: 1px solid #eee; 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 12px 0; 
-            z-index: 100;
-        }
-        .tab-item { text-align: center; text-decoration: none; color: #888; font-size: 0.7rem; }
-        .tab-item.active { color: #008060; }
-        .tab-item i { display: block; font-size: 1.2rem; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="index.html" class="logo">INSTA<span>CART</span></a>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <a href="seller_dashboard.html" class="my-store-link">MY STORE</a>
-            <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
+    <div id="loginOverlay" style="display: none;">
+        <h1 style="font-weight: 900; font-size: 2.5rem; margin-bottom: 10px;">INSTACART</h1>
+        <p style="color: #666; margin-bottom: 25px;">Login to explore top creators & products</p>
+        <button class="login-btn" onclick="loginWithGoogle()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20">
+            Continue with Google
+        </button>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <nav class="navbar">
+            <div style="display:flex; align-items:center;">
+                <div class="logo">Instacart</div>
+                <div class="seller-btn" onclick="window.location.href='seller_dashboard.html'">
+                    <i class="fas fa-store-alt"></i> My Store
+                </div>
+            </div>
+            <div class="icon-group">
+                <i class="fas fa-bell"></i>
+                <div style="position:relative;" onclick="window.location.href='cart.html'">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span id="cartCount" style="position:absolute; top:-8px; right:-8px; background:red; color:white; font-size:0.7rem; width:15px; height:15px; border-radius:50%; display:none; align-items:center; justify-content:center;">0</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search brands, products...">
         </div>
-    </div>
 
-    <div class="search-container">
-        <div class="search-box">
-            <i class="fas fa-search" style="color:#999"></i>
-            <input type="text" placeholder="Search stores or products...">
+        <div class="hero">
+            <h2>Mega Fashion Sale</h2>
+            <p>Min 60% Off on Top Brands</p>
+            <button class="btn-shop">Explore</button>
         </div>
-    </div>
 
-    <div class="banner-box">
-        <div class="main-banner">
-            <h2 style="margin:0">Summer Arrivals 🌴</h2>
-            <p style="margin:5px 0">Explore unique creator stores</p>
+        <div class="section-title">Shop by Category</div>
+        <div class="horizontal-scroll">
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
+            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
         </div>
-    </div>
 
-    <div class="section-title">Top Creators 🌟</div>
-    <div class="creators-scroll" id="topCreatorsList">
-        <p style="font-size: 0.7rem; color: #888;">Loading creators...</p>
-    </div>
+        <div class="section-title">Top Creators (52)</div>
+        <div class="creator-grid" id="creatorContainer"></div>
 
-    <div class="tab-bar">
-        <a href="index.html" class="tab-item active"><i class="fas fa-home"></i>Home</a>
-        <a href="#" class="tab-item"><i class="fas fa-search"></i>Explore</a>
-        <a href="seller_dashboard.html" class="tab-item"><i class="fas fa-store"></i>Seller Hub</a>
-        <a href="#" class="tab-item"><i class="fas fa-user"></i>Profile</a>
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
+            <div class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i> Profile</div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Firebase Config (Same as your project)
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
             authDomain: "instacart-clone-91062.firebaseapp.com",
@@ -150,38 +90,57 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-        // Function to load real sellers from Firestore
-        async function loadSellers() {
-            const list = document.getElementById('topCreatorsList');
-            try {
-                const snap = await getDocs(collection(db, "seller_identity"));
-                list.innerHTML = ""; // Loader hatao
+        // Check Login Status
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User login hai, Home page dikhao
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                loadCreators(); // Original creator list load karo
+                updateCartBadge();
+            } else {
+                // User login nahi hai, Login page dikhao
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+        });
 
-                if(snap.empty) {
-                    list.innerHTML = "<p style='font-size:0.7rem; padding-left:5px;'>No creators found.</p>";
-                    return;
-                }
+        window.loginWithGoogle = () => {
+            signInWithPopup(auth, provider).catch(err => alert(err.message));
+        };
 
-                snap.forEach(doc => {
-                    const seller = doc.data();
-                    const sellerId = doc.id;
-                    
-                    // Wahi purana circular design
-                    list.innerHTML += `
-                        <a href="my_store.html?seller=${sellerId}" class="creator-card">
-                            <img src="${seller.sLogo || 'https://via.placeholder.com/65'}" class="creator-img">
-                            <span class="creator-name">${seller.sName || 'Shop'}</span>
-                        </a>`;
-                });
-            } catch (e) {
-                console.log("Error loading sellers:", e);
-                list.innerHTML = "<p style='font-size:0.7rem;'>Error.</p>";
+        // --- ORIGINAL FUNCTIONS ---
+        function loadCreators() {
+            const container = document.getElementById('creatorContainer');
+            const brands = ["Zara Official", "H&M Fashion", "Nike Store", "Adidas Originals", "Puma India"];
+            const images = ["https://randomuser.me/api/portraits/women/44.jpg", "https://randomuser.me/api/portraits/men/32.jpg", "https://randomuser.me/api/portraits/women/65.jpg"];
+            
+            container.innerHTML = "";
+            for (let i = 0; i < brands.length; i++) {
+                let name = brands[i];
+                let img = images[i % images.length];
+                let followers = (Math.random() * 10 + 1).toFixed(1) + "M";
+                container.innerHTML += `
+                    <div class="seller-card" onclick="visitStore('${name}', '${img}', '${followers}')">
+                        <img src="${img}" class="seller-img">
+                        <div class="seller-name">${name}</div>
+                        <div class="seller-followers">${followers} Followers</div>
+                        <button class="btn-visit">View Store</button>
+                    </div>`;
             }
         }
 
-        loadSellers();
+        function updateCartBadge() {
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            let badge = document.getElementById('cartCount');
+            if(cart.length > 0) {
+                badge.innerText = cart.length;
+                badge.style.display = 'flex';
+            }
+        }
     </script>
 </body>
 </html>
