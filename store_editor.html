@@ -3,64 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Studio - Instacart</title>
+    <title>Master Design Studio - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --shopify-green: #008060; --bg: #f4f6f8; }
-        body { background: var(--bg); font-family: sans-serif; margin: 0; padding-bottom: 80px; }
-        .header { background: white; padding: 15px; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100; border-bottom: 1px solid #ddd; }
+        body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
+        .header { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100; }
         .panel { background: white; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #e3e3e3; }
-        .temp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .temp-card { border: 2px solid #eee; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; }
+        .panel-title { font-weight: 800; font-size: 0.85rem; color: #202223; margin-bottom: 15px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        
+        /* Template Style */
+        .temp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .temp-card { border: 2px solid #eee; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
         .temp-card.active { border-color: var(--shopify-green); background: #f1f8f5; }
-        label { display: block; font-size: 0.7rem; font-weight: 700; margin: 15px 0 5px; text-transform: uppercase; }
-        .inp, .select { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 6px; box-sizing: border-box; }
-        .save-btn { background: var(--shopify-green); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 700; }
+        .temp-card i { font-size: 1.4rem; margin-bottom: 5px; display: block; }
+
+        label { display: block; font-size: 0.7rem; font-weight: 700; color: #5c5f62; margin-top: 15px; text-transform: uppercase; }
+        .inp, .select { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 8px; box-sizing: border-box; background: #fff; margin-top: 5px; }
+        .save-btn { background: var(--shopify-green); color: white; border: none; padding: 10px 25px; border-radius: 6px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <b><i class="fas fa-paint-brush"></i> DESIGN STUDIO</b>
-        <button class="save-btn" id="publishBtn">PUBLISH DESIGN</button>
+        <b><i class="fas fa-magic"></i> DESIGN STUDIO</b>
+        <button class="save-btn" id="publishBtn">PUBLISH</button>
     </div>
 
     <div class="panel">
-        <div style="font-weight:800; margin-bottom:15px;"><i class="fas fa-magic"></i> Default Store Themes</div>
+        <div class="panel-title"><i class="fas fa-layer-group"></i> Choose a Template</div>
         <div class="temp-grid">
-            <div class="temp-card" onclick="applyTemplate('modern')"><i class="fas fa-moon"></i><br>Modern Dark</div>
-            <div class="temp-card" onclick="applyTemplate('classic')"><i class="fas fa-sun"></i><br>Classic White</div>
+            <div class="temp-card" id="btn-modern" onclick="setTemplate('modern')">
+                <i class="fas fa-moon"></i> <b>Modern Dark</b>
+            </div>
+            <div class="temp-card" id="btn-classic" onclick="setTemplate('classic')">
+                <i class="fas fa-sun"></i> <b>Classic White</b>
+            </div>
         </div>
+        <p style="font-size: 0.7rem; color: #888;">*Template select karke aap use niche se mazeed customize kar sakte hain.</p>
     </div>
 
     <div class="panel">
-        <div style="font-weight:800; margin-bottom:15px;">Visual Settings</div>
-        <label>Primary Color</label>
-        <input type="color" id="pColor" class="inp">
+        <div class="panel-title"><i class="fas fa-palette"></i> Visual Settings</div>
         
-        <label>Font Family</label>
-        <select id="fFamily" class="select">
-            <option value="'Inter', sans-serif">Modern</option>
-            <option value="'Playfair Display', serif">Luxury</option>
-        </select>
-
-        <label>Button Style</label>
-        <select id="bStyle" class="select">
-            <option value="50px">Rounded</option>
-            <option value="0px">Square</option>
-        </select>
+        <label>Theme Primary Color</label>
+        <input type="color" id="pColor" class="inp" style="height:45px;">
 
         <label>Dark Mode</label>
         <select id="darkMode" class="select">
-            <option value="light">Off</option>
-            <option value="dark">On</option>
+            <option value="light">Off (Light Mode)</option>
+            <option value="dark">On (Dark Mode)</option>
+        </select>
+
+        <label>Font Family</label>
+        <select id="fFamily" class="select">
+            <option value="'Inter', sans-serif">Modern Clean</option>
+            <option value="'Playfair Display', serif">Luxury Serif</option>
+            <option value="'Poppins', sans-serif">Trendy Poppins</option>
         </select>
 
         <label>Announcement Bar</label>
-        <input type="text" id="annText" class="inp" placeholder="Free Shipping...">
+        <input type="text" id="annText" class="inp" placeholder="e.g. Free Delivery">
 
-        <label>Banner URL</label>
-        <input type="text" id="sBanner" class="inp" placeholder="https://...">
+        <label>Cover Banner URL</label>
+        <input type="text" id="sBanner" class="inp" placeholder="https://image-url.jpg">
     </div>
 
     <script type="module">
@@ -68,38 +75,81 @@
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = { /* Aapka Config */ };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        let uid = null;
+
+        // Template Data
         const templates = {
-            modern: { pColor: "#000000", fFamily: "'Inter', sans-serif", bStyle: "50px", darkMode: "dark", annText: "NEW SEASON LIVE" },
-            classic: { pColor: "#008060", fFamily: "'Playfair Display', serif", bStyle: "5px", darkMode: "light", annText: "WELCOME TO OUR STORE" }
+            modern: { pColor: "#1a1c1d", darkMode: "dark", fFamily: "'Inter', sans-serif", annText: "PREMIUM DARK COLLECTION", sBanner: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800" },
+            classic: { pColor: "#008060", darkMode: "light", fFamily: "'Playfair Display', serif", annText: "ELEGANT SUMMER SALE", sBanner: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800" }
         };
 
-        window.applyTemplate = (t) => {
-            const d = templates[t];
-            document.getElementById('pColor').value = d.pColor;
-            document.getElementById('fFamily').value = d.fFamily;
-            document.getElementById('bStyle').value = d.bStyle;
-            document.getElementById('darkMode').value = d.darkMode;
-            document.getElementById('annText').value = d.annText;
-            alert(t.toUpperCase() + " applied! You can still customize it below.");
+        window.setTemplate = (type) => {
+            const t = templates[type];
+            document.getElementById('pColor').value = t.pColor;
+            document.getElementById('darkMode').value = t.darkMode;
+            document.getElementById('fFamily').value = t.fFamily;
+            document.getElementById('annText').value = t.annText;
+            document.getElementById('sBanner').value = t.sBanner;
+
+            document.querySelectorAll('.temp-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('btn-' + type).classList.add('active');
         };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                uid = user.uid;
+                const snap = await getDoc(doc(db, "store_designs", uid));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    document.getElementById('pColor').value = d.pColor || "#008060";
+                    document.getElementById('darkMode').value = d.darkMode || "light";
+                    document.getElementById('fFamily').value = d.fFamily || "'Inter', sans-serif";
+                    document.getElementById('annText').value = d.annText || "";
+                    document.getElementById('sBanner').value = d.sBanner || "";
+                }
+            }
+        });
 
         document.getElementById('publishBtn').onclick = async () => {
-            const user = auth.currentUser;
-            if(!user) return;
-            await setDoc(doc(db, "store_designs", user.uid), {
+            if (!uid) return alert("Login first!");
+            
+            const btn = document.getElementById('publishBtn');
+            btn.innerText = "Publishing...";
+            btn.disabled = true;
+
+            const settings = {
                 pColor: document.getElementById('pColor').value,
-                fFamily: document.getElementById('fFamily').value,
-                bStyle: document.getElementById('bStyle').value,
                 darkMode: document.getElementById('darkMode').value,
+                fFamily: document.getElementById('fFamily').value,
                 annText: document.getElementById('annText').value,
-                sBanner: document.getElementById('sBanner').value
-            });
-            alert("Design Published!");
+                sBanner: document.getElementById('sBanner').value,
+                updatedAt: new Date()
+            };
+
+            try {
+                // Cloud par save
+                await setDoc(doc(db, "store_designs", uid), settings, { merge: true });
+                alert("✨ Design Published Successfully!");
+                window.location.href = `my_store.html?seller=${uid}`;
+            } catch (e) {
+                alert("Error: " + e.message);
+            } finally {
+                btn.innerText = "PUBLISH";
+                btn.disabled = false;
+            }
         };
     </script>
 </body>
