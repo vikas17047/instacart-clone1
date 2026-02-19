@@ -3,134 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Store - Instacart</title>
+    <title>My Live Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style id="dynamicStyles">
-        /* Default Variables */
-        :root { --theme-color: #000; --btn-radius: 8px; --font-main: 'Inter', sans-serif; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
-        body { background: #f5f5f6; padding-bottom: 80px; }
-
-        /* Banner & Header Settings */
-        .store-header { height: 220px; background-size: cover; background-position: center; position: relative; }
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); } /* Opacity dynamic hogi */
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #f9f9f9; padding-bottom: 80px; }
         
-        .profile-area { padding: 0 20px; margin-top: -50px; position: relative; display: flex; justify-content: space-between; align-items: flex-end; }
-        .p-img { width: 90px; height: 90px; border-radius: 50%; border: 4px solid white; object-fit: cover; background: #eee; }
+        /* Announcement Bar */
+        .announce-bar { background: black; color: white; text-align: center; padding: 8px; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; }
         
-        .action-btn { background: var(--theme-color); color: white; padding: 10px 25px; border-radius: var(--btn-radius); border: none; font-weight: 700; cursor: pointer; }
-
-        .store-details { padding: 15px 20px; }
-        .s-name { font-size: 1.6rem; font-weight: 800; color: #000; }
-        .s-desc { color: #555; font-size: 0.9rem; margin-top: 5px; }
-
-        /* Layout Settings */
-        .grid { display: grid; padding: 15px; gap: 15px; }
-        .grid.grid-view { grid-template-columns: 1fr 1fr; }
-        .grid.list-view { grid-template-columns: 1fr; }
-
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .c-img { width: 100%; height: 200px; object-fit: cover; }
-        .c-info { padding: 15px; }
-        .add-btn { width: 100%; margin-top: 10px; padding: 12px; background: white; border: 1px solid var(--theme-color); color: var(--theme-color); font-weight: 700; border-radius: var(--btn-radius); cursor: pointer; transition: 0.2s; }
+        /* Premium Header */
+        .store-header { height: 250px; background-size: cover; background-position: center; position: relative; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         
-        /* Popup Styling */
-        .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .popup-box { background: white; width: 85%; padding: 30px; border-radius: 20px; text-align: center; }
+        .p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .p-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+        .p-img { width: 100%; height: 180px; object-fit: cover; }
+        .p-info { padding: 10px; text-align: center; }
+        
+        .add-btn { width: 40px; height: 40px; background: white; border-radius: 50%; position: absolute; top: 10px; right: 10px; display: flex; align-items: center; justify-content: center; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
+        
+        /* Social Floating Buttons */
+        .social-float { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .s-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-    <div class="store-header" id="sBanner">
-        <div class="overlay" id="sOverlay"></div>
+    <div class="announce-bar" id="annBar">FREE SHIPPING ON ALL ORDERS</div>
+
+    <div class="store-header" id="headerBg">
+        <div class="overlay">
+            <h1 id="storeTitle" style="margin:0; font-size:2rem; text-transform: uppercase;">MY STORE</h1>
+            <p id="storeFollowers">1.2M Followers</p>
+        </div>
     </div>
 
-    <div class="profile-area">
-        <img src="" id="sLogo" class="p-img">
-        <button class="action-btn" id="followBtn">Follow</button>
-    </div>
-
-    <div class="store-details">
-        <div class="s-name" id="displayStoreName">My Store</div>
-        <div class="s-desc" id="displayStoreDesc">Welcome to our official shop.</div>
-        <div id="followerSection" style="font-size: 0.8rem; color: #888; margin-top: 5px;">⭐ 4.9 • 12.5k Followers</div>
-    </div>
-
-    <div class="grid" id="productGrid">
+    <div class="p-grid" id="productGrid">
         </div>
 
-    <div id="cartPopup" class="popup-overlay">
-        <div class="popup-box">
-            <i class="fas fa-check-circle" style="font-size: 3rem; color: green; margin-bottom: 15px;"></i>
-            <h3>Added to Bag!</h3>
-            <button class="action-btn" style="width:100%; margin-top:20px;" onclick="window.location.href='cart.html'">VIEW CART</button>
-            <p onclick="document.getElementById('cartPopup').style.display='none'" style="margin-top:15px; color:#888; cursor:pointer;">Continue Shopping</p>
-        </div>
+    <div class="social-float">
+        <a href="#" id="waLink" class="s-icon" style="background:#25D366;"><i class="fab fa-whatsapp"></i></a>
+        <a href="#" id="igLink" class="s-icon" style="background:#E1306C;"><i class="fab fa-instagram"></i></a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-            authDomain: "instacart-clone-91062.firebaseapp.com",
-            projectId: "instacart-clone-91062",
-            storageBucket: "instacart-clone-91062.firebasestorage.app",
-            messagingSenderId: "232217818928",
-            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-        };
+        // --- LOAD SETTINGS FROM LOCALSTORAGE ---
+        const themeColor = localStorage.getItem('store_color') || "#008060";
+        document.getElementById('storeTitle').innerText = localStorage.getItem('store_name') || "My Store";
+        document.getElementById('annBar').innerText = localStorage.getItem('store_announce') || "Welcome to our store!";
+        document.getElementById('annBar').style.backgroundColor = themeColor;
+        document.getElementById('headerBg').style.backgroundImage = `url('${localStorage.getItem('store_banner') || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800'}')`;
+        
+        // Social Links
+        document.getElementById('igLink').href = localStorage.getItem('store_insta') || "#";
+        document.getElementById('waLink').href = `https://wa.me/${localStorage.getItem('store_whatsapp')}`;
 
+        // --- FIREBASE PRODUCTS ---
+        const firebaseConfig = { /* Wahi config jo aap use kar rahe hain */ };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        window.onload = function() {
-            // 1. Load Editor Settings
-            const s = JSON.parse(localStorage.getItem('store_settings')) || {};
-            
-            if(s.name) document.getElementById('displayStoreName').innerText = s.name;
-            if(s.desc) document.getElementById('displayStoreDesc').innerText = s.desc;
-            if(s.banner) document.getElementById('sBanner').style.backgroundImage = `url('${s.banner}')`;
-            if(s.logo) document.getElementById('sLogo').src = s.logo;
-            
-            // Apply Theme Options
-            document.documentElement.style.setProperty('--theme-color', s.color || '#000');
-            document.documentElement.style.setProperty('--btn-radius', s.radius || '8px');
-            document.documentElement.style.setProperty('--font-main', s.font || 'Inter');
-            document.getElementById('sOverlay').style.background = `rgba(0,0,0, 0.${s.opacity || 5})`;
-            document.getElementById('followerSection').style.display = s.showFollowers || 'block';
-
-            // Apply Layout
-            const grid = document.getElementById('productGrid');
-            grid.classList.add((s.layout || 'grid') + '-view');
-
-            loadProducts();
-        }
 
         async function loadProducts() {
             const grid = document.getElementById('productGrid');
             const snap = await getDocs(collection(db, "products"));
             grid.innerHTML = "";
             snap.forEach(doc => {
-                let d = doc.data();
+                const d = doc.data();
                 grid.innerHTML += `
-                    <div class="card">
-                        <img src="${d.image}" class="c-img">
-                        <div class="c-info">
-                            <div style="font-weight:700;">${d.name}</div>
-                            <div style="color:var(--theme-color); font-weight:800;">₹${d.price}</div>
-                            <button class="add-btn" onclick="addToCart('${d.name}', '${d.price}', '${d.image}')">Add to Bag</button>
+                    <div class="p-card">
+                        <img src="${d.image}" class="p-img">
+                        <button class="add-btn" style="color:${themeColor}"><i class="fas fa-shopping-cart"></i></button>
+                        <div class="p-info">
+                            <div style="font-weight:700; font-size:0.9rem;">${d.name}</div>
+                            <div style="color:${themeColor}; font-weight:800; margin-top:5px;">₹${d.price}</div>
                         </div>
                     </div>`;
             });
         }
-
-        window.addToCart = (name, price, img) => {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            cart.push({ name, price, img, qty: 1 });
-            localStorage.setItem('myCart', JSON.stringify(cart));
-            document.getElementById('cartPopup').style.display = 'flex';
-        }
+        loadProducts();
     </script>
 </body>
 </html>
