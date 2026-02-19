@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Inventory</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Manage Inventory - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f2f5f8; font-family: sans-serif; padding-bottom: 90px; margin: 0; }
         .page-header { background: white; padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; }
@@ -13,17 +13,14 @@
         .prod-info { flex: 1; }
         .prod-title { font-weight: 700; margin-bottom: 3px; font-size: 0.95rem; }
         .prod-price { color: #000; font-weight: 600; font-size: 0.9rem; }
-        
+        .prod-cat { font-size: 0.7rem; color: #888; text-transform: uppercase; font-weight: bold; }
         .action-icons { display: flex; gap: 15px; font-size: 1.1rem; }
         .edit-icon { color: #2196f3; cursor: pointer; }
         .delete-icon { color: #ff3f6c; cursor: pointer; }
-
         .fab-btn { position: fixed; bottom: 25px; right: 25px; background: black; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        
-        /* MODAL STYLE */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; }
         .modal-content { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; }
+        .form-input, .form-select { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 8px; box-sizing: border-box; background: #f9f9f9; }
         .save-btn { width: 100%; background: black; color: white; padding: 15px; border: none; font-weight: 700; border-radius: 8px; font-size: 1rem; }
     </style>
 </head>
@@ -44,15 +41,20 @@
         <div class="modal-content">
             <h3 id="modalTitle" style="margin-bottom: 20px;">Add Product</h3>
             <input type="hidden" id="editId">
-            <label style="font-size: 0.8rem; font-weight: 700; color: #666;">PRODUCT NAME</label>
-            <input type="text" id="pName" class="form-input" placeholder="e.g. Denim Jacket">
+            <input type="text" id="pName" class="form-input" placeholder="Product Name">
+            <input type="number" id="pPrice" class="form-input" placeholder="Price (₹)">
             
-            <label style="font-size: 0.8rem; font-weight: 700; color: #666;">PRICE (₹)</label>
-            <input type="number" id="pPrice" class="form-input" placeholder="999">
-            
-            <label style="font-size: 0.8rem; font-weight: 700; color: #666;">IMAGE URL</label>
-            <input type="text" id="pImg" class="form-input" placeholder="https://...">
-            
+            <label style="font-size: 0.7rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">SELECT CATEGORY</label>
+            <select id="pCategory" class="form-select">
+                <option value="All">All Categories</option>
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Watches">Watches</option>
+                <option value="Beauty">Beauty</option>
+            </select>
+
+            <input type="text" id="pImg" class="form-input" placeholder="Image URL">
             <button class="save-btn" id="saveBtn" onclick="handleSave()">SAVE PRODUCT</button>
             <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#888; font-weight:600;">Cancel</button>
         </div>
@@ -74,84 +76,70 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // UI Helpers
         window.openAddModal = () => {
             document.getElementById('modalTitle').innerText = "Add Product";
             document.getElementById('editId').value = "";
             document.getElementById('pName').value = "";
             document.getElementById('pPrice').value = "";
+            document.getElementById('pCategory').value = "All";
             document.getElementById('pImg').value = "";
             document.getElementById('productModal').style.display = 'flex';
         };
 
         window.closeModal = () => document.getElementById('productModal').style.display = 'none';
 
-        // 1. LOAD PRODUCTS
         async function loadProducts() {
             const list = document.getElementById('productList');
             const snap = await getDocs(collection(db, "products"));
             list.innerHTML = "";
-            
-            if(snap.empty) {
-                list.innerHTML = "<p style='text-align:center; padding:50px; color:#999;'>No products in inventory.</p>";
-                return;
-            }
-
             snap.forEach((product) => {
                 const d = product.data();
                 list.innerHTML += `
                     <div class="prod-item">
                         <img src="${d.image}" class="prod-img">
                         <div class="prod-info">
+                            <div class="prod-cat">${d.category || 'ALL'}</div>
                             <div class="prod-title">${d.name}</div>
                             <div class="prod-price">₹${d.price}</div>
                         </div>
                         <div class="action-icons">
-                            <i class="fas fa-edit edit-icon" onclick="openEditModal('${product.id}', '${d.name}', '${d.price}', '${d.image}')"></i>
+                            <i class="fas fa-edit edit-icon" onclick="openEditModal('${product.id}', '${d.name}', '${d.price}', '${d.image}', '${d.category}')"></i>
                             <i class="fas fa-trash delete-icon" onclick="deleteProd('${product.id}')"></i>
                         </div>
                     </div>`;
             });
         }
 
-        // 2. OPEN EDIT MODAL
-        window.openEditModal = (id, name, price, img) => {
+        window.openEditModal = (id, name, price, img, category) => {
             document.getElementById('modalTitle').innerText = "Edit Product";
             document.getElementById('editId').value = id;
             document.getElementById('pName').value = name;
             document.getElementById('pPrice').value = price;
+            document.getElementById('pCategory').value = category || "All";
             document.getElementById('pImg').value = img;
             document.getElementById('productModal').style.display = 'flex';
         };
 
-        // 3. HANDLE SAVE (Add or Update)
         window.handleSave = async () => {
             const id = document.getElementById('editId').value;
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
+            const category = document.getElementById('pCategory').value;
             const img = document.getElementById('pImg').value;
 
-            if(!name || !price) return alert("Name and Price are required!");
+            if(!name || !price) return alert("Fill details");
 
             try {
                 if(id) {
-                    // Update Existing
-                    await updateDoc(doc(db, "products", id), { name, price, image: img });
+                    await updateDoc(doc(db, "products", id), { name, price, image: img, category });
                 } else {
-                    // Add New
-                    await addDoc(collection(db, "products"), { name, price, image: img || "https://via.placeholder.com/150" });
+                    await addDoc(collection(db, "products"), { name, price, image: img, category });
                 }
                 location.reload();
-            } catch (e) { alert("Error: " + e.message); }
+            } catch (e) { alert(e.message); }
         };
 
-        window.deleteProd = async (id) => {
-            if(confirm("Delete this product?")) {
-                await deleteDoc(doc(db, "products", id));
-                location.reload();
-            }
-        };
-
+        window.deleteProd = async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db, "products", id)); location.reload(); } };
         loadProducts();
     </script>
 </body>
