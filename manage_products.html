@@ -3,54 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage My Inventory - Instacart</title>
+    <title>My Inventory - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f2f5f8; font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 90px; margin: 0; }
-        .page-header { background: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; }
-        .prod-item { background: white; padding: 15px; margin: 10px 15px; border-radius: 8px; display: flex; gap: 15px; border: 1px solid #eee; align-items: center; }
-        .prod-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
-        .prod-info { flex: 1; }
-        .prod-title { font-weight: 700; font-size: 0.9rem; }
-        .prod-price { color: #008060; font-weight: 800; font-size: 0.85rem; }
-        .action-icons { display: flex; gap: 15px; color: #5c5f62; }
-        .fab-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; }
-        .inp { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 12px; border-radius: 8px; box-sizing: border-box; }
-        .save-btn { width: 100%; background: #008060; color: white; padding: 15px; border: none; font-weight: 700; border-radius: 8px; }
+        body { background: #f4f7f9; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
+        .header { background: white; padding: 15px; border-bottom: 1px solid #e3e3e3; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+        .header h2 { font-size: 1rem; margin: 0; color: #202223; }
+        
+        .list-container { padding: 10px; }
+        .product-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        .product-card img { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; }
+        .product-details { flex: 1; }
+        .product-name { font-weight: 700; font-size: 0.9rem; color: #202223; }
+        .product-price { color: #008060; font-weight: 800; font-size: 0.85rem; margin-top: 2px; }
+        
+        .delete-btn { color: #d82c0d; padding: 10px; cursor: pointer; }
+        .add-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: flex-end; }
+        .modal-body { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .input-box { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #babec3; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        .submit-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; }
     </style>
 </head>
 <body>
 
-    <div class="page-header">
+    <div class="header">
         <div style="display:flex; align-items:center; gap:10px;">
             <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-            <h2 style="font-size:1rem; margin:0;">MY INVENTORY</h2>
+            <h2>My Products</h2>
         </div>
-        <span id="userEmail" style="font-size: 0.7rem; color: #666;"></span>
+        <div id="status" style="font-size: 0.7rem; color: #6d7175;">Checking...</div>
     </div>
 
-    <div id="myProductsList">
-        <p style="text-align:center; padding:50px; color:#999;">Loading your products...</p>
-    </div>
+    <div id="inventoryList" class="list-container">
+        </div>
 
-    <button class="fab-btn" onclick="openAddModal()"><i class="fas fa-plus"></i></button>
+    <button class="add-btn" onclick="toggleModal(true)"><i class="fas fa-plus"></i></button>
 
-    <div id="prodModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle">Add New Product</h3>
-            <input type="text" id="pName" class="inp" placeholder="Product Name">
-            <input type="number" id="pPrice" class="inp" placeholder="Price (₹)">
-            <input type="text" id="pImg" class="inp" placeholder="Image URL">
-            <select id="pCat" class="inp">
+    <div id="addModal" class="modal">
+        <div class="modal-body">
+            <h3 style="margin-top:0;">Add New Product</h3>
+            <input type="text" id="pName" class="input-box" placeholder="Product Name">
+            <input type="number" id="pPrice" class="input-box" placeholder="Price (₹)">
+            <input type="text" id="pImg" class="input-box" placeholder="Image URL (Unsplash link works best)">
+            <select id="pCat" class="input-box">
                 <option value="Men">Men</option>
                 <option value="Women">Women</option>
                 <option value="Shoes">Shoes</option>
-                <option value="Other">Other</option>
+                <option value="Accessories">Accessories</option>
             </select>
-            <button class="save-btn" onclick="saveToCloud()">SAVE PRODUCT</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:10px; color:#888;">Cancel</button>
+            <button class="submit-btn" onclick="addNewProduct()">Add to My Store</button>
+            <button onclick="toggleModal(false)" style="width:100%; background:none; border:none; margin-top:15px; color:#6d7175; font-weight:600;">Cancel</button>
         </div>
     </div>
 
@@ -72,75 +78,92 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let currentSellerId = null;
+        let myId = null;
 
+        // 1. Auth Check & Filter
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentSellerId = user.uid;
-                document.getElementById('userEmail').innerText = user.email;
-                loadMyProducts();
+                myId = user.uid;
+                document.getElementById('status').innerText = "Logged in: " + user.email.split('@')[0];
+                fetchMyProducts();
             } else {
-                window.location.href = "login.html"; 
+                window.location.href = 'login.html';
             }
         });
 
-        // SIRF KHUD KE PRODUCTS LOAD KARNE KA LOGIC
-        async function loadMyProducts() {
-            const listDiv = document.getElementById('myProductsList');
-            // 'where' clause ka use karke filter kiya gaya hai
-            const q = query(collection(db, "products"), where("sellerId", "==", currentSellerId));
-            const snap = await getDocs(q);
-            
-            listDiv.innerHTML = "";
-            if(snap.empty) {
-                listDiv.innerHTML = "<p style='text-align:center; padding:50px; color:#999;'>No products found in your inventory.</p>";
-                return;
-            }
+        // 2. Fetch only MY products
+        async function fetchMyProducts() {
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = "<p style='text-align:center; margin-top:50px;'>Loading your inventory...</p>";
 
-            snap.forEach(product => {
-                const d = product.data();
-                listDiv.innerHTML += `
-                    <div class="prod-item">
-                        <img src="${d.image}" class="prod-img">
-                        <div class="prod-info">
-                            <div class="prod-title">${d.name}</div>
-                            <div class="prod-price">₹${d.price}</div>
-                        </div>
-                        <div class="action-icons">
-                            <i class="fas fa-trash" onclick="deleteMyProd('${product.id}')"></i>
-                        </div>
-                    </div>`;
-            });
+            try {
+                // Yeh query sirf wahi products layegi jo aapne add kiye hain
+                const q = query(collection(db, "products"), where("sellerId", "==", myId));
+                const snap = await getDocs(q);
+                
+                list.innerHTML = "";
+                
+                if (snap.empty) {
+                    list.innerHTML = `
+                        <div style="text-align:center; padding:50px; color:#6d7175;">
+                            <i class="fas fa-box-open" style="font-size:3rem; opacity:0.3;"></i>
+                            <p>Aapki inventory khali hai.<br>Naya product add karein!</p>
+                        </div>`;
+                    return;
+                }
+
+                snap.forEach(product => {
+                    const d = product.data();
+                    list.innerHTML += `
+                        <div class="product-card">
+                            <img src="${d.image || 'https://via.placeholder.com/150'}">
+                            <div class="product-details">
+                                <div class="product-name">${d.name}</div>
+                                <div class="product-price">₹${d.price}</div>
+                            </div>
+                            <div class="delete-btn" onclick="removeProduct('${product.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                        </div>`;
+                });
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = "<p style='color:red; text-align:center;'>Error loading products. Check Console.</p>";
+            }
         }
 
-        window.openAddModal = () => document.getElementById('prodModal').style.display = 'flex';
-        window.closeModal = () => document.getElementById('prodModal').style.display = 'none';
-
-        window.saveToCloud = async () => {
+        // 3. Add Product with Seller ID
+        window.addNewProduct = async () => {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
             const img = document.getElementById('pImg').value;
             const cat = document.getElementById('pCat').value;
 
-            if(!name || !price) return alert("Details bhariye");
+            if (!name || !price) return alert("Please enter name and price");
 
-            await addDoc(collection(db, "products"), {
-                name,
-                price: Number(price),
-                image: img,
-                category: cat,
-                sellerId: currentSellerId // Ye line sabse zaroori hai
-            });
-
-            alert("Product added to your inventory!");
-            location.reload();
+            try {
+                await addDoc(collection(db, "products"), {
+                    name,
+                    price: Number(price),
+                    image: img,
+                    category: cat,
+                    sellerId: myId, // Tagging product to you
+                    createdAt: new Date()
+                });
+                toggleModal(false);
+                fetchMyProducts();
+            } catch (err) { alert("Error adding product: " + err.message); }
         };
 
-        window.deleteMyProd = async (id) => {
-            if(confirm("Khatam karein?")) {
+        window.removeProduct = async (id) => {
+            if (confirm("Delete this product?")) {
                 await deleteDoc(doc(db, "products", id));
-                location.reload();
+                fetchMyProducts();
             }
+        };
+
+        window.toggleModal = (show) => {
+            document.getElementById('addModal').style.display = show ? 'flex' : 'none';
         };
     </script>
 </body>
