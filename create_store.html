@@ -3,51 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Your Store - Instacart</title>
+    <title>Setup Store Identity - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f4f6f8; font-family: sans-serif; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        .inp { width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        body { background: #f4f7f9; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .setup-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; border: 1px solid #eee; }
+        .setup-card h2 { margin: 0 0 10px; font-size: 1.5rem; color: #1a1c1d; }
+        .setup-card p { color: #6d7175; font-size: 0.9rem; margin-bottom: 25px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; }
+        .inp { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 8px; box-sizing: border-box; margin-bottom: 20px; font-size: 1rem; }
+        .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .save-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Setup Store Identity</h2>
-        <p style="color:#666; font-size:0.9rem;">Ye details customer ko aapke profile par dikhengi.</p>
+
+    <div class="setup-card">
+        <h2>Store Identity</h2>
+        <p>Aapke store ka naam aur pehchan yahan se set hogi.</p>
+        
         <label>Store Name</label>
-        <input type="text" id="sName" class="inp" placeholder="e.g. Vikas Collection">
-        <label>Store Bio</label>
-        <textarea id="sBio" class="inp" rows="3" placeholder="Write about your brand..."></textarea>
-        <label>Logo URL</label>
-        <input type="text" id="sLogo" class="inp" placeholder="https://...">
-        <button class="btn" id="saveIdentity">CREATE MY STORE</button>
+        <input type="text" id="sName" class="inp" placeholder="e.g. Vikas Fashion Store">
+
+        <label>Store Bio / Description</label>
+        <textarea id="sBio" class="inp" rows="3" placeholder="Aap kya bechte hain? (e.g. Best quality clothes)"></textarea>
+
+        <label>Store Logo (URL)</label>
+        <input type="text" id="sLogo" class="inp" placeholder="https://image-link.com/logo.jpg">
+
+        <button class="save-btn" id="saveIdBtn">CREATE MY IDENTITY</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = { /* Aapka Config */ };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        document.getElementById('saveIdentity').onclick = async () => {
-            const user = auth.currentUser;
-            if(!user) return alert("Login first");
-            
-            await setDoc(doc(db, "seller_identity", user.uid), {
+        let uid = null;
+
+        // Agar pehle se data hai toh load karo
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                uid = user.uid;
+                const snap = await getDoc(doc(db, "seller_identity", uid));
+                if (snap.exists()) {
+                    const d = snap.data();
+                    document.getElementById('sName').value = d.sName || "";
+                    document.getElementById('sBio').value = d.sBio || "";
+                    document.getElementById('sLogo').value = d.sLogo || "";
+                }
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        document.getElementById('saveIdBtn').onclick = async () => {
+            if (!uid) return;
+            const data = {
                 sName: document.getElementById('sName').value,
                 sBio: document.getElementById('sBio').value,
                 sLogo: document.getElementById('sLogo').value,
-                sellerEmail: user.email
-            }, { merge: true });
+                updatedAt: new Date()
+            };
 
-            alert("Store Identity Created!");
-            window.location.href = 'seller_dashboard.html';
+            await setDoc(doc(db, "seller_identity", uid), data, { merge: true });
+            alert("Identity Saved Successfully!");
+            window.location.href = "seller_dashboard.html";
         };
     </script>
 </body>
