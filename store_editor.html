@@ -7,18 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --shopify-green: #008060; --bg: #f4f6f8; }
-        body { background: var(--bg); font-family: sans-serif; margin: 0; padding-bottom: 80px; }
+        body { background: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
         .studio-header { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100; }
         .save-btn { background: var(--shopify-green); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 700; cursor: pointer; }
         .panel { background: white; margin: 15px; padding: 20px; border-radius: 12px; border: 1px solid #e3e3e3; }
         .panel-title { font-weight: 800; font-size: 0.9rem; color: #202223; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        
-        /* Template Cards */
         .template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .temp-card { border: 2px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .temp-card { border: 2px solid #eee; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; }
         .temp-card.active { border-color: var(--shopify-green); background: #f1f8f5; }
-        .temp-card i { font-size: 1.5rem; margin-bottom: 5px; display: block; }
-
         .control-group { margin-bottom: 20px; }
         label { display: block; font-size: 0.75rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; }
         .inp, .select { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 6px; box-sizing: border-box; background: #fff; }
@@ -31,22 +27,15 @@
             <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
             <b>DESIGN STUDIO</b>
         </div>
-        <button class="save-btn" onclick="applySettings()">PUBLISH STORE</button>
+        <button class="save-btn" id="publishBtn">PUBLISH STORE</button>
     </div>
 
     <div class="panel">
         <div class="panel-title"><i class="fas fa-magic"></i> Quick Templates</div>
         <div class="template-grid">
-            <div class="temp-card" onclick="setTemplate('modern')">
-                <i class="fas fa-moon" style="color:#1a1c1d;"></i>
-                <b>Modern Dark</b>
-            </div>
-            <div class="temp-card" onclick="setTemplate('classic')">
-                <i class="fas fa-sun" style="color:#ff9800;"></i>
-                <b>Classic Light</b>
-            </div>
+            <div class="temp-card" id="temp-modern"><b>Modern Dark</b></div>
+            <div class="temp-card" id="temp-classic"><b>Classic Light</b></div>
         </div>
-        <p style="font-size: 0.7rem; color: #888;">*Template select karne ke baad aap niche customize bhi kar sakte hain.</p>
     </div>
 
     <div class="panel">
@@ -58,8 +47,15 @@
         <div class="control-group">
             <label>Font Family</label>
             <select id="fFamily" class="select">
-                <option value="'Inter', sans-serif">Modern Clean (Inter)</option>
-                <option value="'Playfair Display', serif">Luxury (Playfair)</option>
+                <option value="'Inter', sans-serif">Modern Clean</option>
+                <option value="'Playfair Display', serif">Luxury Serif</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Button Style</label>
+            <select id="bStyle" class="select">
+                <option value="50px">Rounded</option>
+                <option value="5px">Square</option>
             </select>
         </div>
         <div class="control-group">
@@ -72,7 +68,7 @@
     </div>
 
     <div class="panel">
-        <div class="panel-title"><i class="fas fa-tag"></i> Branding & Layout</div>
+        <div class="panel-title"><i class="fas fa-tag"></i> Branding</div>
         <div class="control-group">
             <label>Announcement Bar</label>
             <input type="text" id="annText" class="inp" placeholder="e.g. 20% OFF TODAY">
@@ -81,68 +77,60 @@
             <label>Banner URL</label>
             <input type="text" id="sBanner" class="inp" placeholder="https://...">
         </div>
-        <div class="control-group">
-            <label>Product Display</label>
-            <select id="pLayout" class="select">
-                <option value="grid">Grid View</option>
-                <option value="list">List View</option>
-            </select>
-        </div>
     </div>
 
-    <script>
-        // Templates Data
-        const templates = {
-            modern: {
-                pColor: "#000000",
-                fFamily: "'Inter', sans-serif",
-                darkMode: "dark",
-                annText: "🚀 NEW GEN COLLECTION IS HERE",
-                pLayout: "grid",
-                sBanner: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800"
-            },
-            classic: {
-                pColor: "#008060",
-                fFamily: "'Playfair Display', serif",
-                darkMode: "light",
-                annText: "✨ ELEGANCE IN EVERY PIECE",
-                pLayout: "list",
-                sBanner: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800"
-            }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
         };
 
-        function setTemplate(type) {
-            const data = templates[type];
-            document.getElementById('pColor').value = data.pColor;
-            document.getElementById('fFamily').value = data.fFamily;
-            document.getElementById('darkMode').value = data.darkMode;
-            document.getElementById('annText').value = data.annText;
-            document.getElementById('pLayout').value = data.pLayout;
-            document.getElementById('sBanner').value = data.sBanner;
-            
-            // UI Feedback
-            document.querySelectorAll('.temp-card').forEach(c => c.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            alert(type.toUpperCase() + " Template Applied!");
-        }
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        function applySettings() {
+        let userUid = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userUid = user.uid;
+                const docSnap = await getDoc(doc(db, "store_designs", userUid));
+                if (docSnap.exists()) {
+                    const s = docSnap.data();
+                    document.getElementById('pColor').value = s.pColor || "#008060";
+                    document.getElementById('fFamily').value = s.fFamily || "'Inter', sans-serif";
+                    document.getElementById('bStyle').value = s.bStyle || "50px";
+                    document.getElementById('darkMode').value = s.darkMode || "light";
+                    document.getElementById('annText').value = s.annText || "";
+                    document.getElementById('sBanner').value = s.sBanner || "";
+                }
+            } else {
+                alert("Please login as a seller first!");
+            }
+        });
+
+        document.getElementById('publishBtn').onclick = async () => {
+            if(!userUid) return;
             const settings = {
                 pColor: document.getElementById('pColor').value,
                 fFamily: document.getElementById('fFamily').value,
+                bStyle: document.getElementById('bStyle').value,
                 darkMode: document.getElementById('darkMode').value,
                 annText: document.getElementById('annText').value,
-                pLayout: document.getElementById('pLayout').value,
                 sBanner: document.getElementById('sBanner').value,
-                timestamp: new Date().getTime()
+                sellerName: auth.currentUser.displayName
             };
-            localStorage.setItem('studio_settings', JSON.stringify(settings));
-            window.location.href = 'my_store.html';
-        }
-
-        window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('studio_settings')) || templates.classic;
-            // Load saved settings...
+            await setDoc(doc(db, "store_designs", userUid), settings);
+            alert("Design Saved Globally!");
+            window.location.href = `my_store.html?seller=${userUid}`;
         };
     </script>
 </body>
