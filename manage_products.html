@@ -3,60 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Inventory - Instacart</title>
+    <title>Inventory Management - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f4f7f9; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 90px; }
-        .header { background: white; padding: 15px; border-bottom: 1px solid #e3e3e3; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-        .header h2 { font-size: 1rem; margin: 0; color: #202223; }
+        .header { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; position: sticky; top:0; z-index:10; }
+        .container { padding: 15px; }
         
-        .list-container { padding: 10px; }
-        .product-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        .product-card img { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; }
-        .product-details { flex: 1; }
-        .product-name { font-weight: 700; font-size: 0.9rem; color: #202223; }
-        .product-price { color: #008060; font-weight: 800; font-size: 0.85rem; margin-top: 2px; }
-        
-        .delete-btn { color: #d82c0d; padding: 10px; cursor: pointer; }
-        .add-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        /* Product Card */
+        .p-card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .p-card img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        .p-info { flex: 1; }
+        .p-name { font-weight: 700; font-size: 0.9rem; }
+        .p-price { color: #008060; font-weight: 800; font-size: 0.85rem; }
 
-        /* Modal Styles */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: flex-end; }
-        .modal-body { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .input-box { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #babec3; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-        .submit-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; }
+        /* FAB Button */
+        .add-btn { position: fixed; bottom: 25px; right: 25px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; }
+        .modal-body { background: white; width: 100%; padding: 25px; border-radius: 20px 20px 0 0; box-sizing: border-box; }
+        .inp { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .auto-msg { font-size: 0.7rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-            <h2>My Products</h2>
-        </div>
-        <div id="status" style="font-size: 0.7rem; color: #6d7175;">Checking...</div>
+        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <h2 style="font-size: 1rem; margin: 0;">My Inventory</h2>
     </div>
 
-    <div id="inventoryList" class="list-container">
+    <div id="inventoryList" class="container">
         </div>
 
     <button class="add-btn" onclick="toggleModal(true)"><i class="fas fa-plus"></i></button>
 
     <div id="addModal" class="modal">
         <div class="modal-body">
-            <h3 style="margin-top:0;">Add New Product</h3>
-            <input type="text" id="pName" class="input-box" placeholder="Product Name">
-            <input type="number" id="pPrice" class="input-box" placeholder="Price (₹)">
-            <input type="text" id="pImg" class="input-box" placeholder="Image URL (Unsplash link works best)">
-            <select id="pCat" class="input-box">
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
+            <h3 style="margin-top: 0;">Add New Product</h3>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Tip: Category select karte hi testing image lag jayegi.</p>
+            
+            <input type="text" id="pName" class="inp" placeholder="Product Name">
+            <input type="number" id="pPrice" class="inp" placeholder="Price (₹)">
+            
+            <label style="font-size: 0.7rem; font-weight: 700; color: #5c5f62;">CHOOSE CATEGORY</label>
+            <select id="pCat" class="inp">
+                <option value="">Select Category</option>
                 <option value="Shoes">Shoes</option>
-                <option value="Accessories">Accessories</option>
+                <option value="Men">Men's Fashion</option>
+                <option value="Women">Women's Fashion</option>
+                <option value="Electronics">Electronics</option>
             </select>
-            <button class="submit-btn" onclick="addNewProduct()">Add to My Store</button>
-            <button onclick="toggleModal(false)" style="width:100%; background:none; border:none; margin-top:15px; color:#6d7175; font-weight:600;">Cancel</button>
+
+            <label style="font-size: 0.7rem; font-weight: 700; color: #5c5f62;">PRODUCT IMAGE URL</label>
+            <input type="text" id="pImg" class="inp" placeholder="https://...">
+            <div id="autoMsg" class="auto-msg"><i class="fas fa-magic"></i> Auto-image linked for testing!</div>
+
+            <button class="save-btn" onclick="saveProduct()">SAVE PRODUCT</button>
+            <button onclick="toggleModal(false)" style="width:100%; border:none; background:none; margin-top:15px; color:#888;">Cancel</button>
         </div>
     </div>
 
@@ -78,92 +84,84 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        let myId = null;
+        let sellerId = null;
 
-        // 1. Auth Check & Filter
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                myId = user.uid;
-                document.getElementById('status').innerText = "Logged in: " + user.email.split('@')[0];
-                fetchMyProducts();
-            } else {
-                window.location.href = 'login.html';
+            if (user) { 
+                sellerId = user.uid; 
+                fetchProducts(); 
+            } else { 
+                window.location.href = "login.html"; 
             }
         });
 
-        // 2. Fetch only MY products
-        async function fetchMyProducts() {
+        // 🔥 AUTOMATIC IMAGE LOGIC FOR TESTING
+        document.getElementById('pCat').addEventListener('change', function() {
+            const cat = this.value;
+            const imgInput = document.getElementById('pImg');
+            const msg = document.getElementById('autoMsg');
+
+            if(!cat) return;
+
+            // Using Unsplash Source for high quality random images based on keywords
+            let keyword = cat === "Men" || cat === "Women" ? "fashion,clothes" : cat.toLowerCase();
+            let randomUrl = `https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80`; // Default Red Shoe
+
+            if(cat === "Shoes") randomUrl = `https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80`;
+            if(cat === "Men") randomUrl = `https://images.unsplash.com/photo-1505022663483-546e4effe1ef?w=400&q=80`;
+            if(cat === "Women") randomUrl = `https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80`;
+            if(cat === "Electronics") randomUrl = `https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80`;
+
+            // Adding a random parameter to avoid browser caching the same image
+            imgInput.value = randomUrl + "&sig=" + Math.floor(Math.random() * 1000);
+            msg.style.display = "block";
+        });
+
+        async function fetchProducts() {
             const list = document.getElementById('inventoryList');
-            list.innerHTML = "<p style='text-align:center; margin-top:50px;'>Loading your inventory...</p>";
-
-            try {
-                // Yeh query sirf wahi products layegi jo aapne add kiye hain
-                const q = query(collection(db, "products"), where("sellerId", "==", myId));
-                const snap = await getDocs(q);
-                
-                list.innerHTML = "";
-                
-                if (snap.empty) {
-                    list.innerHTML = `
-                        <div style="text-align:center; padding:50px; color:#6d7175;">
-                            <i class="fas fa-box-open" style="font-size:3rem; opacity:0.3;"></i>
-                            <p>Aapki inventory khali hai.<br>Naya product add karein!</p>
-                        </div>`;
-                    return;
-                }
-
-                snap.forEach(product => {
-                    const d = product.data();
-                    list.innerHTML += `
-                        <div class="product-card">
-                            <img src="${d.image || 'https://via.placeholder.com/150'}">
-                            <div class="product-details">
-                                <div class="product-name">${d.name}</div>
-                                <div class="product-price">₹${d.price}</div>
-                            </div>
-                            <div class="delete-btn" onclick="removeProduct('${product.id}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </div>
-                        </div>`;
-                });
-            } catch (err) {
-                console.error(err);
-                list.innerHTML = "<p style='color:red; text-align:center;'>Error loading products. Check Console.</p>";
-            }
+            const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
+            const snap = await getDocs(q);
+            list.innerHTML = "";
+            snap.forEach(product => {
+                const d = product.data();
+                list.innerHTML += `
+                    <div class="p-card">
+                        <img src="${d.image}">
+                        <div class="p-info">
+                            <div class="p-name">${d.name}</div>
+                            <div class="p-price">₹${d.price}</div>
+                        </div>
+                        <i class="fas fa-trash" style="color:#ff4444;" onclick="deleteProd('${product.id}')"></i>
+                    </div>`;
+            });
         }
 
-        // 3. Add Product with Seller ID
-        window.addNewProduct = async () => {
+        window.saveProduct = async () => {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
-            const img = document.getElementById('pImg').value;
             const cat = document.getElementById('pCat').value;
+            const img = document.getElementById('pImg').value;
 
-            if (!name || !price) return alert("Please enter name and price");
+            if(!name || !price || !cat) return alert("Details bhariye!");
 
-            try {
-                await addDoc(collection(db, "products"), {
-                    name,
-                    price: Number(price),
-                    image: img,
-                    category: cat,
-                    sellerId: myId, // Tagging product to you
-                    createdAt: new Date()
-                });
-                toggleModal(false);
-                fetchMyProducts();
-            } catch (err) { alert("Error adding product: " + err.message); }
+            await addDoc(collection(db, "products"), {
+                name, price: Number(price), category: cat, image: img, sellerId: sellerId
+            });
+
+            toggleModal(false);
+            fetchProducts();
         };
 
-        window.removeProduct = async (id) => {
-            if (confirm("Delete this product?")) {
+        window.deleteProd = async (id) => {
+            if(confirm("Delete karein?")) {
                 await deleteDoc(doc(db, "products", id));
-                fetchMyProducts();
+                fetchProducts();
             }
         };
 
-        window.toggleModal = (show) => {
-            document.getElementById('addModal').style.display = show ? 'flex' : 'none';
+        window.toggleModal = (val) => {
+            document.getElementById('addModal').style.display = val ? 'flex' : 'none';
+            if(!val) document.getElementById('autoMsg').style.display = 'none';
         };
     </script>
 </body>
