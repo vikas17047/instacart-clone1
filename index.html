@@ -8,68 +8,124 @@
     <style>
         body { margin: 0; font-family: sans-serif; background: #fff; padding-bottom: 80px; }
         
-        /* Header & Search */
-        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.2rem; font-weight: 900; color: #000; }
+        /* 1. Header (Logo aur My Store button top par) */
+        .header { 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .logo { font-size: 1.2rem; font-weight: 900; color: #000; text-decoration: none; }
         .logo span { color: #008060; }
-        .search-bar { padding: 0 15px; }
-        .search-box { background: #f1f3f5; padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
-        .search-box input { border: none; background: none; outline: none; width: 100%; }
+        .my-store-link { 
+            text-decoration: none; 
+            color: #008060; 
+            font-weight: 800; 
+            font-size: 0.8rem; 
+            border: 1.5px solid #008060; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+        }
 
-        /* Banners */
-        .banner-container { padding: 15px; }
-        .main-banner { background: #008060; border-radius: 15px; height: 140px; color: white; padding: 20px; box-sizing: border-box; }
+        /* 2. Search Bar (Header ke theek niche) */
+        .search-container { padding: 15px; }
+        .search-box { 
+            background: #f1f3f5; 
+            padding: 12px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .search-box input { border: none; background: none; outline: none; width: 100%; font-size: 1rem; }
 
-        /* 🌟 TOP CREATORS (Fixed Design) */
-        .creators-container { display: flex; overflow-x: auto; gap: 15px; padding: 15px; scrollbar-width: none; }
-        .creators-container::-webkit-scrollbar { display: none; }
-        .creator-item { text-align: center; min-width: 70px; text-decoration: none; color: #000; }
-        .creator-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #008060; padding: 2px; object-fit: cover; }
-        .creator-name { font-size: 0.65rem; font-weight: bold; margin-top: 5px; display: block; }
+        /* 3. Banner Section */
+        .banner-box { padding: 0 15px 15px; }
+        .main-banner { 
+            background: #008060; 
+            border-radius: 15px; 
+            height: 130px; 
+            color: white; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
 
-        /* Categories */
-        .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; }
-        .cat-item { text-align: center; font-size: 0.7rem; font-weight: bold; }
-        .cat-icon { background: #f8f9fa; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 5px; }
+        /* 4. Top Creators (Wahi Purana Design - Gol Profiles) */
+        .section-title { padding: 0 15px; font-size: 1rem; font-weight: bold; margin-bottom: 10px; }
+        .creators-scroll { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 15px; 
+            padding: 0 15px 20px; 
+            scrollbar-width: none; 
+        }
+        .creators-scroll::-webkit-scrollbar { display: none; }
+        
+        .creator-card { text-align: center; min-width: 70px; text-decoration: none; color: #000; }
+        .creator-img { 
+            width: 62px; 
+            height: 62px; 
+            border-radius: 50%; 
+            border: 2px solid #008060; 
+            padding: 2px; 
+            object-fit: cover; 
+            background: #fff;
+        }
+        .creator-name { 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            margin-top: 6px; 
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        /* Tab Bar */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; padding: 10px 0; }
-        .tab-item { text-align: center; font-size: 0.7rem; text-decoration: none; color: #888; }
+        /* 5. Bottom Tab Bar */
+        .tab-bar { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: white; 
+            border-top: 1px solid #eee; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 12px 0; 
+            z-index: 100;
+        }
+        .tab-item { text-align: center; text-decoration: none; color: #888; font-size: 0.7rem; }
         .tab-item.active { color: #008060; }
-        .tab-item i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+        .tab-item i { display: block; font-size: 1.2rem; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">INSTA<span>CART</span></div>
-        <i class="fas fa-shopping-cart"></i>
+        <a href="index.html" class="logo">INSTA<span>CART</span></a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <a href="seller_dashboard.html" class="my-store-link">MY STORE</a>
+            <i class="fas fa-shopping-cart" style="font-size: 1.2rem;"></i>
+        </div>
     </div>
 
-    <div class="search-bar">
+    <div class="search-container">
         <div class="search-box">
             <i class="fas fa-search" style="color:#999"></i>
-            <input type="text" placeholder="Search for products or stores...">
+            <input type="text" placeholder="Search stores or products...">
         </div>
     </div>
 
-    <div class="banner-container">
+    <div class="banner-box">
         <div class="main-banner">
-            <h2 style="margin:0">Big Sale!</h2>
-            <p style="margin:5px 0">Get 50% off on all new stores.</p>
+            <h2 style="margin:0">Summer Arrivals 🌴</h2>
+            <p style="margin:5px 0">Explore unique creator stores</p>
         </div>
     </div>
 
-    <h4 style="margin: 0 15px;">Top Creators 🌟</h4>
-    <div class="creators-container" id="topCreatorsList">
-        </div>
-
-    <h4 style="margin: 0 15px;">Categories</h4>
-    <div class="cat-grid">
-        <div class="cat-item"><div class="cat-icon">👟</div>Shoes</div>
-        <div class="cat-item"><div class="cat-icon">👕</div>Clothes</div>
-        <div class="cat-item"><div class="cat-icon">⌚</div>Watches</div>
-        <div class="cat-item"><div class="cat-icon">📱</div>Tech</div>
+    <div class="section-title">Top Creators 🌟</div>
+    <div class="creators-scroll" id="topCreatorsList">
+        <p style="font-size: 0.7rem; color: #888;">Loading creators...</p>
     </div>
 
     <div class="tab-bar">
@@ -83,6 +139,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Firebase Config (Same as your project)
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
             authDomain: "instacart-clone-91062.firebaseapp.com",
@@ -95,21 +152,35 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Function to load real sellers from Firestore
         async function loadSellers() {
             const list = document.getElementById('topCreatorsList');
             try {
                 const snap = await getDocs(collection(db, "seller_identity"));
-                list.innerHTML = ""; 
+                list.innerHTML = ""; // Loader hatao
+
+                if(snap.empty) {
+                    list.innerHTML = "<p style='font-size:0.7rem; padding-left:5px;'>No creators found.</p>";
+                    return;
+                }
+
                 snap.forEach(doc => {
                     const seller = doc.data();
+                    const sellerId = doc.id;
+                    
+                    // Wahi purana circular design
                     list.innerHTML += `
-                        <a href="my_store.html?seller=${doc.id}" class="creator-item">
-                            <img src="${seller.sLogo || 'https://via.placeholder.com/60'}" class="creator-img">
+                        <a href="my_store.html?seller=${sellerId}" class="creator-card">
+                            <img src="${seller.sLogo || 'https://via.placeholder.com/65'}" class="creator-img">
                             <span class="creator-name">${seller.sName || 'Shop'}</span>
                         </a>`;
                 });
-            } catch (e) { console.log(e); }
+            } catch (e) {
+                console.log("Error loading sellers:", e);
+                list.innerHTML = "<p style='font-size:0.7rem;'>Error.</p>";
+            }
         }
+
         loadSellers();
     </script>
 </body>
