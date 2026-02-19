@@ -12,70 +12,52 @@
             --radius: 8px; 
             --bg: #ffffff; 
             --text: #000000; 
-        }<button id="shareStoreBtn" class="share-fab">
-    <i class="fas fa-share-alt"></i> Share Store
-</button>
-
-<style>
-    .share-fab {
-        position: fixed;
-        bottom: 100px; /* Cart button ke upar rahega */
-        right: 20px;
-        background: var(--p-color); /* Store ki theme color pakdega */
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 50px;
-        font-weight: 700;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        z-index: 99;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-family: 'Inter', sans-serif;
-    }
-</style>
-
+        }
         
         body { 
             margin:0; 
             background-color: var(--bg); 
             color: var(--text); 
             font-family: 'Inter', sans-serif;
-            padding-bottom: 80px; 
+            padding-bottom: 100px; 
             transition: background 0.3s, color 0.3s; 
         }
 
         /* Identity UI */
-        .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
-        .hero { height: 200px; background-size: cover; background-position: center; position: relative; background-color: #eee; }
+        .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; transition: 0.3s; }
+        .hero { height: 180px; background-size: cover; background-position: center; position: relative; background-color: #eee; }
         .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.3); }
         
-        .profile-sec { padding: 0 20px; margin-top: -50px; position: relative; text-align: center; }
+        .profile-sec { padding: 0 20px; margin-top: -45px; position: relative; text-align: center; }
         .store-logo { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--bg); object-fit: cover; background: #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .store-name { font-size: 1.5rem; font-weight: 800; margin-top: 10px; }
-        .store-bio { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; line-height: 1.4; max-width: 85%; margin-left: auto; margin-right: auto; }
+        .store-name { font-size: 1.4rem; font-weight: 800; margin-top: 10px; }
+        .store-bio { font-size: 0.85rem; opacity: 0.8; margin-top: 5px; line-height: 1.4; max-width: 85%; margin-left: auto; margin-right: auto; }
 
         /* Filter Bar */
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 20px; scrollbar-width: none; background: var(--bg); position: sticky; top: 0; z-index: 10; transition: background 0.3s; }
-        .filter-btn { padding: 8px 20px; border: 1px solid #ddd; border-radius: 25px; background: transparent; white-space: nowrap; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text); }
+        .filter-btn { padding: 8px 18px; border: 1px solid #ddd; border-radius: 25px; background: transparent; white-space: nowrap; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--text); }
         .filter-btn.active { background: var(--p-color); color: white; border-color: var(--p-color); }
 
         /* Product Display */
-        .p-grid { display: grid; padding: 15px; gap: 15px; }
-        .p-grid.grid { grid-template-columns: 1fr 1fr; }
-        .p-grid.list { grid-template-columns: 1fr; }
-
+        .p-grid { display: grid; padding: 15px; gap: 15px; grid-template-columns: 1fr 1fr; }
         .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; color: #000; }
-        .p-img { width: 100%; height: 180px; object-fit: cover; }
-        .p-details { padding: 15px; }
-        .buy-btn { width: 100%; padding: 12px; background: var(--p-color); color: white; border: none; font-weight: 700; border-radius: var(--radius); margin-top: 10px; cursor: pointer; }
+        .p-img { width: 100%; height: 160px; object-fit: cover; }
+        .p-details { padding: 12px; }
+        .buy-btn { width: 100%; padding: 10px; background: var(--p-color); color: white; border: none; font-weight: 700; border-radius: var(--radius); margin-top: 8px; cursor: pointer; font-size: 0.8rem; }
+
+        /* Floating Share Button */
+        .share-fab { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--p-color); color: white; border: none; padding: 12px 25px; 
+            border-radius: 50px; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 100; display: flex; align-items: center; gap: 10px; cursor: pointer;
+            white-space: nowrap; font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
 <body>
 
-    <div class="ann-bar" id="annDisplay">WELCOME</div>
+    <div class="ann-bar" id="annDisplay">WELCOME TO OUR STORE</div>
 
     <div class="hero" id="bannerDisplay">
         <div class="hero-overlay"></div>
@@ -83,18 +65,22 @@
 
     <div class="profile-sec">
         <img id="logoDisplay" src="" class="store-logo" style="display: none;">
-        <div class="store-name" id="nameDisplay">Loading Store...</div>
+        <div class="store-name" id="nameDisplay">Loading...</div>
         <div class="store-bio" id="bioDisplay"></div>
     </div>
 
     <div class="filter-bar" id="categoryFilter">
         <button class="filter-btn active" onclick="filterProducts('All', this)">All</button>
-        <button class="filter-btn" onclick="filterProducts('Men', this)">Men</button>
-        <button class="filter-btn" onclick="filterProducts('Women', this)">Women</button>
         <button class="filter-btn" onclick="filterProducts('Shoes', this)">Shoes</button>
+        <button class="filter-btn" onclick="filterProducts('Clothes', this)">Clothes</button>
+        <button class="filter-btn" onclick="filterProducts('Watch', this)">Watches</button>
     </div>
 
     <div class="p-grid" id="mainGrid"></div>
+
+    <button id="shareStoreBtn" class="share-fab">
+        <i class="fas fa-share-alt"></i> Share Store on WhatsApp
+    </button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -121,11 +107,11 @@
             if(!sellerId) return;
 
             try {
-                // 1. Identity Data
+                // 1. Fetch Permanent Identity
                 const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
                 if(idSnap.exists()) {
                     const d = idSnap.data();
-                    document.getElementById('nameDisplay').innerText = d.sName || "My Store";
+                    document.getElementById('nameDisplay').innerText = d.sName || "Store Name";
                     document.getElementById('bioDisplay').innerText = d.sBio || "";
                     if(d.sLogo) {
                         document.getElementById('logoDisplay').src = d.sLogo;
@@ -133,7 +119,7 @@
                     }
                 }
 
-                // 2. Visual Design (Light/Dark Fix)
+                // 2. Fetch Design Settings (Light/Dark Fix included)
                 const designSnap = await getDoc(doc(db, "store_designs", sellerId));
                 if(designSnap.exists()) {
                     const s = designSnap.data();
@@ -145,24 +131,28 @@
                     
                     if(s.sBanner) document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner}')`;
 
-                    // Theme Toggle Logic
+                    // Toggle Theme Colors
                     if(s.darkMode === 'dark') {
                         root.style.setProperty('--bg', '#121212');
                         root.style.setProperty('--text', '#ffffff');
+                        document.body.style.backgroundColor = "#121212";
+                        document.body.style.color = "#ffffff";
                     } else {
                         root.style.setProperty('--bg', '#ffffff');
                         root.style.setProperty('--text', '#000000');
+                        document.body.style.backgroundColor = "#ffffff";
+                        document.body.style.color = "#000000";
                     }
                 }
 
-                // 3. Products
+                // 3. Fetch Seller's Products
                 const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
                 const prodSnap = await getDocs(q);
                 allProducts = [];
                 prodSnap.forEach(doc => allProducts.push(doc.data()));
                 displayProducts(allProducts);
 
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Store Load Error:", err); }
         }
 
         function displayProducts(products) {
@@ -173,14 +163,31 @@
                     <div class="p-card">
                         <img src="${d.image}" class="p-img">
                         <div class="p-details">
-                            <div style="font-size:0.7rem; color:var(--p-color); font-weight:800;">${d.category || 'ALL'}</div>
-                            <div style="font-weight:700;">${d.name}</div>
-                            <div style="font-weight:800; margin-top:5px;">₹${d.price}</div>
+                            <div style="font-size:0.65rem; color:var(--p-color); font-weight:800; text-transform:uppercase;">${d.category}</div>
+                            <div style="font-weight:700; font-size:0.85rem; margin-top:2px; height: 35px; overflow: hidden;">${d.name}</div>
+                            <div style="font-weight:800; margin-top:5px; font-size:1rem;">₹${d.price}</div>
                             <button class="buy-btn">ADD TO BAG</button>
                         </div>
                     </div>`;
             });
         }
+
+        // WhatsApp / Web Share Logic
+        document.getElementById('shareStoreBtn').onclick = async () => {
+            const storeName = document.getElementById('nameDisplay').innerText;
+            const shareText = `Checkout my online store "${storeName}" on Instacart! 🛍️✨\nOrder now here:`;
+            const shareUrl = window.location.href;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: storeName, text: shareText, url: shareUrl });
+                } catch (err) { console.log(err); }
+            } else {
+                // Fallback for Desktop: Open WhatsApp Web
+                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + " " + shareUrl)}`;
+                window.open(waUrl, '_blank');
+            }
+        };
 
         window.filterProducts = (cat, btn) => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
