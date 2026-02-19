@@ -3,26 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Store - Instacart</title>
+    <title>Store - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --p-color: #008060; 
-            --bg: #ffffff; 
-            --text: #000000; 
-        }
-        
-        body { 
-            margin:0; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Inter', sans-serif;
-            padding-bottom: 80px; 
-            transition: background 0.3s; 
-        }
+        :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
+        body { margin:0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding-bottom: 80px; transition: 0.3s; }
 
-        /* Identity UI */
+        /* Store Branding UI */
         .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
         .hero { height: 180px; background-size: cover; background-position: center; position: relative; background-color: #eee; }
         .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.3); }
@@ -37,37 +25,22 @@
         .filter-btn { padding: 8px 18px; border: 1px solid #ddd; border-radius: 25px; background: transparent; white-space: nowrap; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--text); }
         .filter-btn.active { background: var(--p-color); color: white; border-color: var(--p-color); }
 
-        /* Product Display (No Add to Cart Button) */
+        /* Product Grid (Clickable to Details) */
         .p-grid { display: grid; padding: 15px; gap: 15px; grid-template-columns: 1fr 1fr; }
-        .p-card { 
-            background: white; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            border: 1px solid #eee; 
-            color: #000; 
-            text-align: left;
-            transition: transform 0.2s;
-        }
-        .p-card:active { transform: scale(0.97); }
-        .p-img { width: 100%; height: 160px; object-fit: cover; }
+        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; color: #000; text-align: left; }
+        .p-img { width: 100%; height: 165px; object-fit: cover; }
         .p-details { padding: 12px; }
-        .p-price { font-weight: 800; margin-top: 5px; font-size: 1.1rem; color: var(--p-color); }
-        .tap-hint { font-size: 0.6rem; color: #999; margin-top: 4px; }
+        .p-name { font-weight: 700; font-size: 0.85rem; height: 34px; overflow: hidden; margin: 4px 0; }
+        .p-price { font-weight: 800; font-size: 1.1rem; color: var(--p-color); }
+        .tap-msg { font-size: 0.6rem; color: #999; margin-top: 5px; font-weight: 600; }
 
-        /* Share Button */
-        .share-fab { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--p-color); color: white; border: none; padding: 12px 25px; 
-            border-radius: 50px; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            z-index: 100; display: flex; align-items: center; gap: 10px; cursor: pointer;
-            white-space: nowrap;
-        }
+        /* WhatsApp Share FAB */
+        .share-fab { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: var(--p-color); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 700; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 100; display: flex; align-items: center; gap: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="ann-bar" id="annDisplay">WELCOME</div>
+    <div class="ann-bar" id="annDisplay">WELCOME TO OUR STORE</div>
 
     <div class="hero" id="bannerDisplay">
         <div class="hero-overlay"></div>
@@ -75,7 +48,7 @@
 
     <div class="profile-sec">
         <img id="logoDisplay" src="" class="store-logo" style="display: none;">
-        <div class="store-name" id="nameDisplay">Loading Store...</div>
+        <div class="store-name" id="nameDisplay">Loading...</div>
         <div class="store-bio" id="bioDisplay"></div>
     </div>
 
@@ -108,20 +81,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // URL se Seller ID nikalo (Har seller ke liye alag hogi)
         const urlParams = new URLSearchParams(window.location.search);
         const sellerId = urlParams.get('seller');
 
         let allProducts = [];
 
         async function initStore() {
-            if(!sellerId) return;
+            if(!sellerId) {
+                document.getElementById('nameDisplay').innerText = "Store Not Found";
+                return;
+            }
 
             try {
-                // 1. Seller Info
+                // 1. Seller Identity & Design Load Karo
                 const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
                 if(idSnap.exists()) {
                     const d = idSnap.data();
-                    document.getElementById('nameDisplay').innerText = d.sName || "My Store";
+                    document.getElementById('nameDisplay').innerText = d.sName || "Shop Name";
                     document.getElementById('bioDisplay').innerText = d.sBio || "";
                     if(d.sLogo) {
                         document.getElementById('logoDisplay').src = d.sLogo;
@@ -129,7 +106,7 @@
                     }
                 }
 
-                // 2. Design/Theme Settings
+                // 2. Custom Theme Load Karo
                 const designSnap = await getDoc(doc(db, "store_designs", sellerId));
                 if(designSnap.exists()) {
                     const s = designSnap.data();
@@ -146,7 +123,7 @@
                     }
                 }
 
-                // 3. Products Fetch (Added doc ID for linking)
+                // 3. Products Load Karo (Seller-specific)
                 const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
                 const prodSnap = await getDocs(q);
                 allProducts = [];
@@ -155,40 +132,42 @@
                 });
                 displayProducts(allProducts);
 
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Store Init Error:", err); }
         }
 
         function displayProducts(products) {
             const grid = document.getElementById('mainGrid');
             grid.innerHTML = "";
-            products.forEach(d => {
-                // Click on card now opens product_details.html
+            products.forEach(p => {
+                // UNIVERSAL REDIRECTION: Ye har product ki apni ID details page par bhejega
                 grid.innerHTML += `
-                    <div class="p-card" onclick="window.location.href='product_details.html?id=${d.id}'">
-                        <img src="${d.image}" class="p-img">
+                    <div class="p-card" onclick="window.location.href='product_details.html?id=${p.id}'">
+                        <img src="${p.image}" class="p-img">
                         <div class="p-details">
-                            <div style="font-size:0.6rem; color:var(--p-color); font-weight:800; text-transform:uppercase;">${d.category || 'Product'}</div>
-                            <div style="font-weight:700; font-size:0.85rem; height:34px; overflow:hidden;">${d.name}</div>
-                            <div class="p-price">₹${d.price}</div>
-                            <div class="tap-hint">Tap for details</div>
+                            <div style="font-size:0.6rem; color:var(--p-color); font-weight:800; text-transform:uppercase;">${p.category || 'Product'}</div>
+                            <div class="p-name">${p.name}</div>
+                            <div class="p-price">₹${p.price}</div>
+                            <div class="tap-msg">Tap for details & reviews</div>
                         </div>
                     </div>`;
             });
         }
 
-        document.getElementById('shareStoreBtn').onclick = async () => {
-            const shareText = `Checkout my online store! 🛍️\nLink: ${window.location.href}`;
-            if (navigator.share) {
-                await navigator.share({ title: 'My Store', text: shareText, url: window.location.href });
-            } else {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-            }
-        };
-
+        // Filter Logic
         window.filterProducts = (cat, btn) => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             displayProducts(cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat));
+        };
+
+        // Share Logic
+        document.getElementById('shareStoreBtn').onclick = async () => {
+            const shareText = `Checkout this amazing store! 🛍️\nLink: ${window.location.href}`;
+            if (navigator.share) {
+                await navigator.share({ title: 'Instacart Store', text: shareText, url: window.location.href });
+            } else {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+            }
         };
 
         initStore();
