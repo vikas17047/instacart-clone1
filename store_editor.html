@@ -3,126 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Editor - Instacart</title>
+    <title>Store Editor - Shopify Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
-        body { background:#f8f9fa; padding-bottom:100px; }
-        .editor-header { background:black; color:white; padding:15px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:100; }
-        .section { background:white; padding:20px; margin:15px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
-        .section-title { font-size:0.9rem; font-weight:800; text-transform:uppercase; color:#888; margin-bottom:15px; display:flex; align-items:center; gap:8px; }
-        
-        label { display:block; font-size:0.85rem; font-weight:700; color:#333; margin-top:15px; margin-bottom:5px; }
-        .inp, .select { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; outline:none; background:#f9f9f9; }
-        
-        /* Color Picker */
-        .color-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:5px; }
-        .color-dot { width:35px; height:35px; border-radius:50%; cursor:pointer; border:2px solid white; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-        .color-dot.active { border:3px solid black; transform:scale(1.1); }
-
-        .save-bar { position:fixed; bottom:0; width:100%; background:white; padding:15px; border-top:1px solid #eee; display:flex; gap:10px; z-index:200; }
-        .btn-save { flex:1; background:black; color:white; border:none; padding:15px; border-radius:10px; font-weight:700; cursor:pointer; }
+        body { background: #f4f6f8; font-family: sans-serif; padding-bottom: 100px; margin: 0; }
+        .editor-header { background: white; padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100; }
+        .section { background: white; margin: 15px; padding: 20px; border-radius: 8px; border: 1px solid #e3e3e3; }
+        .lbl { font-size: 0.8rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; display: block; }
+        .inp { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 5px; margin-bottom: 15px; box-sizing: border-box; }
+        .save-btn { background: #008060; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="editor-header">
-        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <b>Store Customization</b>
+        <div style="font-weight:800;"><i class="fas fa-magic"></i> STORE CUSTOMIZER</div>
+        <button class="save-btn" onclick="saveStoreSettings()">SAVE CHANGES</button>
     </div>
 
     <div class="section">
-        <div class="section-title"><i class="fas fa-id-card"></i> Basic Info</div>
-        <label>Store Name (Shopify Style)</label>
-        <input type="text" id="sName" class="inp" placeholder="e.g. ZARA Official">
-        
-        <label>Store Tagline / Bio</label>
-        <textarea id="sDesc" class="inp" rows="2" placeholder="Tell customers about your brand..."></textarea>
+        <span class="lbl">STORE IDENTITY</span>
+        <input type="text" id="sName" class="inp" placeholder="Store Name">
+        <input type="text" id="sAnnounce" class="inp" placeholder="Announcement Bar (e.g. Free Shipping on all orders!)">
     </div>
 
     <div class="section">
-        <div class="section-title"><i class="fas fa-image"></i> Visuals</div>
-        <label>Banner Image URL (Main Background)</label>
-        <input type="text" id="sBanner" class="inp" placeholder="https://...">
-        
-        <label>Profile/Logo Image URL</label>
-        <input type="text" id="sLogo" class="inp" placeholder="https://...">
+        <span class="lbl">HERO BANNER & THEME</span>
+        <input type="text" id="sBanner" class="inp" placeholder="Banner Image URL">
+        <label class="lbl">Theme Color</label>
+        <input type="color" id="sColor" style="width:100%; height:40px; border:none; border-radius:5px; margin-bottom:15px;">
     </div>
 
     <div class="section">
-        <div class="section-title"><i class="fas fa-palette"></i> Design & Theme</div>
-        <label>Brand Primary Color</label>
-        <div class="color-row" id="colorPicker">
-            <div class="color-dot" style="background:#000000;" onclick="pickColor('#000000')"></div>
-            <div class="color-dot" style="background:#ff3f6c;" onclick="pickColor('#ff3f6c')"></div>
-            <div class="color-dot" style="background:#0c831f;" onclick="pickColor('#0c831f')"></div>
-            <div class="color-dot" style="background:#2196f3;" onclick="pickColor('#2196f3')"></div>
-            <div class="color-dot" style="background:#ff9800;" onclick="pickColor('#ff9800')"></div>
-        </div>
-        <input type="hidden" id="sColor" value="#000000">
-
-        <label>Font Style</label>
-        <select id="sFont" class="select">
-            <option value="Inter">Modern (Clean)</option>
-            <option value="Playfair Display">Elegant (Serif)</option>
-            <option value="Courier Prime">Retro (Typewriter)</option>
-        </select>
-
-        <label>Button Corner Style</label>
-        <select id="sRadius" class="select">
-            <option value="0px">Sharp Edges</option>
-            <option value="8px">Rounded Corners</option>
-            <option value="30px">Fully Pill Shaped</option>
-        </select>
-    </div>
-
-    <div class="section">
-        <div class="section-title"><i class="fas fa-th-large"></i> Layout & Display</div>
-        <label>Product Display Style</label>
-        <select id="sLayout" class="select">
-            <option value="grid">Grid (2 Columns)</option>
-            <option value="list">List (Instagram Style)</option>
-        </select>
-
-        <label>Show Follower Count?</label>
-        <select id="sFollowers" class="select">
-            <option value="block">Yes, Show</option>
-            <option value="none">No, Hide</option>
-        </select>
-
-        <label>Banner Overlay Opacity</label>
-        <input type="range" id="sOpacity" min="1" max="9" value="5" style="width:100%; accent-color:black;">
-    </div>
-
-    <div class="save-bar">
-        <button class="btn-save" onclick="saveStore()">PUBLISH CHANGES</button>
+        <span class="lbl">SOCIAL PRESENCE</span>
+        <input type="text" id="sInsta" class="inp" placeholder="Instagram Profile Link">
+        <input type="text" id="sWhatsapp" class="inp" placeholder="WhatsApp Number (with country code)">
     </div>
 
     <script>
-        function pickColor(c) {
-            document.getElementById('sColor').value = c;
-            alert("Theme Color Selected: " + c);
-        }
+        // Load existing settings
+        window.onload = () => {
+            document.getElementById('sName').value = localStorage.getItem('store_name') || "";
+            document.getElementById('sAnnounce').value = localStorage.getItem('store_announce') || "";
+            document.getElementById('sBanner').value = localStorage.getItem('store_banner') || "";
+            document.getElementById('sColor').value = localStorage.getItem('store_color') || "#008060";
+            document.getElementById('sInsta').value = localStorage.getItem('store_insta') || "";
+            document.getElementById('sWhatsapp').value = localStorage.getItem('store_whatsapp') || "";
+        };
 
-        function saveStore() {
-            // Collecting 20+ Data points implicitly through these objects
-            const settings = {
-                name: document.getElementById('sName').value,
-                desc: document.getElementById('sDesc').value,
-                banner: document.getElementById('sBanner').value,
-                logo: document.getElementById('sLogo').value,
-                color: document.getElementById('sColor').value,
-                font: document.getElementById('sFont').value,
-                radius: document.getElementById('sRadius').value,
-                layout: document.getElementById('sLayout').value,
-                showFollowers: document.getElementById('sFollowers').value,
-                opacity: document.getElementById('sOpacity').value
-            };
-
-            // Save to Memory
-            localStorage.setItem('store_settings', JSON.stringify(settings));
-            alert("Store Published Successfully!");
-            window.location.href = 'my_store.html'; // Live preview par le jaye
+        function saveStoreSettings() {
+            localStorage.setItem('store_name', document.getElementById('sName').value);
+            localStorage.setItem('store_announce', document.getElementById('sAnnounce').value);
+            localStorage.setItem('store_banner', document.getElementById('sBanner').value);
+            localStorage.setItem('store_color', document.getElementById('sColor').value);
+            localStorage.setItem('store_insta', document.getElementById('sInsta').value);
+            localStorage.setItem('store_whatsapp', document.getElementById('sWhatsapp').value);
+            
+            alert("Store Settings Saved!");
+            window.location.href = 'my_store.html';
         }
     </script>
 </body>
