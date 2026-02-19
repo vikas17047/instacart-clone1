@@ -6,27 +6,25 @@
     <title>Setup Store Identity - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f4f7f9; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        body { background: #f4f7f9; font-family: sans-serif; margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
         .setup-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; border: 1px solid #eee; }
-        .setup-card h2 { margin: 0 0 10px; font-size: 1.5rem; color: #1a1c1d; }
-        .setup-card p { color: #6d7175; font-size: 0.9rem; margin-bottom: 25px; }
         label { display: block; font-size: 0.75rem; font-weight: 700; color: #5c5f62; margin-bottom: 8px; text-transform: uppercase; }
         .inp { width: 100%; padding: 12px; border: 1px solid #babec3; border-radius: 8px; box-sizing: border-box; margin-bottom: 20px; font-size: 1rem; }
-        .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; }
-        .save-btn:active { transform: scale(0.98); }
+        .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+        .save-btn:disabled { background: #ccc; }
     </style>
 </head>
 <body>
 
     <div class="setup-card">
         <h2>Store Identity</h2>
-        <p>Aapke store ka naam aur pehchan yahan se set hogi.</p>
+        <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Apne store ka basic setup yahan karein.</p>
         
         <label>Store Name</label>
         <input type="text" id="sName" class="inp" placeholder="e.g. Vikas Fashion Store">
 
         <label>Store Bio / Description</label>
-        <textarea id="sBio" class="inp" rows="3" placeholder="Aap kya bechte hain? (e.g. Best quality clothes)"></textarea>
+        <textarea id="sBio" class="inp" rows="3" placeholder="Aap kya bechte hain?"></textarea>
 
         <label>Store Logo (URL)</label>
         <input type="text" id="sLogo" class="inp" placeholder="https://image-link.com/logo.jpg">
@@ -54,10 +52,11 @@
 
         let uid = null;
 
-        // Agar pehle se data hai toh load karo
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 uid = user.uid;
+                console.log("Logged in UID:", uid);
+                // Pehle se save data load karein
                 const snap = await getDoc(doc(db, "seller_identity", uid));
                 if (snap.exists()) {
                     const d = snap.data();
@@ -66,22 +65,48 @@
                     document.getElementById('sLogo').value = d.sLogo || "";
                 }
             } else {
+                alert("Session expired! Please login again.");
                 window.location.href = "login.html";
             }
         });
 
         document.getElementById('saveIdBtn').onclick = async () => {
-            if (!uid) return;
-            const data = {
-                sName: document.getElementById('sName').value,
-                sBio: document.getElementById('sBio').value,
-                sLogo: document.getElementById('sLogo').value,
-                updatedAt: new Date()
-            };
+            const btn = document.getElementById('saveIdBtn');
+            const sName = document.getElementById('sName').value;
+            const sBio = document.getElementById('sBio').value;
+            const sLogo = document.getElementById('sLogo').value;
 
-            await setDoc(doc(db, "seller_identity", uid), data, { merge: true });
-            alert("Identity Saved Successfully!");
-            window.location.href = "seller_dashboard.html";
+            if (!uid) {
+                alert("User not identified!");
+                return;
+            }
+
+            if (!sName) {
+                alert("Store Name zaroori hai!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Saving...";
+
+            try {
+                // { merge: true } bahut zaroori hai taaki data update ho sake
+                await setDoc(doc(db, "seller_identity", uid), {
+                    sName: sName,
+                    sBio: sBio,
+                    sLogo: sLogo,
+                    updatedAt: new Date()
+                }, { merge: true });
+
+                console.log("Data successfully saved!");
+                alert("Store Identity Saved!");
+                window.location.href = "seller_dashboard.html"; // Dashboard par redirect
+            } catch (error) {
+                console.error("Firebase Save Error:", error);
+                alert("Error saving: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "CREATE MY IDENTITY";
+            }
         };
     </script>
 </body>
