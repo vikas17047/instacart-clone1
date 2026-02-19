@@ -4,96 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - Instacart</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #f5f7fa; padding-bottom: 50px; margin: 0; }
+        :root {
+            --shopify-green: #008060; /* Shopify Brand Color */
+            --bg-gray: #f6f6f7;
+            --card-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 3px 0 rgba(0,0,0,.15);
+        }
+        body { background: var(--bg-gray); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 50px; }
         
-        .dash-header {
-            background: black; color: white; padding: 25px 20px 60px 20px;
-            border-radius: 0 0 25px 25px; text-align: center;
-        }
+        /* Navigation Bar */
+        .top-bar { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-weight: 800; letter-spacing: -1px; font-size: 1.2rem; }
 
-        .stats-row {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-            padding: 0 20px; margin-top: -35px;
-        }
-        .stat-card {
-            background: white; padding: 15px; border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;
-            border: 1px solid #eee;
-        }
-        .stat-val { font-size: 1.2rem; font-weight: 800; color: black; }
-        .stat-lbl { font-size: 0.7rem; color: #888; text-transform: uppercase; margin-top: 2px; }
+        /* Welcome Section */
+        .welcome-sec { padding: 25px 20px; background: white; border-bottom: 1px solid #e3e3e3; }
+        .welcome-sec h2 { margin: 0; font-size: 1.4rem; color: #202223; }
+        .welcome-sec p { margin: 5px 0 0; color: #6d7175; font-size: 0.9rem; }
 
-        .action-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; 
-            padding: 20px; margin-top: 10px;
+        /* Analytics Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid #e3e3e3; }
+        .stat-title { font-size: 0.75rem; font-weight: 600; color: #6d7175; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-main { font-size: 1.5rem; font-weight: 800; color: #202223; }
+        .stat-trend { font-size: 0.8rem; color: var(--shopify-green); font-weight: 600; margin-top: 5px; }
+
+        /* Chart Section */
+        .chart-container { background: white; margin: 0 20px; padding: 20px; border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid #e3e3e3; }
+
+        /* Action Cards (Shopify Style) */
+        .shopify-actions { padding: 20px; }
+        .action-item { 
+            background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--card-shadow); cursor: pointer; transition: 0.2s;
         }
-        .action-card {
-            background: white; padding: 20px; border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03); text-align: center;
-            cursor: pointer; border: 1px solid #eee; transition: 0.2s;
-            height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .action-card:active { transform: scale(0.95); }
-        .icon-box {
-            width: 45px; height: 45px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; margin-bottom: 10px;
-        }
-        .blue-bg { background: #e3f2fd; color: #2196f3; }
-        .orange-bg { background: #fff3e0; color: #ff9800; }
-        .green-bg { background: #e8f5e9; color: black; }
-        .red-bg { background: #ffebee; color: #f44336; }
+        .action-item:hover { background: #fafafa; }
+        .action-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        
+        .green-lite { background: #f1f8f5; color: var(--shopify-green); }
+        .blue-lite { background: #f0f5ff; color: #2c6ecb; }
+        .purple-lite { background: #f6f0ff; color: #9c6ade; }
+
+        .btn-live { background: var(--shopify-green); color: white; padding: 12px; width: calc(100% - 40px); margin: 10px 20px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="dash-header">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <i class="fas fa-arrow-left" onclick="window.location.href='index.html'" style="cursor:pointer;"></i>
-            <h3 style="margin:0; text-transform:uppercase; letter-spacing:1px;">Dashboard</h3>
-            <i class="fas fa-cog"></i>
+    <div class="top-bar">
+        <div class="logo-text">INSTACART <span style="font-weight:400; font-size:0.8rem; opacity:0.7;">Admin</span></div>
+        <i class="fas fa-search" style="opacity:0.6;"></i>
+    </div>
+
+    <div class="welcome-sec">
+        <h2 id="greeting">Good Morning, Rahul!</h2>
+        <p>Here's what's happening with your store today.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-title">Total Sales</div>
+            <div class="stat-main" id="totalSales">₹0</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up"></i> 12%</div>
         </div>
-        <div style="margin-top:25px;">
-            <p style="opacity:0.7; font-size:0.8rem; margin-bottom:5px;">LIFETIME REVENUE</p>
-            <h1 style="font-size:2.8rem; margin:0;" id="totalRev">₹0</h1>
+        <div class="stat-card">
+            <div class="stat-title">Total Orders</div>
+            <div class="stat-main" id="orderCount">0</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up"></i> 5%</div>
         </div>
     </div>
 
-    <div class="stats-row">
-        <div class="stat-card" onclick="window.location.href='orders.html'" style="cursor:pointer;">
-            <div class="stat-val" id="orderCount">0</div>
-            <div class="stat-lbl">Active Orders</div>
+    <div class="chart-container">
+        <div style="font-weight:700; font-size:0.9rem; margin-bottom:15px; color:#202223;">Sales Over Time</div>
+        <canvas id="salesChart" height="200"></canvas>
+    </div>
+
+    <div class="shopify-actions">
+        <div class="action-item" onclick="window.location.href='orders.html'">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div class="action-icon green-lite"><i class="fas fa-shopping-bag"></i></div>
+                <div>
+                    <div style="font-weight:700; font-size:0.95rem;">Orders</div>
+                    <div style="font-size:0.8rem; color:#6d7175;">Manage fulfilling and shipping</div>
+                </div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
         </div>
-        <div class="stat-card" onclick="window.location.href='manage_products.html'" style="cursor:pointer;">
-            <div class="stat-val" id="productCount">0</div>
-            <div class="stat-lbl">Your Products</div>
+
+        <div class="action-item" onclick="window.location.href='manage_products.html'">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div class="action-icon blue-lite"><i class="fas fa-tag"></i></div>
+                <div>
+                    <div style="font-weight:700; font-size:0.95rem;">Products</div>
+                    <div style="font-size:0.8rem; color:#6d7175;">Add and update inventory</div>
+                </div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
+        </div>
+
+        <div class="action-item" onclick="window.location.href='store_editor.html'">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div class="action-icon purple-lite"><i class="fas fa-palette"></i></div>
+                <div>
+                    <div style="font-weight:700; font-size:0.95rem;">Online Store</div>
+                    <div style="font-size:0.8rem; color:#6d7175;">Customize theme and fonts</div>
+                </div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
         </div>
     </div>
 
-    <div class="action-grid">
-        <div class="action-card" onclick="window.location.href='orders.html'" style="grid-column: span 2; height: 100px; border: 2px solid #e8f5e9;">
-            <div class="icon-box red-bg"><i class="fas fa-shopping-cart"></i></div>
-            <div style="font-weight:700; font-size:0.9rem;">VIEW NEW ORDERS</div>
-        </div>
-
-        <div class="action-card" onclick="window.location.href='store_editor.html'">
-            <div class="icon-box blue-bg"><i class="fas fa-magic"></i></div>
-            <div style="font-weight:700; font-size:0.85rem;">Edit Store</div>
-        </div>
-
-        <div class="action-card" onclick="window.location.href='manage_products.html'">
-            <div class="icon-box orange-bg"><i class="fas fa-plus"></i></div>
-            <div style="font-weight:700; font-size:0.85rem;">Add Items</div>
-        </div>
-
-        <div class="action-card" onclick="window.location.href='my_store.html'" style="grid-column: span 2; height: 90px; background: #fafafa;">
-            <div class="icon-box green-bg"><i class="fas fa-eye"></i></div>
-            <div style="font-weight:700; font-size:0.85rem;">View Live Store</div>
-        </div>
-    </div>
+    <button class="btn-live" onclick="window.location.href='my_store.html'">
+        <i class="fas fa-external-link-alt"></i> View Live Store
+    </button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -111,27 +136,50 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function fetchStats() {
-            try {
-                // Products Count
-                const prodSnap = await getDocs(collection(db, "products"));
-                document.getElementById('productCount').innerText = prodSnap.size;
+        // --- FETCH DATA & RENDER CHART ---
+        async function initDashboard() {
+            const orderSnap = await getDocs(collection(db, "orders"));
+            let total = 0;
+            let orderCount = orderSnap.size;
 
-                // Orders Count
-                const orderSnap = await getDocs(collection(db, "orders"));
-                document.getElementById('orderCount').innerText = orderSnap.size;
+            orderSnap.forEach(doc => {
+                total += Number(doc.data().totalAmount || 0);
+            });
 
-                // Revenue calculation (Mock logic - update based on your payment collection)
-                let total = 0;
-                orderSnap.forEach(doc => {
-                    total += Number(doc.data().totalAmount || 0);
-                });
-                document.getElementById('totalRev').innerText = "₹" + total.toLocaleString();
+            document.getElementById('totalSales').innerText = "₹" + total.toLocaleString();
+            document.getElementById('orderCount').innerText = orderCount;
 
-            } catch (e) { console.error(e); }
+            renderSalesChart();
         }
 
-        window.onload = fetchStats;
+        function renderSalesChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [1200, 1900, 1500, 2500, 2200, 3000, 4500],
+                        borderColor: '#008060',
+                        backgroundColor: 'rgba(0, 128, 96, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { display: false }, 
+                        x: { grid: { display: false } } 
+                    }
+                }
+            });
+        }
+
+        window.onload = initDashboard;
     </script>
 </body>
 </html>
