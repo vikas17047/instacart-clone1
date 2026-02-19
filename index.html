@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* LOGIN PAGE STYLE (Wahi Purana) */
+        /* LOGIN PAGE STYLE (Aapka Original Design) */
         #loginOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; z-index: 9999; display: flex; 
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-    <div id="loginOverlay" style="display: none;">
+    <div id="loginOverlay" style="display: flex;">
         <h1 style="font-weight: 900; font-size: 2.5rem; margin-bottom: 10px;">INSTACART</h1>
         <p style="color: #666; margin-bottom: 25px;">Login to explore top creators & products</p>
         <button class="login-btn" onclick="loginWithGoogle()">
@@ -96,43 +96,46 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Check Login Status
+        // Check Status: Login hai ya nahi
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // User login hai -> Home dikhao
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
-                loadRealCreators(); // 🔥 ASLI SELLERS LOAD KARO
-                updateCartBadge();
+                loadRealSellers(); 
             } else {
+                // User login nahi hai -> Login button dikhao
                 document.getElementById('loginOverlay').style.display = 'flex';
                 document.getElementById('mainContent').style.display = 'none';
             }
         });
 
+        // Login Function
         window.loginWithGoogle = () => {
-            signInWithPopup(auth, provider).catch(err => alert(err.message));
+            signInWithPopup(auth, provider)
+            .then(() => {
+                console.log("Logged in!");
+            })
+            .catch(err => alert("Login Error: " + err.message));
         };
 
-        // 🔥 FIREBASE SE SELLERS UTANE KA LOGIC
-        async function loadRealCreators() {
+        // Real Sellers Load karne ka function
+        async function loadRealSellers() {
             const container = document.getElementById('creatorContainer');
             try {
                 const snap = await getDocs(collection(db, "seller_identity"));
                 container.innerHTML = "";
                 
                 if(snap.empty) {
-                    container.innerHTML = "<p style='padding:20px; color:#888;'>No creators found yet.</p>";
+                    container.innerHTML = "<p style='padding:20px; color:#888;'>No creators found.</p>";
                     return;
                 }
-
-                document.getElementById('creatorTitle').innerText = `Top Creators (${snap.size})`;
 
                 snap.forEach(doc => {
                     const seller = doc.data();
                     const sellerId = doc.id;
-                    const followers = (Math.random() * 5 + 1).toFixed(1) + "K"; // Testing ke liye random followers
+                    const followers = (Math.random() * 5 + 1).toFixed(1) + "K"; 
 
-                    // Aapka wahi seller-card design
                     container.innerHTML += `
                         <div class="seller-card" onclick="window.location.href='my_store.html?seller=${sellerId}'">
                             <img src="${seller.sLogo || 'https://via.placeholder.com/150'}" class="seller-img">
@@ -141,18 +144,7 @@
                             <button class="btn-visit">View Store</button>
                         </div>`;
                 });
-            } catch (err) {
-                console.error("Error loading sellers:", err);
-            }
-        }
-
-        function updateCartBadge() {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            let badge = document.getElementById('cartCount');
-            if(badge && cart.length > 0) {
-                badge.innerText = cart.length;
-                badge.style.display = 'flex';
-            }
+            } catch (err) { console.log(err); }
         }
     </script>
 </body>
