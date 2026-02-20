@@ -13,7 +13,6 @@
         .p-info-sec { padding: 20px; }
         .p-price { font-size: 1.6rem; color: var(--p-color); font-weight: 800; margin: 12px 0; }
         
-        /* Quantity Selector UI */
         .qty-selector { display: flex; align-items: center; gap: 20px; margin: 20px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; width: fit-content; }
         .qty-btn { width: 35px; height: 35px; border: 1px solid #ddd; background: white; border-radius: 50%; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
         .qty-val { font-weight: 800; font-size: 1.1rem; }
@@ -99,25 +98,22 @@
 
         window.handleCartAction = (isBuyNow) => {
             if(!currentProduct || !sellerId) return;
-            
             const cartKey = `myCart_${sellerId}`;
-            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
             
-            // Step 1: Add product with selected quantity
-            const existingIndex = cart.findIndex(item => item.id === currentProduct.id);
-            if (existingIndex > -1) {
-                cart[existingIndex].qty += selectedQty;
-            } else {
-                cart.push({ ...currentProduct, qty: selectedQty, img: currentProduct.image });
-            }
-            
-            localStorage.setItem(cartKey, JSON.stringify(cart));
-
             if(isBuyNow) {
-                // Seedha checkout par bhej do bina cart page dikhaye
-                window.location.href = `checkout.html?seller=${sellerId}`;
+                const singleItem = [{ ...currentProduct, qty: selectedQty, img: currentProduct.image }];
+                localStorage.setItem('temp_buy_now', JSON.stringify(singleItem));
+                window.location.href = `checkout.html?seller=${sellerId}&mode=direct`;
             } else {
-                alert(`${selectedQty} item(s) added to cart! 🛍️`);
+                let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+                const existingIndex = cart.findIndex(item => item.id === currentProduct.id);
+                if (existingIndex > -1) {
+                    cart[existingIndex].qty += selectedQty;
+                } else {
+                    cart.push({ ...currentProduct, qty: selectedQty, img: currentProduct.image });
+                }
+                localStorage.setItem(cartKey, JSON.stringify(cart));
+                window.location.href = `cart.html?seller=${sellerId}`;
             }
         };
 
