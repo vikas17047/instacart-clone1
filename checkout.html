@@ -16,11 +16,7 @@
         .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
         .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 18px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; z-index: 100; }
         .required { color: red; }
-
-        /* SHIPPING STATUS TEXT */
         #shipStatus { font-size: 0.75rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 15px; display: block; }
-
-        /* CUSTOM MODERN ALERT MODAL */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-box { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out; }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -92,45 +88,50 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // URL se Seller ID lo (Isolation logic ke liye zaroori hai)
+        const urlParams = new URLSearchParams(window.location.search);
+        const sellerId = urlParams.get('seller');
+        
+        // Dynamic Cart Key
+        const cartKey = sellerId ? `myCart_${sellerId}` : 'myCart';
         let cartTotal = Number(localStorage.getItem('cartTotal')) || 0;
         let sellerPin = "";
         let prodWeight = 500;
         const API_USER = "vikas17047@gmail.com";
         const API_PASS = "&Ot0^Vbz#9ccEKK8p6S^lrDgA*et17g1";
 
-        // 1. Initial Load
+        // Initial Load
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('custName').value = user.displayName || "";
-                await loadOrderContext();
-            } else {
-                window.location.href = 'login.html';
             }
+            await loadOrderContext();
         });
 
         async function loadOrderContext() {
-            const cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
             document.getElementById('itemPrice').innerText = "₹" + cartTotal;
             document.getElementById('payAmt').innerText = "₹" + cartTotal;
 
-            if(cart.length > 0) {
+            // Agar URL mein sellerId hai toh wahi se details fetch karo
+            if(sellerId) {
                 try {
-                    const pSnap = await getDoc(doc(db, "products", cart[0].id));
-                    if(pSnap.exists()) prodWeight = pSnap.data().weight || 500;
-
-                    const sSnap = await getDoc(doc(db, "seller_identity", cart[0].sellerId));
+                    const sSnap = await getDoc(doc(db, "seller_identity", sellerId));
                     if(sSnap.exists()) sellerPin = sSnap.data().sPin;
-                } catch(e) { console.log("Data fetch error", e); }
+                    
+                    if(cart.length > 0) {
+                         const pSnap = await getDoc(doc(db, "products", cart[0].id));
+                         if(pSnap.exists()) prodWeight = pSnap.data().weight || 500;
+                    }
+                } catch(e) { console.log("Context fetch error", e); }
             }
         }
 
-        // 2. Live Shipping Calculation (With Subsidy Logic)
         window.fetchLiveShipping = async () => {
             const pin = document.getElementById('pincode').value;
             if(pin.length === 6 && sellerPin) {
                 document.getElementById('shipStatus').innerText = "Checking delivery rate...";
                 try {
-                    // Login to Shiprocket
                     const login = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -138,7 +139,6 @@
                     });
                     const authData = await login.json();
                     
-                    // Fetch Serviceability
                     const rateRes = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/serviceability?pickup_postcode=${sellerPin}&delivery_postcode=${pin}&weight=${prodWeight/1000}&cod=0`, {
                         headers: {'Authorization': `Bearer ${authData.token}`}
                     });
@@ -146,27 +146,19 @@
                     
                     if(rateData.status === 200) {
                         const actualCharge = rateData.data.available_courier_companies[0].rate;
-                        
-                        // 🟢 SUBSIDY LOGIC: Subtract ₹49
-                        let customerCharge = Math.max(0, Number(actualCharge) - 49);
+                        let customerCharge = Math.max(0, Number(actualCharge) - 49); // SUBSIDY LOGIC
                         
                         document.getElementById('shipPrice').innerText = "₹" + customerCharge.toFixed(0);
                         document.getElementById('payAmt').innerText = "₹" + (cartTotal + customerCharge).toFixed(0);
                         document.getElementById('shipStatus').innerText = "Delivery rate updated! ✅";
-                        
                         localStorage.setItem('shipping_charge', customerCharge);
                     } else {
                         document.getElementById('shipStatus').innerText = "Delivery not available for this PIN.";
                     }
-                } catch (e) { 
-                    document.getElementById('shipStatus').innerText = "Error calculating rate."; 
-                }
-            } else {
-                document.getElementById('shipStatus').innerText = "";
+                } catch (e) { document.getElementById('shipStatus').innerText = "Error calculating rate."; }
             }
         }
 
-        // 3. Validation & Redirect
         window.showAlert = () => document.getElementById('customAlert').style.display = 'flex';
         window.closeAlert = () => document.getElementById('customAlert').style.display = 'none';
 
@@ -188,7 +180,7 @@
             localStorage.setItem('user_phone', phone);
             localStorage.setItem('user_pincode', pin);
 
-            window.location.href = 'payment.html';
+            window.location.href = `payment.html?seller=${sellerId}`;
         }
     </script>
 </body>
