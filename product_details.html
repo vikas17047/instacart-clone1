@@ -53,6 +53,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -62,14 +63,24 @@
             messagingSenderId: "232217818928",
             appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
         const sellerId = urlParams.get('seller'); 
+        
         let currentProduct = null;
         let selectedQty = 1;
+        let loggedUser = null;
+
+        // Login Status Check
+        onAuthStateChanged(auth, (user) => {
+            loggedUser = user;
+        });
 
         async function loadDetails() {
             if(!productId) return;
@@ -96,8 +107,22 @@
             document.getElementById('qtyDisplay').innerText = selectedQty;
         }
 
-        window.handleCartAction = (isBuyNow) => {
+        // Logic to Handle Login + Cart
+        window.handleCartAction = async (isBuyNow) => {
             if(!currentProduct || !sellerId) return;
+
+            // 1. Agar login nahi hai, toh Google Popup dikhao
+            if(!loggedUser) {
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    loggedUser = result.user;
+                } catch (error) {
+                    alert("Login required to continue!");
+                    return;
+                }
+            }
+
+            // 2. Login hone ke baad aage badho
             const cartKey = `myCart_${sellerId}`;
             
             if(isBuyNow) {
