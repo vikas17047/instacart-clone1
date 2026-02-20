@@ -7,27 +7,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 100px; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 100px; transition: 0.3s; }
         .nav-header { padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid #eee; }
-        .p-main-img { width: 100%; height: 400px; object-fit: cover; }
+        .p-main-img { width: 100%; height: 400px; object-fit: cover; background: #f9f9f9; }
         .p-info-sec { padding: 20px; }
+        .p-title { font-size: 1.5rem; font-weight: 800; margin: 0; line-height: 1.2; }
         .p-price { font-size: 1.6rem; color: var(--p-color); font-weight: 800; margin: 12px 0; }
-        .bottom-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px 20px; gap: 12px; background: var(--bg); border-top: 1px solid #eee; box-sizing: border-box; }
-        .btn-cart { flex: 1; padding: 16px; border: 2px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 12px; font-weight: 800; }
-        .btn-buy { flex: 1; padding: 16px; background: var(--p-color); color: white; border: none; border-radius: 12px; font-weight: 800; }
+        .rating-box { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .stars { color: #ffcc00; font-size: 0.9rem; }
+        .p-desc-title { font-weight: 700; border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .p-desc-text { font-size: 0.95rem; opacity: 0.8; line-height: 1.6; margin-top: 8px; }
+        .bottom-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px 20px; gap: 12px; background: var(--bg); border-top: 1px solid #eee; box-sizing: border-box; z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .btn-cart { flex: 1; padding: 16px; border: 2px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; }
+        .btn-buy { flex: 1; padding: 16px; background: var(--p-color); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,128,96,0.3); }
     </style>
 </head>
 <body>
     <div class="nav-header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <b>Product Details</b>
-        <i class="fas fa-share-alt"></i>
+        <b style="font-size: 1rem;">Product Details</b>
+        <i class="fas fa-share-alt" onclick="shareProduct()"></i>
     </div>
     <img id="pImg" class="p-main-img" src="">
     <div class="p-info-sec">
-        <h1 id="pName">Loading...</h1>
+        <h1 id="pName" class="p-title">Loading...</h1>
+        <div class="rating-box">
+            <div class="stars">★★★★★</div>
+            <span style="font-size: 0.8rem; opacity:0.6;">(4.8 | 150+ Reviews)</span>
+        </div>
         <div id="pPrice" class="p-price">₹--</div>
-        <p id="pDesc">Fetching details...</p>
+        <div class="p-desc-title">Product Description</div>
+        <div id="pDesc" class="p-desc-text">Fetching details...</div>
     </div>
     <div class="bottom-bar">
         <button class="btn-cart" onclick="addToCart()">ADD TO CART</button>
@@ -38,14 +48,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-            authDomain: "instacart-clone-91062.firebaseapp.com",
-            projectId: "instacart-clone-91062",
-            storageBucket: "instacart-clone-91062.firebasestorage.app",
-            messagingSenderId: "232217818928",
-            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg", authDomain: "instacart-clone-91062.firebaseapp.com", projectId: "instacart-clone-91062", storageBucket: "instacart-clone-91062.firebasestorage.app", messagingSenderId: "232217818928", appId: "1:232217818928:web:e05efedfda36263f6cfaf5" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -61,25 +64,28 @@
                 document.getElementById('pName').innerText = currentProduct.name;
                 document.getElementById('pPrice').innerText = "₹" + currentProduct.price;
                 document.getElementById('pImg').src = currentProduct.image;
-                document.getElementById('pDesc').innerText = currentProduct.description || "No description.";
+                document.getElementById('pDesc').innerText = currentProduct.description || "No description provided.";
             }
         }
 
         window.addToCart = () => {
             if(!currentProduct) return;
             let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            cart.push(currentProduct);
+            // FIX: Format matching cart.html
+            cart.push({
+                id: currentProduct.id,
+                name: currentProduct.name,
+                price: Number(currentProduct.price),
+                img: currentProduct.image, 
+                qty: 1
+            });
             localStorage.setItem('myCart', JSON.stringify(cart));
             alert("Added to cart! 🛍️");
+            window.location.href = "cart.html";
         };
 
-        window.buyNow = () => {
-            if(!currentProduct) return;
-            // Clear current cart and add only this item for immediate purchase
-            localStorage.setItem('myCart', JSON.stringify([currentProduct]));
-            localStorage.setItem('cartTotal', currentProduct.price);
-            window.location.href = "checkout.html"; 
-        };
+        window.buyNow = () => { if(!currentProduct) return; window.addToCart(); };
+        window.shareProduct = () => { navigator.share({ title: currentProduct.name, url: window.location.href }); };
         loadDetails();
     </script>
 </body>
