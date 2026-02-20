@@ -4,37 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Admin - Instacart</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { display: none; background: #f5f7fa; font-family: 'Inter', sans-serif; } 
-        .admin-header { background: #000; color: white; padding: 20px; text-align: center; }
+        body { display: none; background: #f5f7fa; font-family: 'Inter', sans-serif; margin: 0; } 
+        .admin-header { background: #000; color: white; padding: 25px 20px; text-align: center; }
         
-        /* Modern Stats Design */
-        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        /* Stats Styling */
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
         .stat-box { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .stat-box h3 { font-size: 1.4rem; font-weight: 800; margin-top: 5px; color: #000; }
-        
+        .stat-box h3 { font-size: 1.5rem; font-weight: 800; margin: 5px 0 0; color: #000; }
+        .stat-label { font-size: 0.75rem; color: #888; font-weight: 700; text-transform: uppercase; }
+
         /* Tabs Styling */
-        .section-tab { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; background: #e0e0e0; transition: 0.3s; }
+        .section-tab { display: flex; gap: 10px; padding: 0 20px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; background: #e0e0e0; transition: 0.3s; font-family: 'Inter'; }
         .tab-btn.active { background: #000; color: white; }
 
-        /* Order & Seller Cards */
-        .card-row { background: white; padding: 18px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #efefef; position: relative; }
-        .payout-info { background: #f0fdf4; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; border: 1px dashed #22c55e; }
-        .copy-btn { background: #000; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; float: right; }
+        /* Card Designs */
+        .card-row { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #eee; position: relative; }
+        .card-title { font-weight: 800; font-size: 1.1rem; color: #000; margin-bottom: 5px; }
+        .card-sub { font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+        
+        .payout-info { background: #f0fdf4; padding: 12px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; border: 1px dashed #22c55e; color: #166534; }
+        .copy-btn { position: absolute; top: 20px; right: 20px; background: #000; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
 
-        /* 🌟 MODERN POPUP NOTIFICATION CSS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 3000; backdrop-filter: blur(5px); }
-        .modal-box { background: white; width: 85%; max-width: 380px; padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popScale 0.3s ease-out; }
+        /* 🌟 MODERN POPUP NOTIFICATION */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(5px); }
+        .modal-box { background: white; width: 85%; max-width: 380px; padding: 30px; border-radius: 25px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popScale 0.3s ease-out; }
         @keyframes popScale { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .modal-icon { font-size: 3.5rem; color: #000; margin-bottom: 15px; }
-        .modal-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 8px; }
-        .modal-text { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px; }
-        .modal-btn { background: #000; color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; }
+        .modal-btn { background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; margin-top: 10px; }
 
-        .denied-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .settle-btn { width: 100%; margin-top: 12px; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer; color: #444; }
+        .settle-btn:hover { background: #eee; }
     </style>
 </head>
 <body>
@@ -42,25 +45,25 @@
     <div id="customAlert" class="modal-overlay">
         <div class="modal-box">
             <div id="alertIcon" class="modal-icon"><i class="fas fa-info-circle"></i></div>
-            <div id="alertTitle" class="modal-title">Notification</div>
-            <div id="alertMsg" class="modal-text">Message goes here...</div>
+            <div id="alertTitle" style="font-weight:800; font-size:1.3rem; margin-bottom:10px;">Notification</div>
+            <div id="alertMsg" style="color:#666; font-size:0.95rem; margin-bottom:20px;">Message goes here...</div>
             <button class="modal-btn" onclick="closeAlert()">Understood</button>
         </div>
     </div>
 
     <div id="adminContent">
         <div class="admin-header">
-            <h2 style="letter-spacing: 1px;">ADMIN CONTROL</h2>
-            <p id="adminStatus" style="font-size: 0.75rem; opacity: 0.8;"></p>
+            <h2 style="margin:0; letter-spacing: 1px;">ADMIN CONTROL</h2>
+            <p id="adminStatus" style="font-size: 0.75rem; opacity: 0.7; margin-top:5px;"></p>
         </div>
 
         <div class="stats-container">
             <div class="stat-box">
-                <small style="color:#888; font-weight:700;">TOTAL ORDERS</small>
+                <div class="stat-label">Total Orders</div>
                 <h3 id="totalOrders">0</h3>
             </div>
             <div class="stat-box">
-                <small style="color:#888; font-weight:700;">TOTAL SALES</small>
+                <div class="stat-label">Total Sales</div>
                 <h3 id="totalRev">₹0</h3>
             </div>
         </div>
@@ -70,7 +73,7 @@
             <button id="sellerTab" class="tab-btn" onclick="switchTab('sellers')">Sellers (Payouts)</button>
         </div>
 
-        <div style="padding: 15px;">
+        <div style="padding: 0 20px;">
             <div id="ordersSection">
                 <div id="masterOrdersList"></div>
             </div>
@@ -101,25 +104,22 @@
 
         const ADMIN_UID = "Bi31d4QWrdbWsUwhuUgCYLbPnw92"; 
 
-        // 🌟 GLOBAL ALERT FUNCTION
-        window.showAlert = function(title, msg, icon = 'fa-info-circle') {
+        // Alert Functions
+        window.showAlert = (title, msg, icon = 'fa-info-circle') => {
             document.getElementById('alertTitle').innerText = title;
             document.getElementById('alertMsg').innerText = msg;
             document.getElementById('alertIcon').innerHTML = `<i class="fas ${icon}"></i>`;
             document.getElementById('customAlert').style.display = 'flex';
         }
-        window.closeAlert = function() {
-            document.getElementById('customAlert').style.display = 'none';
-        }
+        window.closeAlert = () => document.getElementById('customAlert').style.display = 'none';
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.uid === ADMIN_UID) {
                 document.body.style.display = "block";
                 document.getElementById('adminStatus').innerText = "Vikas Gupta | Super Admin";
-                loadMasterData();
-                loadSellers();
+                loadAllData();
             } else {
-                document.body.innerHTML = `<div class="denied-screen"><h1>Access Denied</h1><button onclick="window.location.href='index.html'">Go Back</button></div>`;
+                document.body.innerHTML = "<div style='text-align:center; padding-top:100px;'><h1>Access Denied</h1></div>";
                 document.body.style.display = "block";
             }
         });
@@ -127,53 +127,81 @@
         window.switchTab = (tab) => {
             document.getElementById('ordersSection').style.display = tab === 'orders' ? 'block' : 'none';
             document.getElementById('sellersSection').style.display = tab === 'sellers' ? 'block' : 'none';
-            document.getElementById('orderTab').className = tab === 'orders' ? 'tab-btn active' : 'tab-btn';
-            document.getElementById('sellerTab').className = tab === 'sellers' ? 'tab-btn active' : 'tab-btn';
+            document.getElementById('orderTab').classList.toggle('active', tab === 'orders');
+            document.getElementById('sellerTab').classList.toggle('active', tab === 'sellers');
         }
 
-        async function loadMasterData() {
-            const list = document.getElementById('masterOrdersList');
-            const snap = await getDocs(collection(db, "orders"));
-            let totalRev = 0, count = 0;
-            list.innerHTML = "";
+        async function loadAllData() {
+            const ordersList = document.getElementById('masterOrdersList');
+            const sellersList = document.getElementById('masterSellersList');
+            
+            // 1. Fetch Sellers and Orders
+            const [sellersSnap, ordersSnap] = await Promise.all([
+                getDocs(collection(db, "seller_identity")),
+                getDocs(collection(db, "orders"))
+            ]);
 
-            snap.forEach(doc => {
-                const d = doc.data();
-                count++;
-                totalRev += Number(d.totalAmount || 0);
-                list.innerHTML += `
-                    <div class="card-row">
-                        <div style="font-weight:800; font-size:1rem;">${d.customerName}</div>
-                        <div style="font-size:0.85rem; margin-top:5px; color:#444;">${d.productName} • ₹${d.totalAmount}</div>
-                        <div style="font-size:0.75rem; color:#888; margin-top:5px;"><i class="fas fa-map-marker-alt"></i> ${d.address}</div>
-                    </div>`;
+            let sellersMap = {};
+            let totalRev = 0;
+            let totalCount = 0;
+
+            // Map Sellers
+            sellersSnap.forEach(doc => {
+                sellersMap[doc.id] = { ...doc.data(), totalToPay: 0, orderCount: 0 };
             });
-            document.getElementById('totalOrders').innerText = count;
-            document.getElementById('totalRev').innerText = "₹" + totalRev;
-        }
 
-        async function loadSellers() {
-            const list = document.getElementById('masterSellersList');
-            const snap = await getDocs(collection(db, "seller_identity"));
-            list.innerHTML = "";
+            // Process Orders
+            ordersList.innerHTML = "";
+            ordersSnap.forEach(doc => {
+                const d = doc.data();
+                totalCount++;
+                totalRev += Number(d.totalAmount || 0);
 
-            snap.forEach(doc => {
-                const s = doc.data();
-                list.innerHTML += `
+                // Add to Orders List UI
+                ordersList.innerHTML += `
                     <div class="card-row">
-                        <button class="copy-btn" onclick="copyUPI('${s.sUpi}')">COPY UPI</button>
-                        <div style="font-weight:800;">${s.sName}</div>
-                        <div class="payout-info">
-                            <b>Payment ID:</b> ${s.sUpi || 'Not Set'}
-                        </div>
+                        <div class="card-title">${d.customerName}</div>
+                        <div class="card-sub">${d.productName} • <b>₹${d.totalAmount}</b></div>
+                        <div style="font-size:0.75rem; color:#888;"><i class="fas fa-map-marker-alt"></i> ${d.address}</div>
                     </div>`;
+
+                // Add to Seller Map for Payouts
+                if(sellersMap[d.sellerId]) {
+                    sellersMap[d.sellerId].totalToPay += Number(d.totalAmount || 0);
+                    sellersMap[d.sellerId].orderCount += 1;
+                }
+            });
+
+            document.getElementById('totalOrders').innerText = totalCount;
+            document.getElementById('totalRev').innerText = "₹" + totalRev;
+
+            // 2. Display Grouped Sellers Payouts
+            sellersList.innerHTML = "";
+            Object.values(sellersMap).forEach(s => {
+                if(s.orderCount > 0) {
+                    sellersList.innerHTML += `
+                        <div class="card-row" style="border-left: 5px solid #008060;">
+                            <button class="copy-btn" onclick="copyUPI('${s.sUpi}')">COPY UPI</button>
+                            <div class="card-title">${s.sName}</div>
+                            <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                                <span style="font-size:0.85rem; color:#666;">Orders: <b>${s.orderCount}</b></span>
+                                <span style="font-size:1rem; color:#008060; font-weight:800;">Pay: ₹${s.totalToPay}</span>
+                            </div>
+                            <div class="payout-info">
+                                <i class="fas fa-wallet"></i> <b>UPI ID:</b> ${s.sUpi || 'Not Set'}
+                            </div>
+                            <button class="settle-btn" onclick="showAlert('Success', 'Hisaab clear ho gaya!', 'fa-check-circle')">
+                                <i class="fas fa-check-double"></i> MARK AS SETTLED
+                            </button>
+                        </div>`;
+                }
             });
         }
 
         window.copyUPI = (upi) => {
-            if(!upi) { showAlert('Error', 'Seller ne UPI ID nahi daali hai!', 'fa-times-circle'); return; }
+            if(!upi) return showAlert('Error', 'UPI ID missing!', 'fa-times-circle');
             navigator.clipboard.writeText(upi);
-            showAlert('Success', 'UPI ID copy ho gayi hai. Ab aap pay kar sakte hain.', 'fa-check-circle');
+            showAlert('Copied', 'UPI ID copy ho gayi hai.', 'fa-check');
         }
     </script>
 </body>
