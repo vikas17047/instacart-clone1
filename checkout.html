@@ -17,6 +17,8 @@
         .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 18px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; z-index: 100; }
         .required { color: red; }
         #shipStatus { font-size: 0.75rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 15px; display: block; }
+        
+        /* MODERN MODAL */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-box { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out; }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -30,9 +32,9 @@
 
     <div id="customAlert" class="modal-overlay">
         <div class="modal-box">
-            <i class="fas fa-exclamation-circle modal-icon"></i>
-            <div class="modal-title">Details Missing!</div>
-            <div class="modal-text" id="alertMsg">Kripya saari details bhariye. Red '*' waale fields mandatory hain.</div>
+            <i class="fas fa-exclamation-triangle modal-icon"></i>
+            <div class="modal-title">Action Required!</div>
+            <div class="modal-text" id="alertMsg">Details missing or delivery not available.</div>
             <button class="modal-btn" onclick="closeAlert()">Sahi Hai</button>
         </div>
     </div>
@@ -88,11 +90,9 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // URL se Seller ID lo (Isolation logic ke liye zaroori hai)
         const urlParams = new URLSearchParams(window.location.search);
         const sellerId = urlParams.get('seller');
         
-        // Dynamic Cart Key
         const cartKey = sellerId ? `myCart_${sellerId}` : 'myCart';
         let cartTotal = Number(localStorage.getItem('cartTotal')) || 0;
         let sellerPin = "";
@@ -100,11 +100,8 @@
         const API_USER = "vikas17047@gmail.com";
         const API_PASS = "&Ot0^Vbz#9ccEKK8p6S^lrDgA*et17g1";
 
-        // Initial Load
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('custName').value = user.displayName || "";
-            }
+            if (user) document.getElementById('custName').value = user.displayName || "";
             await loadOrderContext();
         });
 
@@ -113,7 +110,6 @@
             document.getElementById('itemPrice').innerText = "₹" + cartTotal;
             document.getElementById('payAmt').innerText = "₹" + cartTotal;
 
-            // Agar URL mein sellerId hai toh wahi se details fetch karo
             if(sellerId) {
                 try {
                     const sSnap = await getDoc(doc(db, "seller_identity", sellerId));
@@ -146,20 +142,28 @@
                     
                     if(rateData.status === 200) {
                         const actualCharge = rateData.data.available_courier_companies[0].rate;
-                        let customerCharge = Math.max(0, Number(actualCharge) - 49); // SUBSIDY LOGIC
+                        
+                        // 🟢 LOGIC: Subtract 49 subsidy AND Add 5 Hidden Charge (-44 total)
+                        let customerCharge = Math.max(0, Number(actualCharge) - 44); 
                         
                         document.getElementById('shipPrice').innerText = "₹" + customerCharge.toFixed(0);
                         document.getElementById('payAmt').innerText = "₹" + (cartTotal + customerCharge).toFixed(0);
-                        document.getElementById('shipStatus').innerText = "Delivery rate updated! ✅";
+                        document.getElementById('shipStatus').innerText = "Delivery available! ✅";
+                        
                         localStorage.setItem('shipping_charge', customerCharge);
                     } else {
                         document.getElementById('shipStatus').innerText = "Delivery not available for this PIN.";
+                        document.getElementById('shipPrice').innerText = "₹0";
+                        document.getElementById('payAmt').innerText = "₹" + cartTotal;
                     }
                 } catch (e) { document.getElementById('shipStatus').innerText = "Error calculating rate."; }
             }
         }
 
-        window.showAlert = () => document.getElementById('customAlert').style.display = 'flex';
+        window.showAlert = (msg) => {
+            document.getElementById('alertMsg').innerText = msg;
+            document.getElementById('customAlert').style.display = 'flex';
+        }
         window.closeAlert = () => document.getElementById('customAlert').style.display = 'none';
 
         window.validateAndProceed = function() {
@@ -168,15 +172,23 @@
             const addr1 = document.getElementById('addrLine1').value.trim();
             const addr2 = document.getElementById('addrLine2').value.trim();
             const pin = document.getElementById('pincode').value.trim();
+            const shipPrice = document.getElementById('shipPrice').innerText;
 
+            // 1. Basic Validation
             if(!name || !phone || !addr1 || !addr2 || pin.length < 6) {
-                showAlert();
+                showAlert("Kripya saari details aur sahi 6-digit pincode bhariye.");
                 return;
             }
 
-            const fullAddress = `${addr1}, ${addr2}, PIN: ${pin}`;
+            // 2. Shipping Check (Block if shipping is 0 or delivery not verified)
+            if(shipPrice === "₹0" || shipPrice === "") {
+                showAlert("Aapke pincode par delivery available nahi hai. Kripya dusra pincode try karein.");
+                return;
+            }
+
+            // Save details and proceed
             localStorage.setItem('user_name', name);
-            localStorage.setItem('user_address', fullAddress);
+            localStorage.setItem('user_address', `${addr1}, ${addr2}, PIN: ${pin}`);
             localStorage.setItem('user_phone', phone);
             localStorage.setItem('user_pincode', pin);
 
