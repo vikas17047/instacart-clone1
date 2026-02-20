@@ -3,44 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Confirm Order</title>
+    <title>Checkout - Confirm Address</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #f5f5f5; font-family: sans-serif; padding-bottom: 80px; margin:0; }
-        .header { background: white; padding: 15px; border-bottom: 1px solid #eee; }
+        body { background: #f5f5f5; font-family: 'Inter', sans-serif; padding-bottom: 100px; margin:0; }
+        .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; }
         .form-box { background: white; padding: 20px; margin-top: 10px; }
-        .inp-field { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 4px; }
-        .btn-pay { position: fixed; bottom: 0; width: 100%; background: black; color: white; padding: 15px; border: none; font-weight: 700; cursor: pointer; }
+        .inp-label { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; display: block; color: #555; }
+        .inp-field { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; border-radius: 4px; font-family: 'Inter'; box-sizing: border-box; }
+        .summary-box { padding: 20px; background: white; margin-top: 10px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 15px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; }
+        .required { color: red; }
     </style>
 </head>
 <body>
-    <div class="header"><b>CONFIRM ADDRESS</b></div>
-    <div class="form-box">
-        <input type="text" id="name" class="inp-field" placeholder="Full Name">
-        <input type="text" id="phone" class="inp-field" placeholder="Phone Number">
-        <textarea id="address" class="inp-field" rows="3" placeholder="Full Address"></textarea>
-        <div style="padding:10px; background:#fff; font-weight:700;">
-            Total Amount: <span id="payAmt">₹0</span>
-        </div>
-    </div>
-    <button class="btn-pay" onclick="proceedToPayment()">PROCEED TO PAYMENT</button>
 
-    <script>
+    <div class="header">
+        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <div style="font-weight:700; text-transform:uppercase;">Confirm Address</div>
+    </div>
+
+    <div class="form-box">
+        <label class="inp-label">Full Name <span class="required">*</span></label>
+        <input type="text" id="custName" class="inp-field" placeholder="Enter your name">
+
+        <label class="inp-label">Phone Number <span class="required">*</span></label>
+        <input type="text" id="custPhone" class="inp-field" placeholder="+91">
+
+        <label class="inp-label">House No. / Building / Area <span class="required">*</span></label>
+        <input type="text" id="addrLine1" class="inp-field" placeholder="E.g. House No 123, Sakaldiha">
+
+        <label class="inp-label">Street / Landmark / City <span class="required">*</span></label>
+        <textarea id="addrLine2" class="inp-field" rows="2" placeholder="E.g. Near Main Market, Chandauli, UP"></textarea>
+
+        <label class="inp-label">Pincode <span class="required">*</span></label>
+        <input type="text" id="pincode" class="inp-field" placeholder="232104">
+    </div>
+
+    <div class="summary-box">
+        <div class="row"><b>Total Items</b> <span id="itemCount">0</span></div>
+        <div class="row"><b>To Pay</b> <span id="payAmt" style="font-weight:700;">₹0</span></div>
+    </div>
+
+    <button class="btn-pay" onclick="validateAndProceed()">PROCEED TO PAYMENT</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Auto-fill user name on load
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.displayName) {
+                document.getElementById('custName').value = user.displayName;
+            }
+        });
+
         window.onload = function() {
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
             let total = localStorage.getItem('cartTotal') || 0;
+
+            document.getElementById('itemCount').innerText = cart.length;
             document.getElementById('payAmt').innerText = "₹" + total;
         }
 
-        function proceedToPayment() {
-            const name = document.getElementById('name').value;
-            const address = document.getElementById('address').value;
-            const phone = document.getElementById('phone').value;
+        window.validateAndProceed = function() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const addr1 = document.getElementById('addrLine1').value.trim();
+            const addr2 = document.getElementById('addrLine2').value.trim();
+            const pin = document.getElementById('pincode').value.trim();
 
-            if(!name || !address || !phone) { alert("Please fill all details!"); return; }
+            // Validation: Sab mandatory hai
+            if(!name || !phone || !addr1 || !addr2 || !pin) {
+                alert("Kripya saari details bhariye. Red '*' waale fields mandatory hain.");
+                return;
+            }
 
+            // Combine addresses for storage
+            const fullAddress = `${addr1}, ${addr2}, PIN: ${pin}`;
+            
             localStorage.setItem('user_name', name);
-            localStorage.setItem('user_address', address);
+            localStorage.setItem('user_address', fullAddress);
             localStorage.setItem('user_phone', phone);
+
             window.location.href = 'payment.html';
         }
     </script>
