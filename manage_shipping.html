@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Shipping - Instacart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --shopify-green: #008060;
+            --bg-gray: #f6f6f7;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        body { background: var(--bg-gray); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 30px; }
+        
+        .header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e3e3e3; position: sticky; top: 0; z-index: 100; }
+        .header b { font-size: 1.1rem; }
+
+        .container { padding: 15px; }
+        
+        /* Order Card Style */
+        .order-card { background: white; padding: 18px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--card-shadow); border-left: 5px solid #ffcc00; transition: 0.3s; }
+        .order-card.shipped { border-left-color: #38b2ac; }
+        
+        .status-badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase; display: inline-block; margin-bottom: 10px; }
+        .badge-pending { background: #fff4e5; color: #b7791f; }
+        .badge-shipped { background: #e6fffa; color: #2c7a7b; }
+
+        .cust-info { font-size: 0.85rem; color: #202223; margin: 10px 0; line-height: 1.4; }
+        .product-name { font-weight: 800; font-size: 1rem; color: #000; }
+
+        .ship-form { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .ship-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; box-sizing: border-box; margin-bottom: 10px; }
+        .ship-btn { width: 100%; background: var(--shopify-green); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .ship-btn:active { transform: scale(0.98); }
+
+        .tracking-box { background: #f0fdf4; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.8rem; color: #166534; border: 1px dashed #22c55e; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-arrow-left" onclick="window.history.back()" style="cursor:pointer;"></i>
+        <b>Shipping & Orders</b>
+    </div>
+
+    <div class="container">
+        <div id="orderList">Loading your orders...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadOrders(user.uid);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        async function loadOrders(sellerId) {
+            const list = document.getElementById('orderList');
+            const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
+            const snap = await getDocs(q);
+            
+            list.innerHTML = "";
+            if(snap.empty) {
+                list.innerHTML = `<div style="text-align:center; margin-top:50px; color:#666;">
+                    <i class="fas fa-box-open" style="font-size:3rem; opacity:0.2;"></i>
+                    <p>Abhi tak koi order nahi aaya hai.</p>
+                </div>`;
+                return;
+            }
+
+            snap.forEach(orderDoc => {
+                const d = orderDoc.data();
+                const isShipped = d.status === "Shipped";
+                
+                list.innerHTML += `
+                    <div class="order-card ${isShipped ? 'shipped' : ''}">
+                        <span class="status-badge ${isShipped ? 'badge-shipped' : 'badge-pending'}">
+                            ${d.status || 'Pending'}
+                        </span>
+                        <div class="product-name">${d.productName}</div>
+                        <div class="cust-info">
+                            <i class="fas fa-user"></i> ${d.customerName}<br>
+                            <i class="fas fa-phone"></i> ${d.phone || 'N/A'}<br>
+                            <i class="fas fa-map-marker-alt"></i> ${d.address}
+                        </div>
+                        
+                        ${!isShipped ? `
+                            <div class="ship-form">
+                                <input type="text" id="track-${orderDoc.id}" class="ship-input" placeholder="Courier Name & Tracking ID">
+                                <button class="ship-btn" onclick="shipThisOrder('${orderDoc.id}')">MARK AS SHIPPED</button>
+                            </div>
+                        ` : `
+                            <div class="tracking-box">
+                                <i class="fas fa-truck"></i> <b>Tracking Info:</b> ${d.trackingDetails}
+                            </div>
+                        `}
+                    </div>`;
+            });
+        }
+
+        window.shipThisOrder = async (orderId) => {
+            const tracking = document.getElementById(`track-${orderId}`).value.trim();
+            if(!tracking) { alert("Please enter courier and tracking ID!"); return; }
+
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                await updateDoc(orderRef, {
+                    status: "Shipped",
+                    trackingDetails: tracking
+                });
+                alert("Order Shipped! 🚚");
+                location.reload();
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
