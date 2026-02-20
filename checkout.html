@@ -14,17 +14,19 @@
         .inp-field { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; border-radius: 4px; font-family: 'Inter'; box-sizing: border-box; }
         .summary-box { padding: 20px; background: white; margin-top: 10px; }
         .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
-        .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 15px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; }
+        .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 18px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; z-index: 100; }
         .required { color: red; }
-        
-        /* Shipping calculation status text */
-        #shipStatus { font-size: 0.75rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 10px; display: block; }
 
-        /* MODAL STYLE (Restored) */
+        /* SHIPPING STATUS TEXT */
+        #shipStatus { font-size: 0.75rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 15px; display: block; }
+
+        /* CUSTOM MODERN ALERT MODAL */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-box { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out; }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .modal-icon { font-size: 3rem; color: #ff3b30; margin-bottom: 15px; }
+        .modal-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; }
+        .modal-text { color: #666; font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px; }
         .modal-btn { background: #000; color: #fff; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; }
     </style>
 </head>
@@ -33,8 +35,8 @@
     <div id="customAlert" class="modal-overlay">
         <div class="modal-box">
             <i class="fas fa-exclamation-circle modal-icon"></i>
-            <div class="modal-title" style="font-weight:800; margin-bottom:10px;">Details Missing!</div>
-            <div class="modal-text" id="alertMsg" style="color:#666; font-size:0.9rem; margin-bottom:20px;">Kripya saari details bhariye.</div>
+            <div class="modal-title">Details Missing!</div>
+            <div class="modal-text" id="alertMsg">Kripya saari details bhariye. Red '*' waale fields mandatory hain.</div>
             <button class="modal-btn" onclick="closeAlert()">Sahi Hai</button>
         </div>
     </div>
@@ -49,7 +51,7 @@
         <input type="text" id="custName" class="inp-field" placeholder="Full Name">
 
         <label class="inp-label">Phone Number <span class="required">*</span></label>
-        <input type="text" id="custPhone" class="inp-field" placeholder="Mobile Number">
+        <input type="number" id="custPhone" class="inp-field" placeholder="Mobile Number">
 
         <label class="inp-label">House No. / Building / Area <span class="required">*</span></label>
         <input type="text" id="addrLine1" class="inp-field" placeholder="Building name or House number">
@@ -66,7 +68,7 @@
         <div class="row"><b>Items Total</b> <span id="itemPrice">₹0</span></div>
         <div class="row"><b>Shipping Charges</b> <span id="shipPrice">₹0</span></div>
         <div class="row" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
-            <b>To Pay</b> <span id="payAmt" style="font-weight:700; color:#008060; font-size:1.1rem;">₹0</span>
+            <b>To Pay</b> <span id="payAmt" style="font-weight:700; color:#000; font-size:1.1rem;">₹0</span>
         </div>
     </div>
 
@@ -92,40 +94,43 @@
 
         let cartTotal = Number(localStorage.getItem('cartTotal')) || 0;
         let sellerPin = "";
-        let prodWeight = 500; // Grams mein
-
-        // 🚀 Shiprocket Details
+        let prodWeight = 500;
         const API_USER = "vikas17047@gmail.com";
         const API_PASS = "&Ot0^Vbz#9ccEKK8p6S^lrDgA*et17g1";
 
+        // 1. Initial Load
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('custName').value = user.displayName || "";
-                await loadOrderDetails();
+                await loadOrderContext();
+            } else {
+                window.location.href = 'login.html';
             }
         });
 
-        async function loadOrderDetails() {
+        async function loadOrderContext() {
             const cart = JSON.parse(localStorage.getItem('myCart')) || [];
             document.getElementById('itemPrice').innerText = "₹" + cartTotal;
             document.getElementById('payAmt').innerText = "₹" + cartTotal;
 
             if(cart.length > 0) {
-                // Seller ka pincode aur Product ka weight nikalna
-                const pSnap = await getDoc(doc(db, "products", cart[0].id));
-                if(pSnap.exists()) prodWeight = pSnap.data().weight || 500;
+                try {
+                    const pSnap = await getDoc(doc(db, "products", cart[0].id));
+                    if(pSnap.exists()) prodWeight = pSnap.data().weight || 500;
 
-                const sSnap = await getDoc(doc(db, "seller_identity", cart[0].sellerId));
-                if(sSnap.exists()) sellerPin = sSnap.data().sPin;
+                    const sSnap = await getDoc(doc(db, "seller_identity", cart[0].sellerId));
+                    if(sSnap.exists()) sellerPin = sSnap.data().sPin;
+                } catch(e) { console.log("Data fetch error", e); }
             }
         }
 
+        // 2. Live Shipping Calculation (With Subsidy Logic)
         window.fetchLiveShipping = async () => {
             const pin = document.getElementById('pincode').value;
             if(pin.length === 6 && sellerPin) {
                 document.getElementById('shipStatus').innerText = "Checking delivery rate...";
                 try {
-                    // Get Shiprocket Token
+                    // Login to Shiprocket
                     const login = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -133,34 +138,56 @@
                     });
                     const authData = await login.json();
                     
-                    // Get Rate
+                    // Fetch Serviceability
                     const rateRes = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/serviceability?pickup_postcode=${sellerPin}&delivery_postcode=${pin}&weight=${prodWeight/1000}&cod=0`, {
                         headers: {'Authorization': `Bearer ${authData.token}`}
                     });
                     const rateData = await rateRes.json();
                     
                     if(rateData.status === 200) {
-                        const charge = rateData.data.available_courier_companies[0].rate;
-                        document.getElementById('shipPrice').innerText = "₹" + charge;
-                        document.getElementById('payAmt').innerText = "₹" + (cartTotal + Number(charge));
-                        document.getElementById('shipStatus').innerText = "Live shipping rate applied! ✅";
-                        localStorage.setItem('shipping_charge', charge);
+                        const actualCharge = rateData.data.available_courier_companies[0].rate;
+                        
+                        // 🟢 SUBSIDY LOGIC: Subtract ₹49
+                        let customerCharge = Math.max(0, Number(actualCharge) - 49);
+                        
+                        document.getElementById('shipPrice').innerText = "₹" + customerCharge.toFixed(0);
+                        document.getElementById('payAmt').innerText = "₹" + (cartTotal + customerCharge).toFixed(0);
+                        document.getElementById('shipStatus').innerText = "Delivery rate updated! ✅";
+                        
+                        localStorage.setItem('shipping_charge', customerCharge);
+                    } else {
+                        document.getElementById('shipStatus').innerText = "Delivery not available for this PIN.";
                     }
-                } catch (e) { document.getElementById('shipStatus').innerText = "Rate not available for this PIN."; }
+                } catch (e) { 
+                    document.getElementById('shipStatus').innerText = "Error calculating rate."; 
+                }
+            } else {
+                document.getElementById('shipStatus').innerText = "";
             }
         }
 
+        // 3. Validation & Redirect
         window.showAlert = () => document.getElementById('customAlert').style.display = 'flex';
         window.closeAlert = () => document.getElementById('customAlert').style.display = 'none';
 
         window.validateAndProceed = function() {
-            const pin = document.getElementById('pincode').value;
-            if(!document.getElementById('custName').value || !pin || pin.length < 6) {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const addr1 = document.getElementById('addrLine1').value.trim();
+            const addr2 = document.getElementById('addrLine2').value.trim();
+            const pin = document.getElementById('pincode').value.trim();
+
+            if(!name || !phone || !addr1 || !addr2 || pin.length < 6) {
                 showAlert();
                 return;
             }
-            // Save address and proceed
+
+            const fullAddress = `${addr1}, ${addr2}, PIN: ${pin}`;
+            localStorage.setItem('user_name', name);
+            localStorage.setItem('user_address', fullAddress);
+            localStorage.setItem('user_phone', phone);
             localStorage.setItem('user_pincode', pin);
+
             window.location.href = 'payment.html';
         }
     </script>
