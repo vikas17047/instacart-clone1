@@ -3,128 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seller Hub - Instacart</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Seller Dashboard - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --shopify-green: #008060;
-            --bg-gray: #f6f6f7;
-            --card-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 3px 0 rgba(0,0,0,.15);
-        }
-        body { background: var(--bg-gray); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
-        
-        .top-nav { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-weight: 800; letter-spacing: -1px; font-size: 1.1rem; }
-
-        .profile-section { background: white; padding: 25px 20px; border-bottom: 1px solid #e3e3e3; display: flex; align-items: center; gap: 15px; position: relative; }
-        .seller-avatar { width: 65px; height: 65px; border-radius: 12px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
-        .seller-info h2 { margin: 0; font-size: 1.2rem; color: #202223; font-weight: 800; }
-        .seller-info p { margin: 2px 0 0; color: #6d7175; font-size: 0.75rem; font-family: monospace; }
-        
-        .edit-profile-btn { 
-            position: absolute; right: 20px; top: 25px; background: #f1f1f1; 
-            padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; 
-            font-weight: 700; color: #202223; text-decoration: none; border: 1px solid #ddd;
-        }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px 15px; }
-        .stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: var(--card-shadow); }
-        .stat-title { font-size: 0.65rem; font-weight: 700; color: #6d7175; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-val { font-size: 1.2rem; font-weight: 800; color: #202223; }
-
-        .action-list { padding: 0 15px; }
-        .action-item { 
-            background: white; padding: 16px; border-radius: 10px; margin-bottom: 10px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: var(--card-shadow); text-decoration: none; color: inherit;
-        }
-        .icon-box { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
-        
-        .green-lite { background: #f1f8f5; color: var(--shopify-green); }
-        .blue-lite { background: #f0f5ff; color: #2c6ecb; }
-        .purple-lite { background: #f6f0ff; color: #9c6ade; }
-
-        #setupBox { padding: 20px; text-align: center; }
-        .setup-card { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: var(--card-shadow); }
-        .setup-btn { background: var(--shopify-green); color: white; padding: 15px 30px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 15px; }
-
-        /* Floating Admin Button Style */
-        .admin-float-btn {
-            position: fixed; bottom: 20px; right: 20px; background: #ff4444; color: white;
-            padding: 12px 20px; border-radius: 50px; font-weight: 800; font-size: 0.8rem;
-            box-shadow: 0 4px 15px rgba(255,68,68,0.4); border: none; cursor: pointer;
-            z-index: 9999; display: flex; align-items: center; gap: 8px;
-        }
+        body { background: #f6f6f7; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
+        .nav-header { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; }
+        .card { background: white; margin: 15px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .order-card { border-left: 5px solid #ffcc00; margin-bottom: 10px; }
+        .status-badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; font-weight: 800; text-transform: uppercase; }
+        .status-pending { background: #fff4e5; color: #b7791f; }
+        .status-shipped { background: #e6fffa; color: #2c7a7b; border-left-color: #38b2ac !important; }
+        .ship-btn { background: #008060; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .ship-input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="top-nav">
-        <div class="logo-text">INSTACART <span style="font-weight:400; opacity:0.6;">Seller</span></div>
-        <i class="fas fa-bell"></i>
+    <div class="nav-header">
+        <b style="font-size: 1.2rem;">Seller Hub</b>
+        <span id="storeDisplayName">Loading Store...</span>
     </div>
 
-    <div id="setupBox" style="display: none;">
-        <div class="setup-card">
-            <i class="fas fa-store-alt" style="font-size: 3rem; color: #dfe3e8; margin-bottom: 15px;"></i>
-            <h2>Finish your setup</h2>
-            <p style="color: #6d7175;">Manage options unlock karne ke liye apni store details fill karein.</p>
-            <button class="setup-btn" onclick="window.location.href='create_store.html'">SET IDENTITY</button>
-        </div>
-    </div>
-
-    <div id="mainDashboard" style="display: none;">
-        <div class="profile-section">
-            <img id="sellerImg" src="" class="seller-avatar">
-            <div class="seller-info">
-                <h2 id="storeName">Store Name</h2>
-                <p id="sellerUID">ID: Loading...</p>
-            </div>
-            <a href="create_store.html" class="edit-profile-btn"><i class="fas fa-edit"></i> Edit</a>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-title">Today's Sales</div>
-                <div class="stat-val">₹0.00</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Orders</div>
-                <div class="stat-val">0</div>
-            </div>
-        </div>
-
-        <div class="action-list">
-            <a href="manage_products.html" class="action-item">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <div class="icon-box blue-lite"><i class="fas fa-box"></i></div>
-                    <div><b style="font-size:0.9rem;">Products</b><br><small style="color:#6d7175; font-size:0.7rem;">Manage inventory & pricing</small></div>
-                </div>
-                <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
-            </a>
-
-            <a href="store_editor.html" class="action-item">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <div class="icon-box purple-lite"><i class="fas fa-brush"></i></div>
-                    <div><b style="font-size:0.9rem;">Design Studio</b><br><small style="color:#6d7175; font-size:0.7rem;">Theme & Layout settings</small></div>
-                </div>
-                <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
-            </a>
-
-            <a id="liveLink" href="#" class="action-item">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <div class="icon-box green-lite"><i class="fas fa-eye"></i></div>
-                    <div><b style="font-size:0.9rem;">View Live Store</b><br><small style="color:#6d7175; font-size:0.7rem;">Share your link</small></div>
-                </div>
-                <i class="fas fa-external-link-alt" style="color:#babec3; font-size:0.8rem;"></i>
-            </a>
-        </div>
+    <div style="padding: 15px;">
+        <h3 style="margin-bottom: 10px;">New Orders & Shipping</h3>
+        <div id="sellerOrdersList">Loading orders...</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -140,37 +48,57 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const MY_ADMIN_ID = "Bi31d4QWrdbWsUwhuUgCYLbPnw92"; // Vikas Gupta UID
-
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Admin Check: Agar Vikas login hai toh button dikhao
-                if (user.uid === MY_ADMIN_ID) {
-                    showAdminButton();
-                }
-
-                const idDoc = await getDoc(doc(db, "seller_identity", user.uid));
-                if (idDoc.exists()) {
-                    const data = idDoc.data();
-                    document.getElementById('mainDashboard').style.display = 'block';
-                    document.getElementById('storeName').innerText = data.sName || "My Store";
-                    document.getElementById('sellerImg').src = data.sLogo || "https://via.placeholder.com/65";
-                    document.getElementById('sellerUID').innerText = "ID: " + user.uid.substring(0, 8).toUpperCase();
-                    document.getElementById('liveLink').href = `my_store.html?seller=${user.uid}`;
-                } else {
-                    document.getElementById('setupBox').style.display = 'block';
-                }
+                loadSellerOrders(user.uid);
             } else {
-                window.location.href = "login.html";
+                window.location.href = 'login.html';
             }
         });
 
-        function showAdminButton() {
-            let btn = document.createElement("button");
-            btn.className = "admin-float-btn";
-            btn.innerHTML = `<i class="fas fa-user-shield"></i> SUPER ADMIN ACCESS`;
-            btn.onclick = () => window.location.href = 'admin.html';
-            document.body.appendChild(btn);
+        async function loadSellerOrders(sellerId) {
+            const list = document.getElementById('sellerOrdersList');
+            const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
+            const snap = await getDocs(q);
+            
+            list.innerHTML = "";
+            if(snap.empty) { list.innerHTML = "No orders found."; return; }
+
+            snap.forEach(orderDoc => {
+                const d = orderDoc.data();
+                const isShipped = d.status === "Shipped";
+                
+                list.innerHTML += `
+                    <div class="card order-card" style="${isShipped ? 'border-left-color:#38b2ac' : ''}">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="status-badge ${isShipped ? 'status-shipped' : 'status-pending'}">${d.status || 'Pending'}</span>
+                            <small>${new Date(d.orderDate).toLocaleDateString()}</small>
+                        </div>
+                        <h4 style="margin:10px 0 5px;">${d.productName}</h4>
+                        <p style="font-size:0.8rem; color:#666;">Customer: ${d.customerName}<br>Address: ${d.address}</p>
+                        
+                        ${!isShipped ? `
+                            <div id="shipBox-${orderDoc.id}">
+                                <input type="text" id="track-${orderDoc.id}" class="ship-input" placeholder="Courier Name & Tracking ID">
+                                <button class="ship-btn" onclick="markAsShipped('${orderDoc.id}')">MARK AS SHIPPED</button>
+                            </div>
+                        ` : `<p style="font-size:0.75rem; color:#2c7a7b;"><b>Tracking:</b> ${d.trackingDetails}</p>`}
+                    </div>`;
+            });
+        }
+
+        window.markAsShipped = async (orderId) => {
+            const tracking = document.getElementById(`track-${orderId}`).value;
+            if(!tracking) { alert("Please enter tracking details!"); return; }
+
+            try {
+                await updateDoc(doc(db, "orders", orderId), {
+                    status: "Shipped",
+                    trackingDetails: tracking
+                });
+                alert("Order marked as Shipped! 🚚");
+                location.reload();
+            } catch (e) { alert(e.message); }
         }
     </script>
 </body>
