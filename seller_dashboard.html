@@ -7,96 +7,124 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --shopify-green: #008060; --bg-gray: #f6f6f7; --card-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        :root {
+            --shopify-green: #008060;
+            --bg-gray: #f6f6f7;
+            --card-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 3px 0 rgba(0,0,0,.15);
+        }
         body { background: var(--bg-gray); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 50px; }
         
-        /* Header */
         .top-nav { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Profile Section */
-        .profile-section { background: white; padding: 20px; border-bottom: 1px solid #e3e3e3; display: flex; align-items: center; gap: 15px; position: relative; }
-        .seller-avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background: #eee; }
-        .edit-profile-btn { position: absolute; right: 20px; top: 20px; background: #f1f1f1; padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-decoration: none; color: #202223; border: 1px solid #ddd; }
+        .logo-text { font-weight: 800; letter-spacing: -1px; font-size: 1.1rem; }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .profile-section { background: white; padding: 25px 20px; border-bottom: 1px solid #e3e3e3; display: flex; align-items: center; gap: 15px; position: relative; }
+        .seller-avatar { width: 65px; height: 65px; border-radius: 12px; object-fit: cover; background: #eee; border: 1px solid #ddd; }
+        .seller-info h2 { margin: 0; font-size: 1.2rem; color: #202223; font-weight: 800; }
+        .seller-info p { margin: 2px 0 0; color: #6d7175; font-size: 0.75rem; font-family: monospace; }
+        .edit-profile-btn { 
+            position: absolute; right: 20px; top: 25px; background: #f1f1f1; 
+            padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; 
+            font-weight: 700; color: #202223; text-decoration: none; border: 1px solid #ddd;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 20px 15px; }
         .stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: var(--card-shadow); }
-        .stat-val { font-size: 1.2rem; font-weight: 800; }
+        .stat-title { font-size: 0.65rem; font-weight: 700; color: #6d7175; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-val { font-size: 1.2rem; font-weight: 800; color: #202223; }
 
-        /* Navigation Tabs */
-        .tab-menu { display: flex; background: white; border-bottom: 1px solid #ddd; }
-        .tab-link { flex: 1; text-align: center; padding: 15px; font-weight: 700; font-size: 0.8rem; cursor: pointer; color: #666; border-bottom: 3px solid transparent; }
-        .tab-link.active { color: var(--shopify-green); border-bottom-color: var(--shopify-green); }
+        .action-list { padding: 0 15px; }
+        .action-item { 
+            background: white; padding: 16px; border-radius: 10px; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--card-shadow); text-decoration: none; color: inherit;
+        }
+        .icon-box { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        
+        .green-lite { background: #f1f8f5; color: var(--shopify-green); }
+        .blue-lite { background: #f0f5ff; color: #2c6ecb; }
+        .purple-lite { background: #f6f0ff; color: #9c6ade; }
+        .orange-lite { background: #fff4e5; color: #ff8800; } /* New Color for Shipping */
 
-        /* Sections */
-        .content-section { display: none; padding: 15px; }
-        .content-section.active { display: block; }
-
-        /* Order/Shipping Cards */
-        .order-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ffcc00; box-shadow: var(--card-shadow); }
-        .status-shipped { border-left-color: #38b2ac !important; }
-        .ship-input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .ship-btn { background: var(--shopify-green); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; margin-top: 10px; cursor: pointer; }
-
-        /* Design/Manage Items */
-        .action-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; box-shadow: var(--card-shadow); }
-        .icon-box { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        #setupBox { padding: 20px; text-align: center; }
+        .setup-card { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: var(--card-shadow); }
+        .setup-btn { background: var(--shopify-green); color: white; padding: 15px 30px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
-        <div style="font-weight:800;">INSTACART <span style="font-weight:400; opacity:0.6;">Seller</span></div>
+        <div class="logo-text">INSTACART <span style="font-weight:400; opacity:0.6;">Seller</span></div>
         <i class="fas fa-bell"></i>
     </div>
 
-    <div id="mainDashboard">
+    <div id="setupBox" style="display: none;">
+        <div class="setup-card">
+            <i class="fas fa-store-alt" style="font-size: 3rem; color: #dfe3e8; margin-bottom: 15px;"></i>
+            <h2>Finish your setup</h2>
+            <p style="color: #6d7175;">Manage options unlock karne ke liye apni store details fill karein.</p>
+            <button class="setup-btn" onclick="window.location.href='create_store.html'">SET IDENTITY</button>
+        </div>
+    </div>
+
+    <div id="mainDashboard" style="display: none;">
         <div class="profile-section">
             <img id="sellerImg" src="" class="seller-avatar">
             <div class="seller-info">
-                <h2 id="storeName" style="margin:0; font-size:1.1rem;">My Store</h2>
-                <p id="sellerUID" style="margin:2px 0 0; font-size:0.7rem; color:#6d7175;">ID: --</p>
+                <h2 id="storeName">Store Name</h2>
+                <p id="sellerUID">ID: Loading...</p>
             </div>
-            <a href="create_store.html" class="edit-profile-btn">Edit Profile</a>
+            <a href="create_store.html" class="edit-profile-btn"><i class="fas fa-edit"></i> Edit</a>
         </div>
 
-        <div class="tab-menu">
-            <div class="tab-link active" onclick="openTab(event, 'manage')">MANAGE</div>
-            <div class="tab-link" onclick="openTab(event, 'shipping')">SHIPPING (ORDERS)</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Today's Sales</div>
+                <div class="stat-val">₹0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Orders</div>
+                <div class="stat-val">0</div>
+            </div>
         </div>
 
-        <div id="manage" class="content-section active">
-            <div class="stats-grid">
-                <div class="stat-card"><small>TODAY'S SALES</small><div class="stat-val">₹0</div></div>
-                <div class="stat-card"><small>ACTIVE PRODUCTS</small><div class="stat-val" id="pCount">0</div></div>
-            </div>
+        <div class="action-list">
+            <a href="manage_shipping.html" class="action-item">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div class="icon-box orange-lite"><i class="fas fa-truck"></i></div>
+                    <div><b style="font-size:0.9rem;">Shipping & Orders</b><br><small style="color:#6d7175; font-size:0.7rem;">Track and ship your orders</small></div>
+                </div>
+                <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
+            </a>
 
             <a href="manage_products.html" class="action-item">
                 <div style="display:flex; align-items:center; gap:15px;">
-                    <div class="icon-box" style="background:#f0f5ff; color:#2c6ecb;"><i class="fas fa-box"></i></div>
-                    <div><b>Manage Products</b><br><small style="color:#666;">Add or remove items</small></div>
+                    <div class="icon-box blue-lite"><i class="fas fa-box"></i></div>
+                    <div><b style="font-size:0.9rem;">Products</b><br><small style="color:#6d7175; font-size:0.7rem;">Manage inventory & pricing</small></div>
                 </div>
-                <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
             </a>
 
             <a href="store_editor.html" class="action-item">
                 <div style="display:flex; align-items:center; gap:15px;">
-                    <div class="icon-box" style="background:#f6f0ff; color:#9c6ade;"><i class="fas fa-brush"></i></div>
-                    <div><b>Design Studio</b><br><small style="color:#666;">Change store look</small></div>
+                    <div class="icon-box purple-lite"><i class="fas fa-brush"></i></div>
+                    <div><b style="font-size:0.9rem;">Design Studio</b><br><small style="color:#6d7175; font-size:0.7rem;">Theme & Layout settings</small></div>
                 </div>
-                <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-chevron-right" style="color:#babec3; font-size:0.8rem;"></i>
             </a>
-        </div>
 
-        <div id="shipping" class="content-section">
-            <h3 style="font-size: 0.9rem; color: #666;">CUSTOMER ORDERS</h3>
-            <div id="orderList">Loading orders...</div>
+            <a id="liveLink" href="#" class="action-item">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div class="icon-box green-lite"><i class="fas fa-eye"></i></div>
+                    <div><b style="font-size:0.9rem;">View Live Store</b><br><small style="color:#6d7175; font-size:0.7rem;">Share your link</small></div>
+                </div>
+                <i class="fas fa-external-link-alt" style="color:#babec3; font-size:0.8rem;"></i>
+            </a>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -114,61 +142,22 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loadProfile(user.uid);
-                loadOrders(user.uid);
-            } else { window.location.href = 'login.html'; }
-        });
-
-        async function loadProfile(uid) {
-            const d = await getDoc(doc(db, "seller_identity", uid));
-            if(d.exists()) {
-                document.getElementById('storeName').innerText = d.data().sName;
-                document.getElementById('sellerImg').src = d.data().sLogo || "https://via.placeholder.com/60";
-                document.getElementById('sellerUID').innerText = "ID: " + uid.substring(0,8).toUpperCase();
+                const idDoc = await getDoc(doc(db, "seller_identity", user.uid));
+                
+                if (idDoc.exists()) {
+                    const data = idDoc.data();
+                    document.getElementById('mainDashboard').style.display = 'block';
+                    document.getElementById('storeName').innerText = data.sName || "My Store";
+                    document.getElementById('sellerImg').src = data.sLogo || "https://via.placeholder.com/65";
+                    document.getElementById('sellerUID').innerText = "ID: " + user.uid.substring(0, 8).toUpperCase();
+                    document.getElementById('liveLink').href = `my_store.html?seller=${user.uid}`;
+                } else {
+                    document.getElementById('setupBox').style.display = 'block';
+                }
+            } else {
+                window.location.href = "login.html";
             }
-        }
-
-        window.openTab = (evt, tabName) => {
-            let i, content, tabs;
-            content = document.getElementsByClassName("content-section");
-            for (i = 0; i < content.length; i++) { content[i].style.display = "none"; }
-            tabs = document.getElementsByClassName("tab-link");
-            for (i = 0; i < tabs.length; i++) { tabs[i].className = tabs[i].className.replace(" active", ""); }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
-
-        async function loadOrders(sellerId) {
-            const list = document.getElementById('orderList');
-            const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
-            const snap = await getDocs(q);
-            list.innerHTML = "";
-
-            snap.forEach(od => {
-                const data = od.data();
-                const isShipped = data.status === "Shipped";
-                list.innerHTML += `
-                    <div class="order-card ${isShipped ? 'status-shipped' : ''}">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <b>${data.productName}</b>
-                            <span style="font-size:0.7rem; color:${isShipped ? '#2c7a7b' : '#b7791f'}; font-weight:800;">${data.status || 'Pending'}</span>
-                        </div>
-                        <p style="font-size:0.75rem; color:#666; margin:5px 0;">To: ${data.customerName}<br>${data.address}</p>
-                        ${!isShipped ? `
-                            <input type="text" id="track-${od.id}" class="ship-input" placeholder="Enter Tracking ID (e.g. BlueDart 123)">
-                            <button class="ship-btn" onclick="shipOrder('${od.id}')">MARK AS SHIPPED</button>
-                        ` : `<div style="font-size:0.7rem; color:#2c7a7b; margin-top:5px;"><b>Tracking:</b> ${data.trackingDetails}</div>`}
-                    </div>`;
-            });
-        }
-
-        window.shipOrder = async (id) => {
-            const track = document.getElementById(`track-${id}`).value;
-            if(!track) return alert("Please enter tracking info!");
-            await updateDoc(doc(db, "orders", id), { status: "Shipped", trackingDetails: track });
-            alert("Order Updated! 🚚");
-            location.reload();
-        }
+        });
     </script>
 </body>
 </html>
