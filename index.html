@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* LOGIN PAGE STYLE (Aapka Original Design) */
+        /* Login Overlay Style */
         #loginOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; z-index: 9999; display: flex; 
@@ -61,10 +61,10 @@
 
         <div class="section-title">Shop by Category</div>
         <div class="horizontal-scroll">
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
-            <div class="scroll-item" onclick="window.location.href='seller.html'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
         </div>
 
         <div class="section-title" id="creatorTitle">Top Creators</div>
@@ -96,30 +96,25 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Check Status: Login hai ya nahi
+        // Check Login Status
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User login hai -> Home dikhao
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 loadRealSellers(); 
             } else {
-                // User login nahi hai -> Login button dikhao
                 document.getElementById('loginOverlay').style.display = 'flex';
                 document.getElementById('mainContent').style.display = 'none';
             }
         });
 
-        // Login Function
+        // Google Login
         window.loginWithGoogle = () => {
             signInWithPopup(auth, provider)
-            .then(() => {
-                console.log("Logged in!");
-            })
-            .catch(err => alert("Login Error: " + err.message));
+            .catch(err => alert("Error: " + err.message));
         };
 
-        // Real Sellers Load karne ka function
+        // Real Sellers Load logic
         async function loadRealSellers() {
             const container = document.getElementById('creatorContainer');
             try {
