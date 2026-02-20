@@ -3,67 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Products - Instacart</title>
+    <title>Manage Inventory - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         body { background: #f6f6f7; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 100px; }
-        .header { background: #fff; padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .header { background: #fff; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 1000; }
         
-        /* Floating Plus Button */
-        .add-btn-circle { position: fixed; bottom: 30px; right: 30px; background: #008060; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 2000; }
+        /* 📱 Grid View Restored */
+        .product-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
+        .p-img { width: 100%; height: 140px; object-fit: cover; background: #f9f9f9; }
+        .p-info { padding: 10px; }
+        .p-name { font-weight: 800; font-size: 0.85rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-price { color: #008060; font-weight: 700; font-size: 0.85rem; margin-top: 3px; display: block; }
+        
+        /* Edit & Delete Icons on Card */
+        .p-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; }
+        .p-actions i { background: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+
+        /* Floating Plus Button Restored */
+        .add-btn-circle { position: fixed; bottom: 30px; right: 30px; background: #1a1c1d; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 2000; }
 
         /* Modal / Form Styling */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; padding: 20px; overflow-y: auto; }
-        .modal-content { background: white; border-radius: 15px; padding: 25px; max-width: 450px; margin: auto; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; padding: 20px; overflow-y: auto; align-items: flex-end; }
+        .modal-content { background: white; border-radius: 20px 20px 0 0; padding: 25px; width: 100%; max-width: 450px; margin: auto; box-sizing: border-box; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         
-        .ship-box { background: #f0f7ff; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #cce3ff; }
+        /* Shipping Fields (New) */
+        .ship-details { background: #f0f7ff; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #cce3ff; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-
-        /* Product List Styling */
-        .product-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .p-img { width: 100%; height: 150px; object-fit: cover; }
-        .p-info { padding: 10px; }
-        .p-name { font-weight: 800; font-size: 0.9rem; margin: 0; }
-        .p-price { color: #008060; font-weight: 700; font-size: 0.85rem; }
+        .save-btn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <i class="fas fa-arrow-left" onclick="window.location.href='seller_dashboard.html'"></i>
-        <b style="font-size: 1.1rem;">My Products</b>
-        <div style="width: 20px;"></div>
+        <b style="font-size: 1rem;">Inventory Management</b>
     </div>
 
-    <div class="product-grid" id="productContainer">
-        </div>
+    <div class="product-grid" id="inventoryList"></div>
 
-    <div class="add-btn-circle" onclick="document.getElementById('addModal').style.display='block'">
+    <div class="add-btn-circle" onclick="openAddModal()">
         <i class="fas fa-plus"></i>
     </div>
 
     <div id="addModal" class="modal">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="margin:0;">Add New Product</h3>
-                <i class="fas fa-times" onclick="document.getElementById('addModal').style.display='none'"></i>
+                <h3 id="modalTitle" style="margin:0;">Add New Product</h3>
+                <i class="fas fa-times" onclick="toggleModal(false)" style="color:#888;"></i>
             </div>
             
-            <label style="font-size: 0.8rem; font-weight:700; display:block; margin-top:15px;">Product Name</label>
-            <input type="text" id="pName" placeholder="e.g. Designer Kurta">
-            
-            <label style="font-size: 0.8rem; font-weight:700; display:block;">Price (₹)</label>
-            <input type="number" id="pPrice" placeholder="999">
+            <input type="text" id="pName" placeholder="Product Name">
+            <input type="number" id="pPrice" placeholder="Price (₹)">
+            <input type="text" id="pImg" placeholder="Image URL">
 
-            <label style="font-size: 0.8rem; font-weight:700; display:block;">Image URL</label>
-            <input type="text" id="pImg" placeholder="https://image-link.jpg">
-
-            <div class="ship-box">
-                <b style="font-size: 0.8rem; color: #2c6ecb;"><i class="fas fa-truck"></i> Shipping Weight & Size</b>
-                <input type="number" id="pWeight" placeholder="Weight (Grams) e.g. 500">
+            <div class="ship-details">
+                <b style="font-size: 0.75rem; color: #2c6ecb;"><i class="fas fa-truck"></i> Shipping Details (Weight/Size)</b>
+                <input type="number" id="pWeight" placeholder="Weight (Grams)">
                 <div class="grid-3">
                     <input type="number" id="pL" placeholder="L(cm)">
                     <input type="number" id="pW" placeholder="W(cm)">
@@ -71,13 +70,14 @@
                 </div>
             </div>
 
-            <button onclick="uploadProduct()" style="width:100%; background:#008060; color:white; border:none; padding:15px; border-radius:10px; font-weight:800; cursor:pointer;">UPLOAD PRODUCT</button>
+            <button class="save-btn" id="mainActionBtn" onclick="saveProduct()">SAVE PRODUCT</button>
+            <button onclick="toggleModal(false)" style="width:100%; border:none; background:none; margin-top:15px; color:#888; font-size:0.8rem;">Cancel</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -93,50 +93,97 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        let sellerId = null;
+        let editId = null;
+
         onAuthStateChanged(auth, (user) => {
-            if (user) { loadMyProducts(user.uid); }
-            else { window.location.href = 'login.html'; }
+            if (user) { sellerId = user.uid; fetchProducts(); }
+            else { window.location.href = "login.html"; }
         });
 
-        async function loadMyProducts(sellerId) {
-            const container = document.getElementById('productContainer');
+        async function fetchProducts() {
+            const list = document.getElementById('inventoryList');
             const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
             const snap = await getDocs(q);
-            container.innerHTML = "";
-            snap.forEach(doc => {
-                const p = doc.data();
-                container.innerHTML += `
+            list.innerHTML = "";
+            snap.forEach(product => {
+                const d = product.data();
+                // ✅ Grid Item with Edit/Delete Icons restored
+                list.innerHTML += `
                     <div class="p-card">
-                        <img src="${p.img || 'https://via.placeholder.com/150'}" class="p-img">
+                        <div class="p-actions">
+                            <i class="fas fa-edit" style="color:#2c6ecb;" onclick='openEditModal("${product.id}", ${JSON.stringify(d)})'></i>
+                            <i class="fas fa-trash" style="color:#ff4444;" onclick="deleteProd('${product.id}')"></i>
+                        </div>
+                        <img src="${d.image || d.img}" class="p-img">
                         <div class="p-info">
-                            <p class="p-name">${p.name}</p>
-                            <span class="p-price">₹${p.price}</span>
+                            <p class="p-name">${d.name}</p>
+                            <span class="p-price">₹${d.price}</span>
                         </div>
                     </div>`;
             });
         }
 
-        window.uploadProduct = async () => {
-            const user = auth.currentUser;
+        window.openAddModal = () => {
+            editId = null;
+            document.getElementById('modalTitle').innerText = "Add New Product";
+            toggleModal(true);
+        };
+
+        window.openEditModal = (id, data) => {
+            editId = id;
+            document.getElementById('modalTitle').innerText = "Edit Product";
+            document.getElementById('pName').value = data.name;
+            document.getElementById('pPrice').value = data.price;
+            document.getElementById('pImg').value = data.image || data.img;
+            document.getElementById('pWeight').value = data.weight || "";
+            document.getElementById('pL').value = data.length || "";
+            document.getElementById('pW').value = data.width || "";
+            document.getElementById('pH').value = data.height || "";
+            toggleModal(true);
+        };
+
+        window.saveProduct = async () => {
             const data = {
                 name: document.getElementById('pName').value,
-                price: document.getElementById('pPrice').value,
-                img: document.getElementById('pImg').value,
+                price: Number(document.getElementById('pPrice').value),
+                image: document.getElementById('pImg').value,
                 weight: document.getElementById('pWeight').value,
                 length: document.getElementById('pL').value,
                 width: document.getElementById('pW').value,
                 height: document.getElementById('pH').value,
-                sellerId: user.uid,
-                createdAt: new Date()
+                sellerId, updatedAt: new Date()
             };
 
-            if(!data.name || !data.weight) return alert("Product Name and Weight are required!");
-
             try {
-                await addDoc(collection(db, "products"), data);
-                alert("Product Added! 🚀");
-                location.reload();
+                if(editId) {
+                    await updateDoc(doc(db, "products", editId), data);
+                } else {
+                    await addDoc(collection(db, "products"), data);
+                }
+                toggleModal(false);
+                fetchProducts();
             } catch (e) { alert(e.message); }
+        };
+
+        window.deleteProd = async (id) => {
+            if(confirm("Delete product?")) {
+                await deleteDoc(doc(db, "products", id));
+                fetchProducts();
+            }
+        };
+
+        window.toggleModal = (val) => {
+            document.getElementById('addModal').style.display = val ? 'flex' : 'none';
+            if(!val) {
+                document.getElementById('pName').value = "";
+                document.getElementById('pPrice').value = "";
+                document.getElementById('pImg').value = "";
+                document.getElementById('pWeight').value = "";
+                document.getElementById('pL').value = "";
+                document.getElementById('pW').value = "";
+                document.getElementById('pH').value = "";
+            }
         };
     </script>
 </body>
