@@ -16,9 +16,41 @@
         .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
         .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 15px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; }
         .required { color: red; }
+
+        /* CUSTOM MODERN NOTIFICATION STYLE */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-box {
+            background: white; width: 85%; max-width: 400px; padding: 25px;
+            border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-icon { font-size: 3rem; color: #ff3b30; margin-bottom: 15px; }
+        .modal-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; }
+        .modal-text { color: #666; font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px; }
+        .modal-btn {
+            background: #000; color: #fff; border: none; padding: 12px 30px;
+            border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%;
+        }
     </style>
 </head>
 <body>
+
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-box">
+            <i class="fas fa-exclamation-circle modal-icon"></i>
+            <div class="modal-title">Details Missing!</div>
+            <div class="modal-text" id="alertMsg">Kripya saari details bhariye. Red '*' waale fields mandatory hain.</div>
+            <button class="modal-btn" onclick="closeAlert()">Sahi Hai</button>
+        </div>
+    </div>
 
     <div class="header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
@@ -27,19 +59,19 @@
 
     <div class="form-box">
         <label class="inp-label">Full Name <span class="required">*</span></label>
-        <input type="text" id="custName" class="inp-field" placeholder="Enter your name">
+        <input type="text" id="custName" class="inp-field" placeholder="Full Name">
 
         <label class="inp-label">Phone Number <span class="required">*</span></label>
-        <input type="text" id="custPhone" class="inp-field" placeholder="+91">
+        <input type="text" id="custPhone" class="inp-field" placeholder="Mobile Number">
 
         <label class="inp-label">House No. / Building / Area <span class="required">*</span></label>
-        <input type="text" id="addrLine1" class="inp-field" placeholder="E.g. House No 123, Sakaldiha">
+        <input type="text" id="addrLine1" class="inp-field" placeholder="Building name or House number">
 
         <label class="inp-label">Street / Landmark / City <span class="required">*</span></label>
-        <textarea id="addrLine2" class="inp-field" rows="2" placeholder="E.g. Near Main Market, Chandauli, UP"></textarea>
+        <textarea id="addrLine2" class="inp-field" rows="2" placeholder="Street name, landmark, city"></textarea>
 
         <label class="inp-label">Pincode <span class="required">*</span></label>
-        <input type="text" id="pincode" class="inp-field" placeholder="232104">
+        <input type="text" id="pincode" class="inp-field" placeholder="6-digit Pincode">
     </div>
 
     <div class="summary-box">
@@ -65,7 +97,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Auto-fill user name on load
+        // Auto-fill name logic
         onAuthStateChanged(auth, (user) => {
             if (user && user.displayName) {
                 document.getElementById('custName').value = user.displayName;
@@ -73,11 +105,17 @@
         });
 
         window.onload = function() {
-            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
             let total = localStorage.getItem('cartTotal') || 0;
-
-            document.getElementById('itemCount').innerText = cart.length;
             document.getElementById('payAmt').innerText = "₹" + total;
+            document.getElementById('itemCount').innerText = (JSON.parse(localStorage.getItem('myCart')) || []).length;
+        }
+
+        // CUSTOM ALERT FUNCTIONS
+        window.showAlert = function() {
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+        window.closeAlert = function() {
+            document.getElementById('customAlert').style.display = 'none';
         }
 
         window.validateAndProceed = function() {
@@ -87,15 +125,12 @@
             const addr2 = document.getElementById('addrLine2').value.trim();
             const pin = document.getElementById('pincode').value.trim();
 
-            // Validation: Sab mandatory hai
             if(!name || !phone || !addr1 || !addr2 || !pin) {
-                alert("Kripya saari details bhariye. Red '*' waale fields mandatory hain.");
+                showAlert(); // Naya modern alert dikhayega
                 return;
             }
 
-            // Combine addresses for storage
             const fullAddress = `${addr1}, ${addr2}, PIN: ${pin}`;
-            
             localStorage.setItem('user_name', name);
             localStorage.setItem('user_address', fullAddress);
             localStorage.setItem('user_phone', phone);
