@@ -26,36 +26,51 @@
     </style>
 </head>
 <body>
+
     <div class="header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
         <div class="title">Shopping Bag</div>
     </div>
+
     <div class="address-bar">
         <i class="fas fa-map-marker-alt addr-icon"></i>
         <div>
             <div style="font-weight:700; font-size:0.85rem;">Deliver to: <span id="userName">Rahul Kumar</span></div>
-            <div class="addr-text" id="userAddress">Sakaldiha, Chandauli, UP</div>
+            <div class="addr-text" id="userAddress">123, Sakaldiha, Chandauli, UP - 232104</div>
         </div>
         <button class="addr-btn" onclick="window.location.href='checkout.html'">Change</button>
     </div>
+
     <div id="cartContainer" style="padding:10px;"></div>
+
     <div style="background:white; padding:20px; margin-top:10px;">
         <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:700;">
             <span>Total Amount</span>
             <span id="totalPrice">₹0</span>
         </div>
     </div>
+
     <div class="bottom-bar">
-        <div><div style="font-size:0.8rem; color:#888;">TOTAL</div><div style="font-size:1.2rem; font-weight:800;" id="footerPrice">₹0</div></div>
+        <div>
+            <div style="font-size:0.8rem; color:#888;">TOTAL</div>
+            <div style="font-size:1.2rem; font-weight:800;" id="footerPrice">₹0</div>
+        </div>
         <button class="btn-checkout" onclick="goToCheckout()">CHECKOUT</button>
     </div>
 
     <script>
-        let cart = [];
+        // MULTI-VENDOR LOGIC
+        const urlParams = new URLSearchParams(window.location.search);
+        const sellerId = urlParams.get('seller');
+        const cartKey = sellerId ? `myCart_${sellerId}` : 'myCart_default';
+        
+        let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        
         window.onload = function() {
-            cart = JSON.parse(localStorage.getItem('myCart')) || [];
             let savedAddr = localStorage.getItem('user_address');
-            if(savedAddr) document.getElementById('userAddress').innerText = savedAddr;
+            if(savedAddr) {
+                document.getElementById('userAddress').innerText = savedAddr;
+            }
             renderCart();
         }
 
@@ -63,38 +78,41 @@
             let container = document.getElementById('cartContainer');
             let total = 0;
             container.innerHTML = "";
+
             if(cart.length === 0) {
-                container.innerHTML = "<div style='text-align:center; padding:50px; color:#888;'>Bag is Empty</div>";
+                container.innerHTML = "<div style='text-align:center; padding:50px;'>Bag is Empty for this store</div>";
+                document.getElementById('totalPrice').innerText = "₹0";
+                document.getElementById('footerPrice').innerText = "₹0";
+                return;
             }
+
             cart.forEach((item, index) => {
-                // FIX: Support both 'img' and 'image' keys
-                let price = Number(item.price) || 0;
-                let qty = Number(item.qty) || 1;
-                total += price * qty;
+                total += parseInt(item.price) * (item.qty || 1);
                 container.innerHTML += `
                     <div class="cart-item">
-                        <img src="${item.img || item.image}" class="c-img">
+                        <img src="${item.img}" class="c-img">
                         <div class="c-info">
                             <div class="c-name">${item.name}</div>
-                            <div class="c-price">₹${price}</div>
+                            <div class="c-price">₹${item.price}</div>
                             <div class="remove" onclick="removeItem(${index})">REMOVE</div>
                         </div>
                     </div>`;
             });
+
             document.getElementById('totalPrice').innerText = "₹" + total;
             document.getElementById('footerPrice').innerText = "₹" + total;
-            localStorage.setItem('cartTotal', total);
+            localStorage.setItem('cartTotal', total); 
         }
 
         function removeItem(index) {
             cart.splice(index, 1);
-            localStorage.setItem('myCart', JSON.stringify(cart));
+            localStorage.setItem(cartKey, JSON.stringify(cart));
             renderCart();
         }
 
         function goToCheckout() {
             if(cart.length === 0) alert("Cart is empty!");
-            else window.location.href = 'checkout.html';
+            else window.location.href = `checkout.html?seller=${sellerId}`;
         }
     </script>
 </body>
