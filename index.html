@@ -10,44 +10,39 @@
 <body>
 
     <header>
-        <div class="logo">
-            <h1>Instacart</h1>
+        <div class="header-container">
+            <h1 class="logo">Instacart</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="login.html" id="profile-link"><i class="fas fa-user"></i> My Profile</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
-                <li id="profile-section">
-                    <a href="login.html" id="profile-link">
-                        <i class="fas fa-user"></i> My Profile
-                    </a>
-                </li>
-            </ul>
-        </nav>
     </header>
 
     <section class="hero">
-        <h2>Shop Directly from Instagram Sellers</h2>
-        <p>Discover unique products and support small businesses.</p>
+        <div class="hero-content">
+            <h2>Shop Directly from Instagram Sellers</h2>
+            <p>Discover unique products and support small businesses.</p>
+        </div>
     </section>
 
-    <main id="product-container" class="product-grid">
-        </main>
+    <main class="container">
+        <div id="product-container" class="product-grid">
+            </div>
+    </main>
 
     <script src="script.js"></script>
     <script>
-        // Profile logic to check if user is logged in
+        // Profile persistence logic
         document.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const profileLink = document.getElementById('profile-link');
-            
             if (isLoggedIn === 'true') {
-                // Agar login hai toh profile page par bhejo
-                profileLink.href = "profile-details.html"; 
                 profileLink.innerHTML = '<i class="fas fa-user-check"></i> My Profile';
-            } else {
-                // Agar login nahi hai toh login page par bhejo
-                profileLink.href = "login.html";
+                profileLink.href = "profile-details.html";
             }
         });
     </script>
