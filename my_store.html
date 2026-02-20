@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
-        body { margin:0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding-bottom: 100px; transition: 0.3s; }
+        body { margin:0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding-bottom: 80px; transition: 0.3s; }
 
         /* Store Header */
         .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
@@ -33,38 +33,39 @@
         .p-name { font-weight: 700; font-size: 0.85rem; height: 34px; overflow: hidden; margin: 4px 0; }
         .p-price { font-weight: 800; font-size: 1.1rem; color: var(--p-color); }
 
-        /* RIGHT CORNER FLOATING ACTIONS */
-        .floating-container { 
+        /* TOP RIGHT FLOATING CONTAINER */
+        .top-right-actions { 
             position: fixed; 
-            bottom: 30px; 
-            right: 20px; 
+            top: 20px; 
+            right: 15px; 
             display: flex; 
             flex-direction: column; 
             align-items: flex-end; 
-            gap: 15px; 
-            z-index: 9999; 
+            gap: 12px; 
+            z-index: 10000; 
         }
 
-        /* Modern Cart Button */
+        /* Modern Top Cart Button */
         .cart-fab { 
-            background: #000; color: white; border: none; width: 60px; height: 60px; 
+            background: #000; color: white; border: none; width: 50px; height: 50px; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 1.4rem; cursor: pointer; position: relative; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: 0.3s;
+            font-size: 1.2rem; cursor: pointer; position: relative; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: 0.3s;
         }
         .cart-badge { 
             position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; 
-            font-size: 0.75rem; min-width: 22px; height: 22px; border-radius: 11px; 
+            font-size: 0.7rem; min-width: 20px; height: 20px; border-radius: 10px; 
             display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid white;
         }
 
-        /* Modern Share Button */
+        /* Share Button (Niche hi rakha hai taaki balanced lage) */
         .share-fab { 
-            background: var(--p-color); color: white; border: none; padding: 12px 20px; 
-            border-radius: 50px; font-weight: 800; font-size: 0.8rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: var(--p-color); color: white; border: none; padding: 12px 25px; 
+            border-radius: 50px; font-weight: 800; font-size: 0.85rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
             display: flex; align-items: center; gap: 8px; cursor: pointer;
-            text-transform: uppercase;
+            z-index: 9999;
         }
     </style>
 </head>
@@ -79,6 +80,13 @@
         <div class="store-bio" id="bioDisplay"></div>
     </div>
 
+    <div class="top-right-actions">
+        <button class="cart-fab" id="cartBtn">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+        </button>
+    </div>
+
     <div class="filter-bar" id="categoryFilter">
         <button class="filter-btn active" onclick="filterProducts('All', this)">All</button>
         <button class="filter-btn" onclick="filterProducts('Shoes', this)">Shoes</button>
@@ -88,15 +96,9 @@
 
     <div class="p-grid" id="mainGrid"></div>
 
-    <div class="floating-container">
-        <button id="shareStoreBtn" class="share-fab">
-            <i class="fas fa-share-alt"></i> Share Store
-        </button>
-        <button class="cart-fab" id="cartBtn">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-        </button>
-    </div>
+    <button id="shareStoreBtn" class="share-fab">
+        <i class="fas fa-share-alt"></i> Share Store
+    </button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -121,13 +123,11 @@
         async function initStore() {
             if(!sellerId) return;
 
-            // Live Cart Badge
             updateCartBadge();
             document.getElementById('cartBtn').onclick = () => {
                 window.location.href = `cart.html?seller=${sellerId}`;
             };
 
-            // Branding
             try {
                 const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
                 if(idSnap.exists()) {
@@ -145,7 +145,6 @@
                     if(s.sBanner) document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner}')`;
                 }
 
-                // Products
                 const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
                 const prodSnap = await getDocs(q);
                 allProducts = [];
