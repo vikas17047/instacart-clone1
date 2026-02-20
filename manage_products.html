@@ -48,7 +48,7 @@
         </div>
 
         <div class="section-title" style="font-weight:800; margin-bottom:15px;">Product Grid</div>
-        <div class="p-grid" id="inventoryList"></div>
+        <div id="inventoryList" class="p-grid"></div>
     </div>
 
     <div id="pModal" class="modal">
@@ -62,10 +62,15 @@
             <select id="pCat" onchange="autoFillImage()">
                 <option value="">-- Manual Entry --</option>
                 <option value="Shoes">Shoes</option>
-                <option value="Clothes">Clothes</option>
+                <option value="Clothes">Clothes & Fashion</option>
                 <option value="Watch">Watches</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Groceries">Groceries</option>
+                <option value="Beauty">Beauty & Makeup</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Toys">Toys</option>
+                <option value="Accessories">Accessories</option>
             </select>
 
             <input type="text" id="pName" placeholder="Product Name">
@@ -122,6 +127,23 @@
             else openAddModal();
         };
 
+        window.autoFillImage = () => {
+            const cat = document.getElementById('pCat').value;
+            const library = {
+                "Shoes": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+                "Clothes": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b",
+                "Watch": "https://images.unsplash.com/photo-1524592091214-8c97af8c7db8",
+                "Electronics": "https://images.unsplash.com/photo-1498049794561-7780e7231661",
+                "Groceries": "https://images.unsplash.com/photo-1542838132-92c53300491e",
+                "Beauty": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9",
+                "Fitness": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+                "Furniture": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc",
+                "Toys": "https://images.unsplash.com/photo-1531323380765-a11963563d6b",
+                "Accessories": "https://images.unsplash.com/photo-1511406361295-0a5ff814c0ad"
+            };
+            if(library[cat]) document.getElementById('pImg').value = library[cat] + "?w=500&q=80";
+        };
+
         window.saveProduct = async () => {
             const name = document.getElementById('pName').value.trim();
             const price = document.getElementById('pPrice').value.trim();
@@ -131,9 +153,8 @@
             const W = document.getElementById('pW').value.trim();
             const H = document.getElementById('pH').value.trim();
 
-            // 🛡️ STRICT VALIDATION: Kuch bhi khali nahi hona chahiye
             if(!name || !price || !img || !weight || !L || !W || !H) {
-                alert("Kripya saari details bhariye! Shipping (Weight/Size) ke bina product save nahi hoga.");
+                alert("Kripya saari details bhariye! Shipping details ke bina product save nahi hoga.");
                 return;
             }
 
@@ -150,7 +171,6 @@
             } catch (e) { alert(e.message); }
         };
 
-        // Baki purane functions (fetchProducts, openEditModal, autoFillImage) bilkul safe hain...
         async function fetchProducts() {
             const list = document.getElementById('inventoryList');
             const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
@@ -188,10 +208,22 @@
 
         window.openAddModal = () => { editId = null; document.getElementById('modalTitle').innerText = "Add New Product"; document.getElementById('pModal').style.display = 'block'; };
         window.closeModal = () => { document.getElementById('pModal').style.display = 'none'; resetForm(); };
-        function resetForm() { document.querySelectorAll('.modal input').forEach(i => i.value = ""); }
+        function resetForm() { document.querySelectorAll('.modal input').forEach(i => i.value = ""); document.getElementById('pCat').value = ""; }
         window.deleteProd = async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db, "products", id)); fetchProducts(); } };
-        window.showIdentityAlert = () => { alert("Pehle store setup mein address bhariye!"); window.location.href='create_store.html'; };
-        window.autoFillImage = () => { /* Purana logic */ };
+
+        window.showIdentityAlert = () => {
+            const overlay = document.createElement('div');
+            overlay.style = "position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px);";
+            overlay.innerHTML = `
+                <div style="background:white; padding:30px; border-radius:20px; text-align:center; width:85%; max-width:350px; animation: popIn 0.3s ease-out;">
+                    <i class="fas fa-map-marker-alt" style="font-size:3.5rem; color:#ff3b30; margin-bottom:15px;"></i>
+                    <h2 style="margin:0 0 10px 0; font-weight:800;">Setup Required!</h2>
+                    <p style="color:#666; font-size:1rem; margin-bottom:25px; line-height:1.5;">Actual shipping rates ke liye pehle apna <b>Pickup Address</b> aur <b>Pincode</b> setup kijiye.</p>
+                    <button onclick="window.location.href='create_store.html'" style="width:100%; background:#000; color:#fff; border:none; padding:15px; border-radius:12px; font-weight:800; font-size:1rem; cursor:pointer;">FILL DETAILS NOW</button>
+                </div>
+                <style>@keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }</style>`;
+            document.body.appendChild(overlay);
+        };
     </script>
 </body>
 </html>
