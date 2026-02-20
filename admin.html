@@ -7,51 +7,76 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { display: none; background: #f5f7fa; } 
+        body { display: none; background: #f5f7fa; font-family: 'Inter', sans-serif; } 
         .admin-header { background: #000; color: white; padding: 20px; text-align: center; }
-        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
-        .stat-box { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .card-row { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        /* Modern Stats Design */
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .stat-box { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .stat-box h3 { font-size: 1.4rem; font-weight: 800; margin-top: 5px; color: #000; }
+        
+        /* Tabs Styling */
         .section-tab { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; background: #ddd; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; background: #e0e0e0; transition: 0.3s; }
         .tab-btn.active { background: #000; color: white; }
+
+        /* Order & Seller Cards */
+        .card-row { background: white; padding: 18px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #efefef; position: relative; }
+        .payout-info { background: #f0fdf4; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85rem; border: 1px dashed #22c55e; }
+        .copy-btn { background: #000; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; cursor: pointer; float: right; }
+
+        /* 🌟 MODERN POPUP NOTIFICATION CSS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 3000; backdrop-filter: blur(5px); }
+        .modal-box { background: white; width: 85%; max-width: 380px; padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popScale 0.3s ease-out; }
+        @keyframes popScale { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .modal-icon { font-size: 3.5rem; color: #000; margin-bottom: 15px; }
+        .modal-title { font-weight: 800; font-size: 1.25rem; margin-bottom: 8px; }
+        .modal-text { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px; }
+        .modal-btn { background: #000; color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; }
+
         .denied-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
-        .seller-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
     </style>
 </head>
 <body>
 
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-box">
+            <div id="alertIcon" class="modal-icon"><i class="fas fa-info-circle"></i></div>
+            <div id="alertTitle" class="modal-title">Notification</div>
+            <div id="alertMsg" class="modal-text">Message goes here...</div>
+            <button class="modal-btn" onclick="closeAlert()">Understood</button>
+        </div>
+    </div>
+
     <div id="adminContent">
         <div class="admin-header">
-            <h2 style="letter-spacing: 2px;">SUPER ADMIN PANEL</h2>
-            <p id="adminStatus" style="font-size: 0.8rem; opacity: 0.7;"></p>
+            <h2 style="letter-spacing: 1px;">ADMIN CONTROL</h2>
+            <p id="adminStatus" style="font-size: 0.75rem; opacity: 0.8;"></p>
         </div>
 
         <div class="stats-container">
             <div class="stat-box">
-                <small>TOTAL ORDERS</small>
+                <small style="color:#888; font-weight:700;">TOTAL ORDERS</small>
                 <h3 id="totalOrders">0</h3>
             </div>
             <div class="stat-box">
-                <small>TOTAL REVENUE</small>
+                <small style="color:#888; font-weight:700;">TOTAL SALES</small>
                 <h3 id="totalRev">₹0</h3>
             </div>
         </div>
 
         <div class="section-tab">
             <button id="orderTab" class="tab-btn active" onclick="switchTab('orders')">Orders</button>
-            <button id="sellerTab" class="tab-btn" onclick="switchTab('sellers')">Sellers List</button>
+            <button id="sellerTab" class="tab-btn" onclick="switchTab('sellers')">Sellers (Payouts)</button>
         </div>
 
         <div style="padding: 15px;">
             <div id="ordersSection">
-                <h3 style="margin-bottom:15px;">ALL CUSTOMER ORDERS</h3>
-                <div id="masterOrdersList">Loading global orders...</div>
+                <div id="masterOrdersList"></div>
             </div>
 
             <div id="sellersSection" style="display:none;">
-                <h3 style="margin-bottom:15px;">REGISTERED SELLERS</h3>
-                <div id="masterSellersList">Loading sellers...</div>
+                <div id="masterSellersList"></div>
             </div>
         </div>
     </div>
@@ -61,7 +86,6 @@
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        //
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
             authDomain: "instacart-clone-91062.firebaseapp.com",
@@ -77,43 +101,40 @@
 
         const ADMIN_UID = "Bi31d4QWrdbWsUwhuUgCYLbPnw92"; 
 
+        // 🌟 GLOBAL ALERT FUNCTION
+        window.showAlert = function(title, msg, icon = 'fa-info-circle') {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMsg').innerText = msg;
+            document.getElementById('alertIcon').innerHTML = `<i class="fas ${icon}"></i>`;
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+        window.closeAlert = function() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+
         onAuthStateChanged(auth, (user) => {
             if (user && user.uid === ADMIN_UID) {
                 document.body.style.display = "block";
-                document.getElementById('adminStatus').innerText = "Vikas Gupta | Admin Mode";
+                document.getElementById('adminStatus').innerText = "Vikas Gupta | Super Admin";
                 loadMasterData();
                 loadSellers();
             } else {
-                document.body.innerHTML = `
-                    <div class="denied-screen">
-                        <i class="fas fa-user-shield" style="font-size: 4rem; color: red; margin-bottom:15px;"></i>
-                        <h1>Access Denied</h1>
-                        <p>Sirf Vikas Gupta hi is page ko access kar sakte hain.</p>
-                        <button onclick="window.location.href='index.html'" style="margin-top:20px; padding:12px 25px; background:black; color:white; border:none; border-radius:30px; font-weight:700;">Back to Home</button>
-                    </div>`;
+                document.body.innerHTML = `<div class="denied-screen"><h1>Access Denied</h1><button onclick="window.location.href='index.html'">Go Back</button></div>`;
                 document.body.style.display = "block";
             }
         });
 
         window.switchTab = (tab) => {
-            if(tab === 'orders') {
-                document.getElementById('ordersSection').style.display = 'block';
-                document.getElementById('sellersSection').style.display = 'none';
-                document.getElementById('orderTab').classList.add('active');
-                document.getElementById('sellerTab').classList.remove('active');
-            } else {
-                document.getElementById('ordersSection').style.display = 'none';
-                document.getElementById('sellersSection').style.display = 'block';
-                document.getElementById('orderTab').classList.remove('active');
-                document.getElementById('sellerTab').classList.add('active');
-            }
+            document.getElementById('ordersSection').style.display = tab === 'orders' ? 'block' : 'none';
+            document.getElementById('sellersSection').style.display = tab === 'sellers' ? 'block' : 'none';
+            document.getElementById('orderTab').className = tab === 'orders' ? 'tab-btn active' : 'tab-btn';
+            document.getElementById('sellerTab').className = tab === 'sellers' ? 'tab-btn active' : 'tab-btn';
         }
 
         async function loadMasterData() {
             const list = document.getElementById('masterOrdersList');
-            const snap = await getDocs(collection(db, "orders")); //
-            let totalRev = 0;
-            let count = 0;
+            const snap = await getDocs(collection(db, "orders"));
+            let totalRev = 0, count = 0;
             list.innerHTML = "";
 
             snap.forEach(doc => {
@@ -122,9 +143,9 @@
                 totalRev += Number(d.totalAmount || 0);
                 list.innerHTML += `
                     <div class="card-row">
-                        <div style="font-weight:700;">${d.customerName}</div>
-                        <div style="font-size:0.85rem; margin:5px 0;">Item: ${d.productName} | Price: ₹${d.totalAmount}</div>
-                        <div style="font-size:0.75rem; color:#666;">Addr: ${d.address}</div>
+                        <div style="font-weight:800; font-size:1rem;">${d.customerName}</div>
+                        <div style="font-size:0.85rem; margin-top:5px; color:#444;">${d.productName} • ₹${d.totalAmount}</div>
+                        <div style="font-size:0.75rem; color:#888; margin-top:5px;"><i class="fas fa-map-marker-alt"></i> ${d.address}</div>
                     </div>`;
             });
             document.getElementById('totalOrders').innerText = count;
@@ -133,25 +154,26 @@
 
         async function loadSellers() {
             const list = document.getElementById('masterSellersList');
-            const snap = await getDocs(collection(db, "seller_identity")); //
+            const snap = await getDocs(collection(db, "seller_identity"));
             list.innerHTML = "";
-
-            if(snap.empty) {
-                list.innerHTML = "No sellers registered yet.";
-                return;
-            }
 
             snap.forEach(doc => {
                 const s = doc.data();
                 list.innerHTML += `
-                    <div class="card-row" style="display:flex; align-items:center;">
-                        <img src="${s.sLogo || 'https://via.placeholder.com/40'}" class="seller-logo">
-                        <div>
-                            <div style="font-weight:700;">${s.sName || 'Store'}</div>
-                            <div style="font-size:0.75rem; color:#666;">UID: ${doc.id.substring(0,10)}...</div>
+                    <div class="card-row">
+                        <button class="copy-btn" onclick="copyUPI('${s.sUpi}')">COPY UPI</button>
+                        <div style="font-weight:800;">${s.sName}</div>
+                        <div class="payout-info">
+                            <b>Payment ID:</b> ${s.sUpi || 'Not Set'}
                         </div>
                     </div>`;
             });
+        }
+
+        window.copyUPI = (upi) => {
+            if(!upi) { showAlert('Error', 'Seller ne UPI ID nahi daali hai!', 'fa-times-circle'); return; }
+            navigator.clipboard.writeText(upi);
+            showAlert('Success', 'UPI ID copy ho gayi hai. Ab aap pay kar sakte hain.', 'fa-check-circle');
         }
     </script>
 </body>
