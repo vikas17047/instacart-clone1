@@ -3,106 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store - Instacart</title>
+    <title>My Store - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
-        body { margin:0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding-bottom: 80px; transition: 0.3s; }
+        :root { --p-color: #008060; --bg: #ffffff; }
+        body { margin:0; font-family: 'Inter', sans-serif; background: var(--bg); }
 
-        /* Store Header */
+        /* MANDATORY LOGIN MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .modal-box { background: white; width: 85%; max-width: 350px; padding: 30px 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-icon { font-size: 3.5rem; color: var(--p-color); margin-bottom: 15px; }
+        .modal-title { font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; }
+        .modal-text { color: #666; font-size: 0.95rem; line-height: 1.4; margin-bottom: 25px; }
+        .modal-btn { background: #000; color: #fff; border: none; padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
+
+        /* Store Content (Chupa rhega jab tak login na ho) */
+        #storeContent { display: none; }
         .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
         .hero { height: 180px; background-size: cover; background-position: center; position: relative; background-color: #eee; }
-        .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.3); }
-        
-        .profile-sec { padding: 0 20px; margin-top: -45px; position: relative; text-align: center; }
-        .store-logo { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--bg); object-fit: cover; background: #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .store-name { font-size: 1.4rem; font-weight: 800; margin-top: 10px; }
-        .store-bio { font-size: 0.85rem; opacity: 0.8; margin-top: 5px; line-height: 1.4; max-width: 85%; margin-left: auto; margin-right: auto; }
-
-        /* Filter Bar */
-        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding: 20px; scrollbar-width: none; background: var(--bg); position: sticky; top: 0; z-index: 10; }
-        .filter-btn { padding: 8px 18px; border: 1px solid #ddd; border-radius: 25px; background: transparent; white-space: nowrap; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--text); }
-        .filter-btn.active { background: var(--p-color); color: white; border-color: var(--p-color); }
-
-        /* Product Grid */
         .p-grid { display: grid; padding: 15px; gap: 15px; grid-template-columns: 1fr 1fr; }
-        .p-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; color: #000; }
-        .p-img { width: 100%; height: 165px; object-fit: cover; }
-        .p-details { padding: 12px; }
-        .p-name { font-weight: 700; font-size: 0.85rem; height: 34px; overflow: hidden; margin: 4px 0; }
-        .p-price { font-weight: 800; font-size: 1.1rem; color: var(--p-color); }
-
-        /* TOP RIGHT FLOATING CONTAINER */
-        .top-right-actions { 
-            position: fixed; 
-            top: 20px; 
-            right: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-end; 
-            gap: 12px; 
-            z-index: 10000; 
-        }
-
-        /* Modern Top Cart Button */
-        .cart-fab { 
-            background: #000; color: white; border: none; width: 50px; height: 50px; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 1.2rem; cursor: pointer; position: relative; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: 0.3s;
-        }
-        .cart-badge { 
-            position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; 
-            font-size: 0.7rem; min-width: 20px; height: 20px; border-radius: 10px; 
-            display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid white;
-        }
-
-        /* Share Button (Niche hi rakha hai taaki balanced lage) */
-        .share-fab { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            background: var(--p-color); color: white; border: none; padding: 12px 25px; 
-            border-radius: 50px; font-weight: 800; font-size: 0.85rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
-            display: flex; align-items: center; gap: 8px; cursor: pointer;
-            z-index: 9999;
-        }
+        .p-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #eee; }
+        .p-img { width: 100%; height: 160px; object-fit: cover; }
+        .p-info { padding: 10px; }
+        .p-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 5px; }
+        .p-price { font-weight: 800; color: var(--p-color); }
     </style>
 </head>
 <body>
 
-    <div class="ann-bar" id="annDisplay">WELCOME</div>
-    <div class="hero" id="bannerDisplay"><div class="hero-overlay"></div></div>
-
-    <div class="profile-sec">
-        <img id="logoDisplay" src="" class="store-logo" style="display: none;">
-        <div class="store-name" id="nameDisplay">Store Name</div>
-        <div class="store-bio" id="bioDisplay"></div>
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-box">
+            <i class="fas fa-store modal-icon"></i>
+            <div class="modal-title">Welcome to Store</div>
+            <div class="modal-text">Store browse karne ke liye aapko Google se ek bar login karna hoga.</div>
+            <button class="modal-btn" onclick="loginWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="20px">
+                Login with Google
+            </button>
+        </div>
     </div>
 
-    <div class="top-right-actions">
-        <button class="cart-fab" id="cartBtn">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-        </button>
+    <div id="storeContent">
+        <div class="ann-bar" id="annDisplay">WELCOME</div>
+        <div class="hero" id="bannerDisplay"></div>
+        <div id="nameDisplay" style="text-align:center; padding:15px; font-weight:800; font-size:1.4rem;">Store Name</div>
+        <div class="p-grid" id="mainGrid"></div>
     </div>
-
-    <div class="filter-bar" id="categoryFilter">
-        <button class="filter-btn active" onclick="filterProducts('All', this)">All</button>
-        <button class="filter-btn" onclick="filterProducts('Shoes', this)">Shoes</button>
-        <button class="filter-btn" onclick="filterProducts('Clothes', this)">Clothes</button>
-        <button class="filter-btn" onclick="filterProducts('Watch', this)">Watches</button>
-    </div>
-
-    <div class="p-grid" id="mainGrid"></div>
-
-    <button id="shareStoreBtn" class="share-fab">
-        <i class="fas fa-share-alt"></i> Share Store
-    </button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -115,85 +67,52 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
         const urlParams = new URLSearchParams(window.location.search);
         const sellerId = urlParams.get('seller');
-        let allProducts = [];
+
+        // Check Login
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('storeContent').style.display = 'block';
+                initStore();
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+                document.getElementById('storeContent').style.display = 'none';
+            }
+        });
+
+        window.loginWithGoogle = async () => {
+            try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }
+        };
 
         async function initStore() {
             if(!sellerId) return;
-
-            updateCartBadge();
-            document.getElementById('cartBtn').onclick = () => {
-                window.location.href = `cart.html?seller=${sellerId}`;
-            };
-
             try {
+                // Seller Identity load
                 const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
-                if(idSnap.exists()) {
-                    const d = idSnap.data();
-                    document.getElementById('nameDisplay').innerText = d.sName || "Store";
-                    document.getElementById('bioDisplay').innerText = d.sBio || "";
-                    if(d.sLogo) { document.getElementById('logoDisplay').src = d.sLogo; document.getElementById('logoDisplay').style.display = 'inline-block'; }
-                }
+                if(idSnap.exists()) document.getElementById('nameDisplay').innerText = idSnap.data().sName;
 
-                const designSnap = await getDoc(doc(db, "store_designs", sellerId));
-                if(designSnap.exists()) {
-                    const s = designSnap.data();
-                    document.documentElement.style.setProperty('--p-color', s.pColor || '#008060');
-                    document.getElementById('annDisplay').innerText = s.annText || "WELCOME";
-                    if(s.sBanner) document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner}')`;
-                }
-
+                // Products load (Aapka purana logic)
                 const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
-                const prodSnap = await getDocs(q);
-                allProducts = [];
-                prodSnap.forEach(doc => { allProducts.push({ id: doc.id, ...doc.data() }); });
-                displayProducts(allProducts);
-            } catch (err) { console.error(err); }
-        }
-
-        function updateCartBadge() {
-            const cartKey = `myCart_${sellerId}`;
-            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
-            const badge = document.getElementById('cartBadge');
-            badge.innerText = cart.length;
-            badge.style.display = cart.length > 0 ? 'flex' : 'none';
-        }
-
-        function displayProducts(products) {
-            const grid = document.getElementById('mainGrid');
-            grid.innerHTML = "";
-            products.forEach(p => {
-                grid.innerHTML += `
-                    <div class="p-card" onclick="window.location.href='product_details.html?id=${p.id}&seller=${sellerId}'">
+                const snap = await getDocs(q);
+                const grid = document.getElementById('mainGrid');
+                grid.innerHTML = "";
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    grid.innerHTML += `<div class="p-card" onclick="window.location.href='product_details.html?id=${doc.id}&seller=${sellerId}'">
                         <img src="${p.image}" class="p-img">
-                        <div class="p-details">
-                            <div style="font-size:0.6rem; color:var(--p-color); font-weight:800; text-transform:uppercase;">${p.category || 'Product'}</div>
+                        <div class="p-info">
                             <div class="p-name">${p.name}</div>
                             <div class="p-price">₹${p.price}</div>
                         </div>
                     </div>`;
-            });
+                });
+            } catch (err) { console.log(err); }
         }
-
-        window.filterProducts = (cat, btn) => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            displayProducts(cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat));
-        };
-
-        document.getElementById('shareStoreBtn').onclick = async () => {
-            const storeName = document.getElementById('nameDisplay').innerText;
-            const shareText = `Checkout this amazing store: ${storeName} 🛍️\nLink: ${window.location.href}`;
-            if (navigator.share) {
-                await navigator.share({ title: 'Share Store', text: shareText, url: window.location.href });
-            } else {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-            }
-        };
-
-        initStore();
     </script>
 </body>
 </html>
