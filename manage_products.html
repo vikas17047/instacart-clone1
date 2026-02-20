@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory - Instacart</title>
+    <title>Inventory Listing - Instacart</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,62 +13,63 @@
         .header { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .container { padding: 15px; }
 
-        /* Dashboard Box Style for Add Button */
+        /* Premium Add Box - As per your screenshot */
         .add-listing-card {
-            background: white; border: 2px dashed #008060; padding: 20px; border-radius: 12px;
-            display: flex; align-items: center; gap: 15px; cursor: pointer; margin-bottom: 20px;
+            background: white; border: 2px dashed #008060; padding: 15px; border-radius: 12px;
+            display: flex; align-items: center; gap: 15px; cursor: pointer; margin-bottom: 25px;
         }
         .icon-sq { width: 45px; height: 45px; background: #f1f8f5; color: var(--shopify-green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 
-        /* Product Grid Style */
-        .section-title { font-weight: 800; font-size: 1rem; margin-bottom: 15px; color: #202223; }
+        /* Grid View for Products */
+        .section-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: #000; }
         .p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .p-card { background: white; border-radius: 12px; padding: 12px; box-shadow: var(--card-shadow); position: relative; }
-        .p-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; background: #f9f9f9; }
-        .p-name { font-weight: 700; font-size: 0.85rem; margin: 8px 0 2px; }
-        .p-price { color: var(--shopify-green); font-weight: 800; font-size: 0.9rem; }
+        .p-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; background: #f9f9f9; }
+        .p-name { font-weight: 700; font-size: 0.9rem; margin: 10px 0 2px; color: #202223; }
+        .p-price { color: var(--shopify-green); font-weight: 800; font-size: 0.95rem; }
 
-        /* Modal & Form */
+        /* Modal Overlay */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; padding: 20px; overflow-y: auto; }
-        .modal-content { background: white; border-radius: 15px; padding: 20px; max-width: 400px; margin: auto; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 420px; margin: auto; position: relative; }
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
         
-        .ship-box { background: #f0f7ff; padding: 12px; border-radius: 10px; border: 1px solid #cce3ff; margin-top: 10px; }
+        .ship-box { background: #f0f7ff; padding: 15px; border-radius: 12px; border: 1px solid #cce3ff; margin-top: 15px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .save-btn { width: 100%; background: var(--shopify-green); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 800; margin-top: 10px; }
+        .save-btn { width: 100%; background: var(--shopify-green); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="font-weight:800;">Inventory Product Listing</div>
+        <div style="font-weight:800; font-size: 1.1rem;">Inventory Product Listing</div>
         <i class="fas fa-bell"></i>
     </div>
 
     <div class="container">
-        <div class="add-listing-card" onclick="openModal()">
+        <div class="add-listing-card" onclick="openAddModal()">
             <div class="icon-sq"><i class="fas fa-plus"></i></div>
-            <div><b style="font-size:0.9rem;">Add Product Listing</b><br><small style="color:#6d7175;">Update store inventory</small></div>
+            <div><b style="font-size:1rem;">Add Product Listing</b><br><small style="color:#6d7175;">Manage your store items</small></div>
         </div>
 
         <div class="section-title">Inventuct grid</div>
-        <div class="p-grid" id="productList"></div>
+        <div class="p-grid" id="productList">
+            </div>
     </div>
 
     <div id="pModal" class="modal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
                 <h3 style="margin:0;">Add New Product</h3>
-                <i class="fas fa-times" onclick="closeModal()"></i>
+                <i class="fas fa-times" onclick="closeModal()" style="font-size: 1.2rem; cursor: pointer;"></i>
             </div>
 
-            <label style="font-size:0.75rem; font-weight:700; margin-top:15px; display:block;">Choose Quick Product</label>
+            <label style="font-size:0.7rem; font-weight:800; color:#888; text-transform:uppercase;">Choose Quick Product (Optional)</label>
             <select id="quickPick" onchange="autoFill()">
-                <option value="">-- Select Product --</option>
-                <option value="item1">Classic Cotton Shirt (₹799)</option>
-                <option value="item2">Casual Denim Jeans (₹1299)</option>
-                <option value="item3">Printed Summer Dress (₹999)</option>
-                </select>
+                <option value="">-- Manual Entry --</option>
+                <option value="item1">Classic Cotton Shirt</option>
+                <option value="item2">Casual Denim Jeans</option>
+                <option value="item3">Printed Summer Dress</option>
+            </select>
 
             <input type="text" id="pName" placeholder="Product Name">
             <input type="number" id="pPrice" placeholder="Price (₹)">
@@ -89,26 +90,95 @@
     </div>
 
     <script type="module">
-        // Firebase setup same as before...
-        const productsDB = {
-            "item1": { name: "Classic Cotton Shirt", price: 799, img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
-            "item2": { name: "Casual Denim Jeans", price: 1299, img: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" },
-            "item3": { name: "Printed Summer Dress", price: 999, img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400" }
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let sellerId = null;
+
+        // Load Old Products on Startup
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                sellerId = user.uid;
+                loadProducts();
+            } else { window.location.href = "login.html"; }
+        });
+
+        async function loadProducts() {
+            const list = document.getElementById('productList');
+            const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
+            const snap = await getDocs(q);
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const p = doc.data();
+                list.innerHTML += `
+                    <div class="p-card">
+                        <img src="${p.image || p.img || 'https://via.placeholder.com/150'}">
+                        <div class="p-name">${p.name}</div>
+                        <div class="p-price">₹${p.price}</div>
+                    </div>`;
+            });
+        }
+
+        const quickDB = {
+            "item1": { name: "Classic Cotton Shirt", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
+            "item2": { name: "Casual Denim Jeans", img: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" },
+            "item3": { name: "Printed Summer Dress", img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400" }
         };
 
         window.autoFill = () => {
             const key = document.getElementById('quickPick').value;
-            if(productsDB[key]) {
-                document.getElementById('pName').value = productsDB[key].name;
-                document.getElementById('pPrice').value = productsDB[key].price;
-                document.getElementById('pImg').value = productsDB[key].img;
+            if(quickDB[key]) {
+                document.getElementById('pName').value = quickDB[key].name;
+                document.getElementById('pImg').value = quickDB[key].img;
+                document.getElementById('pPrice').value = ""; // Always leave price blank for seller
             }
         };
 
-        window.openModal = () => document.getElementById('pModal').style.display = 'block';
+        window.openAddModal = () => {
+            document.getElementById('pName').value = "";
+            document.getElementById('pPrice').value = "";
+            document.getElementById('pImg').value = "";
+            document.getElementById('quickPick').value = "";
+            document.getElementById('pModal').style.display = 'block';
+        };
+
         window.closeModal = () => document.getElementById('pModal').style.display = 'none';
-        
-        // Load & Save logic using Firebase Firestore...
+
+        window.saveToFirebase = async () => {
+            const data = {
+                name: document.getElementById('pName').value,
+                price: Number(document.getElementById('pPrice').value),
+                image: document.getElementById('pImg').value,
+                weight: document.getElementById('pWeight').value,
+                length: document.getElementById('pL').value,
+                width: document.getElementById('pW').value,
+                height: document.getElementById('pH').value,
+                sellerId, createdAt: new Date()
+            };
+
+            if(!data.name || !data.price) return alert("Please fill Name and Price!");
+
+            try {
+                await addDoc(collection(db, "products"), data);
+                alert("Product Added! 🚀");
+                closeModal();
+                loadProducts();
+            } catch (e) { alert(e.message); }
+        };
     </script>
 </body>
 </html>
