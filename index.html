@@ -6,33 +6,8 @@
     <title>Instacart Home</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* Modern Login Modal Style */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(4px); }
-        .modal-box { background: white; width: 85%; max-width: 350px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: 'Inter', sans-serif; }
-        .modal-icon { font-size: 3rem; color: #008060; margin-bottom: 15px; }
-        .modal-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; color: #333; }
-        .modal-text { color: #666; font-size: 0.9rem; line-height: 1.4; margin-bottom: 25px; }
-        .modal-btn { background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Inter'; font-size: 0.95rem; }
-        
-        /* Initial state: Content hide rhega jab tak login na ho */
-        #mainContent { display: none; }
-    </style>
 </head>
 <body>
-
-    <div id="loginModal" class="modal-overlay">
-        <div class="modal-box">
-            <i class="fas fa-shopping-bag modal-icon"></i>
-            <div class="modal-title">Welcome to Instacart</div>
-            <div class="modal-text">Behatareen deals aur creators ko dekhne ke liye Google se login karein.</div>
-            <button class="modal-btn" onclick="loginWithGoogle()">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="18px">
-                Login with Google
-            </button>
-        </div>
-    </div>
 
     <div id="mainContent">
         <nav class="navbar">
@@ -82,8 +57,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        // Auth imports add kiye hain login fix ke liye
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -96,33 +69,8 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
 
-        // 🟢 UNIVERSAL LOGIN CHECK
-        onAuthStateChanged(auth, (user) => {
-            const modal = document.getElementById('loginModal');
-            const content = document.getElementById('mainContent');
-            if (user) {
-                // User logged in hai -> Modal hide, Content show
-                if(modal) modal.style.display = 'none';
-                if(content) content.style.display = 'block';
-                loadRealSellers(); // Content load hone ke baad data fetch karo
-            } else {
-                // User logged in nahi hai -> Modal show, Content hide
-                if(modal) modal.style.display = 'flex';
-                if(content) content.style.display = 'none';
-            }
-        });
-
-        // Login Function
-        window.loginWithGoogle = async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (err) {
-                console.error("Login Error:", err);
-            }
-        };
+        loadRealSellers();
 
         async function loadRealSellers() {
             const container = document.getElementById('creatorContainer');
