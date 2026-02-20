@@ -3,27 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Store - Instacart</title>
+    <title>My Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --p-color: #008060; --bg: #ffffff; }
         body { margin:0; font-family: 'Inter', sans-serif; background: var(--bg); }
-
-        /* MANDATORY LOGIN MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
-        .modal-box { background: white; width: 85%; max-width: 350px; padding: 30px 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-icon { font-size: 3.5rem; color: var(--p-color); margin-bottom: 15px; }
-        .modal-title { font-weight: 800; font-size: 1.3rem; margin-bottom: 10px; }
-        .modal-text { color: #666; font-size: 0.95rem; line-height: 1.4; margin-bottom: 25px; }
-        .modal-btn { background: #000; color: #fff; border: none; padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
-
-        /* Store Content (Chupa rhega jab tak login na ho) */
-        #storeContent { display: none; }
+        /* Ab yahan koi login modal ka CSS nahi hai */
         .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
         .hero { height: 180px; background-size: cover; background-position: center; position: relative; background-color: #eee; }
         .p-grid { display: grid; padding: 15px; gap: 15px; grid-template-columns: 1fr 1fr; }
-        .p-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #eee; }
+        .p-card { background: white; border-radius: 12px; overflow: hidden; border: 1px solid #eee; cursor: pointer; }
         .p-img { width: 100%; height: 160px; object-fit: cover; }
         .p-info { padding: 10px; }
         .p-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 5px; }
@@ -32,29 +22,16 @@
 </head>
 <body>
 
-    <div id="loginModal" class="modal-overlay">
-        <div class="modal-box">
-            <i class="fas fa-store modal-icon"></i>
-            <div class="modal-title">Welcome to Store</div>
-            <div class="modal-text">Store browse karne ke liye aapko Google se ek bar login karna hoga.</div>
-            <button class="modal-btn" onclick="loginWithGoogle()">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="20px">
-                Login with Google
-            </button>
-        </div>
-    </div>
-
     <div id="storeContent">
         <div class="ann-bar" id="annDisplay">WELCOME</div>
         <div class="hero" id="bannerDisplay"></div>
-        <div id="nameDisplay" style="text-align:center; padding:15px; font-weight:800; font-size:1.4rem;">Store Name</div>
+        <h2 id="nameDisplay" style="text-align:center; padding:10px;">Store Name</h2>
         <div class="p-grid" id="mainGrid"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -67,51 +44,38 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
 
         const urlParams = new URLSearchParams(window.location.search);
         const sellerId = urlParams.get('seller');
 
-        // Check Login
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('storeContent').style.display = 'block';
-                initStore();
-            } else {
-                document.getElementById('loginModal').style.display = 'flex';
-                document.getElementById('storeContent').style.display = 'none';
-            }
-        });
-
-        window.loginWithGoogle = async () => {
-            try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }
-        };
+        // Seedha store load hoga bina login maange
+        if(sellerId) {
+            initStore();
+        }
 
         async function initStore() {
-            if(!sellerId) return;
             try {
-                // Seller Identity load
+                // Seller info load karein
                 const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
                 if(idSnap.exists()) document.getElementById('nameDisplay').innerText = idSnap.data().sName;
 
-                // Products load (Aapka purana logic)
+                // Products load karein
                 const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
                 const snap = await getDocs(q);
                 const grid = document.getElementById('mainGrid');
                 grid.innerHTML = "";
                 snap.forEach(doc => {
                     const p = doc.data();
-                    grid.innerHTML += `<div class="p-card" onclick="window.location.href='product_details.html?id=${doc.id}&seller=${sellerId}'">
-                        <img src="${p.image}" class="p-img">
-                        <div class="p-info">
-                            <div class="p-name">${p.name}</div>
-                            <div class="p-price">₹${p.price}</div>
-                        </div>
-                    </div>`;
+                    grid.innerHTML += `
+                        <div class="p-card" onclick="window.location.href='product_details.html?id=${doc.id}&seller=${sellerId}'">
+                            <img src="${p.image}" class="p-img">
+                            <div class="p-info">
+                                <div class="p-name">${p.name}</div>
+                                <div class="p-price">₹${p.price}</div>
+                            </div>
+                        </div>`;
                 });
-            } catch (err) { console.log(err); }
+            } catch (err) { console.error(err); }
         }
     </script>
 </body>
