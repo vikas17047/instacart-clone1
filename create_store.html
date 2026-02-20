@@ -4,39 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setup Store - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
-        .card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .label-text { text-align: left; display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-top: 10px; }
-        #saveBtn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; }
-        #statusMsg { margin-top: 15px; font-size: 0.85rem; font-weight: bold; }
-        .highlight-box { background: #f0fdf4; border: 1px dashed #22c55e; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.75rem; color: #166534; }
+        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+        .label-text { display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-top: 10px; text-align: left; }
+        #saveBtn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        .ship-box { background: #fffcf0; border: 1px dashed #eab308; padding: 15px; border-radius: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h3>Create Your Store</h3>
-        <p style="font-size: 0.8rem; color: #666; margin-bottom: 20px;">Apni dukan ki jankari bhariye</p>
+        <h3 style="text-align:center; margin-top:0;">Store Identity</h3>
         
         <label class="label-text">Store Name *</label>
-        <input type="text" id="sName" placeholder="e.g. Vikas Fashion Hub">
+        <input type="text" id="sName" placeholder="e.g. Vikas Hub">
         
         <label class="label-text">Store Bio</label>
-        <textarea id="sBio" placeholder="Aap kya bechte hain?" rows="2"></textarea>
+        <textarea id="sBio" placeholder="What do you sell?" rows="2"></textarea>
         
         <label class="label-text">Logo Image URL</label>
         <input type="text" id="sLogo" placeholder="https://image-link.jpg">
 
-        <div class="highlight-box">
-            <i class="fas fa-wallet"></i> <b>Payment Info:</b> Isi ID par Admin aapko aapka paisa bhejega.
-        </div>
-        <label class="label-text">Your UPI ID (For Payouts) *</label>
-        <input type="text" id="sUpi" placeholder="e.g. 9044226342@ybl">
+        <label class="label-text">UPI ID (For Payouts) *</label>
+        <input type="text" id="sUpi" placeholder="9044226342@ybl">
 
-        <button id="saveBtn">CREATE MY STORE</button>
-        <div id="statusMsg"></div>
+        <div class="ship-box">
+            <b style="font-size: 0.85rem; color: #854d0e;"><i class="fas fa-truck"></i> Pickup Address (For Courier)</b>
+            <label class="label-text">Full Shop/Home Address *</label>
+            <textarea id="sAddr" placeholder="Gali no, Landmark, City, State" rows="2"></textarea>
+            
+            <label class="label-text">Pickup Pincode *</label>
+            <input type="number" id="sPin" placeholder="232108">
+        </div>
+
+        <button id="saveBtn">SAVE & CONTINUE</button>
     </div>
 
     <script type="module">
@@ -58,54 +62,44 @@
         const auth = getAuth(app);
 
         let uid = null;
-        const status = document.getElementById('statusMsg');
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 uid = user.uid;
-                // Pehle se data hai toh load karo
-                const docRef = doc(db, "seller_identity", uid);
-                const docSnap = await getDoc(docRef);
+                const docSnap = await getDoc(doc(db, "seller_identity", uid));
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('sName').value = data.sName || "";
                     document.getElementById('sBio').value = data.sBio || "";
                     document.getElementById('sLogo').value = data.sLogo || "";
                     document.getElementById('sUpi').value = data.sUpi || "";
+                    document.getElementById('sAddr').value = data.sAddr || ""; // Restore Old Data
+                    document.getElementById('sPin').value = data.sPin || "";   // Restore Old Data
                 }
-                status.innerText = "System Ready. User: " + user.email;
-                status.style.color = "green";
-            } else {
-                window.location.href = 'login.html';
-            }
+            } else { window.location.href = 'login.html'; }
         });
 
         document.getElementById('saveBtn').addEventListener('click', async () => {
-            const name = document.getElementById('sName').value.trim();
-            const bio = document.getElementById('sBio').value.trim();
-            const logo = document.getElementById('sLogo').value.trim();
-            const upi = document.getElementById('sUpi').value.trim();
+            const data = {
+                sName: document.getElementById('sName').value,
+                sBio: document.getElementById('sBio').value,
+                sLogo: document.getElementById('sLogo').value,
+                sUpi: document.getElementById('sUpi').value,
+                sAddr: document.getElementById('sAddr').value, // Save New
+                sPin: document.getElementById('sPin').value,   // Save New
+                updatedAt: new Date()
+            };
 
-            if (!name || !upi) {
-                alert("Store Name aur UPI ID bharna zaroori hai!");
+            if (!data.sName || !data.sUpi || !data.sPin) {
+                alert("Name, UPI aur Pincode bharna zaroori hai!");
                 return;
             }
 
             try {
-                status.innerText = "Saving Store Details...";
-                await setDoc(doc(db, "seller_identity", uid), {
-                    sName: name,
-                    sBio: bio,
-                    sLogo: logo,
-                    sUpi: upi, // Save UPI for Admin Payouts
-                    updatedAt: new Date()
-                }, { merge: true });
-
-                alert("Store Setup Successful! 🎉");
+                await setDoc(doc(db, "seller_identity", uid), data, { merge: true });
+                alert("Store Updated! 🎉");
                 window.location.href = "seller_dashboard.html";
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
+            } catch (e) { alert(e.message); }
         });
     </script>
 </body>
