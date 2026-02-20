@@ -3,36 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seller Dashboard - Instacart</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Seller Hub - Instacart</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f6f6f7; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
-        .nav-header { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; }
-        .card { background: white; margin: 15px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .order-card { border-left: 5px solid #ffcc00; margin-bottom: 10px; }
-        .status-badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; font-weight: 800; text-transform: uppercase; }
-        .status-pending { background: #fff4e5; color: #b7791f; }
-        .status-shipped { background: #e6fffa; color: #2c7a7b; border-left-color: #38b2ac !important; }
-        .ship-btn { background: #008060; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 10px; }
-        .ship-input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        :root { --shopify-green: #008060; --bg-gray: #f6f6f7; --card-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        body { background: var(--bg-gray); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 50px; }
+        
+        /* Header */
+        .top-nav { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Profile Section */
+        .profile-section { background: white; padding: 20px; border-bottom: 1px solid #e3e3e3; display: flex; align-items: center; gap: 15px; position: relative; }
+        .seller-avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background: #eee; }
+        .edit-profile-btn { position: absolute; right: 20px; top: 20px; background: #f1f1f1; padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-decoration: none; color: #202223; border: 1px solid #ddd; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: var(--card-shadow); }
+        .stat-val { font-size: 1.2rem; font-weight: 800; }
+
+        /* Navigation Tabs */
+        .tab-menu { display: flex; background: white; border-bottom: 1px solid #ddd; }
+        .tab-link { flex: 1; text-align: center; padding: 15px; font-weight: 700; font-size: 0.8rem; cursor: pointer; color: #666; border-bottom: 3px solid transparent; }
+        .tab-link.active { color: var(--shopify-green); border-bottom-color: var(--shopify-green); }
+
+        /* Sections */
+        .content-section { display: none; padding: 15px; }
+        .content-section.active { display: block; }
+
+        /* Order/Shipping Cards */
+        .order-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ffcc00; box-shadow: var(--card-shadow); }
+        .status-shipped { border-left-color: #38b2ac !important; }
+        .ship-input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .ship-btn { background: var(--shopify-green); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+
+        /* Design/Manage Items */
+        .action-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; box-shadow: var(--card-shadow); }
+        .icon-box { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div class="nav-header">
-        <b style="font-size: 1.2rem;">Seller Hub</b>
-        <span id="storeDisplayName">Loading Store...</span>
+    <div class="top-nav">
+        <div style="font-weight:800;">INSTACART <span style="font-weight:400; opacity:0.6;">Seller</span></div>
+        <i class="fas fa-bell"></i>
     </div>
 
-    <div style="padding: 15px;">
-        <h3 style="margin-bottom: 10px;">New Orders & Shipping</h3>
-        <div id="sellerOrdersList">Loading orders...</div>
+    <div id="mainDashboard">
+        <div class="profile-section">
+            <img id="sellerImg" src="" class="seller-avatar">
+            <div class="seller-info">
+                <h2 id="storeName" style="margin:0; font-size:1.1rem;">My Store</h2>
+                <p id="sellerUID" style="margin:2px 0 0; font-size:0.7rem; color:#6d7175;">ID: --</p>
+            </div>
+            <a href="create_store.html" class="edit-profile-btn">Edit Profile</a>
+        </div>
+
+        <div class="tab-menu">
+            <div class="tab-link active" onclick="openTab(event, 'manage')">MANAGE</div>
+            <div class="tab-link" onclick="openTab(event, 'shipping')">SHIPPING (ORDERS)</div>
+        </div>
+
+        <div id="manage" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card"><small>TODAY'S SALES</small><div class="stat-val">₹0</div></div>
+                <div class="stat-card"><small>ACTIVE PRODUCTS</small><div class="stat-val" id="pCount">0</div></div>
+            </div>
+
+            <a href="manage_products.html" class="action-item">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div class="icon-box" style="background:#f0f5ff; color:#2c6ecb;"><i class="fas fa-box"></i></div>
+                    <div><b>Manage Products</b><br><small style="color:#666;">Add or remove items</small></div>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </a>
+
+            <a href="store_editor.html" class="action-item">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div class="icon-box" style="background:#f6f0ff; color:#9c6ade;"><i class="fas fa-brush"></i></div>
+                    <div><b>Design Studio</b><br><small style="color:#666;">Change store look</small></div>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+
+        <div id="shipping" class="content-section">
+            <h3 style="font-size: 0.9rem; color: #666;">CUSTOMER ORDERS</h3>
+            <div id="orderList">Loading orders...</div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -48,57 +112,62 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loadSellerOrders(user.uid);
-            } else {
-                window.location.href = 'login.html';
-            }
+                loadProfile(user.uid);
+                loadOrders(user.uid);
+            } else { window.location.href = 'login.html'; }
         });
 
-        async function loadSellerOrders(sellerId) {
-            const list = document.getElementById('sellerOrdersList');
+        async function loadProfile(uid) {
+            const d = await getDoc(doc(db, "seller_identity", uid));
+            if(d.exists()) {
+                document.getElementById('storeName').innerText = d.data().sName;
+                document.getElementById('sellerImg').src = d.data().sLogo || "https://via.placeholder.com/60";
+                document.getElementById('sellerUID').innerText = "ID: " + uid.substring(0,8).toUpperCase();
+            }
+        }
+
+        window.openTab = (evt, tabName) => {
+            let i, content, tabs;
+            content = document.getElementsByClassName("content-section");
+            for (i = 0; i < content.length; i++) { content[i].style.display = "none"; }
+            tabs = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tabs.length; i++) { tabs[i].className = tabs[i].className.replace(" active", ""); }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        async function loadOrders(sellerId) {
+            const list = document.getElementById('orderList');
             const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
             const snap = await getDocs(q);
-            
             list.innerHTML = "";
-            if(snap.empty) { list.innerHTML = "No orders found."; return; }
 
-            snap.forEach(orderDoc => {
-                const d = orderDoc.data();
-                const isShipped = d.status === "Shipped";
-                
+            snap.forEach(od => {
+                const data = od.data();
+                const isShipped = data.status === "Shipped";
                 list.innerHTML += `
-                    <div class="card order-card" style="${isShipped ? 'border-left-color:#38b2ac' : ''}">
-                        <div style="display:flex; justify-content:space-between;">
-                            <span class="status-badge ${isShipped ? 'status-shipped' : 'status-pending'}">${d.status || 'Pending'}</span>
-                            <small>${new Date(d.orderDate).toLocaleDateString()}</small>
+                    <div class="order-card ${isShipped ? 'status-shipped' : ''}">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <b>${data.productName}</b>
+                            <span style="font-size:0.7rem; color:${isShipped ? '#2c7a7b' : '#b7791f'}; font-weight:800;">${data.status || 'Pending'}</span>
                         </div>
-                        <h4 style="margin:10px 0 5px;">${d.productName}</h4>
-                        <p style="font-size:0.8rem; color:#666;">Customer: ${d.customerName}<br>Address: ${d.address}</p>
-                        
+                        <p style="font-size:0.75rem; color:#666; margin:5px 0;">To: ${data.customerName}<br>${data.address}</p>
                         ${!isShipped ? `
-                            <div id="shipBox-${orderDoc.id}">
-                                <input type="text" id="track-${orderDoc.id}" class="ship-input" placeholder="Courier Name & Tracking ID">
-                                <button class="ship-btn" onclick="markAsShipped('${orderDoc.id}')">MARK AS SHIPPED</button>
-                            </div>
-                        ` : `<p style="font-size:0.75rem; color:#2c7a7b;"><b>Tracking:</b> ${d.trackingDetails}</p>`}
+                            <input type="text" id="track-${od.id}" class="ship-input" placeholder="Enter Tracking ID (e.g. BlueDart 123)">
+                            <button class="ship-btn" onclick="shipOrder('${od.id}')">MARK AS SHIPPED</button>
+                        ` : `<div style="font-size:0.7rem; color:#2c7a7b; margin-top:5px;"><b>Tracking:</b> ${data.trackingDetails}</div>`}
                     </div>`;
             });
         }
 
-        window.markAsShipped = async (orderId) => {
-            const tracking = document.getElementById(`track-${orderId}`).value;
-            if(!tracking) { alert("Please enter tracking details!"); return; }
-
-            try {
-                await updateDoc(doc(db, "orders", orderId), {
-                    status: "Shipped",
-                    trackingDetails: tracking
-                });
-                alert("Order marked as Shipped! 🚚");
-                location.reload();
-            } catch (e) { alert(e.message); }
+        window.shipOrder = async (id) => {
+            const track = document.getElementById(`track-${id}`).value;
+            if(!track) return alert("Please enter tracking info!");
+            await updateDoc(doc(db, "orders", id), { status: "Shipped", trackingDetails: track });
+            alert("Order Updated! 🚚");
+            location.reload();
         }
     </script>
 </body>
