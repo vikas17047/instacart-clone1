@@ -5,27 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setup Store - Instacart</title>
     <style>
-        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        body { background: #f4f6f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px 0; }
         .card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
         input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        #saveBtn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .label-text { text-align: left; display: block; font-size: 0.8rem; font-weight: 700; color: #555; margin-top: 10px; }
+        #saveBtn { width: 100%; background: #008060; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; }
         #statusMsg { margin-top: 15px; font-size: 0.85rem; font-weight: bold; }
+        .highlight-box { background: #f0fdf4; border: 1px dashed #22c55e; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.75rem; color: #166534; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h3>Create Your Store</h3>
-        <input type="text" id="sName" placeholder="Store Name (Zaroori)">
-        <textarea id="sBio" placeholder="Store Bio" rows="3"></textarea>
-        <input type="text" id="sLogo" placeholder="Logo Image URL">
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 20px;">Apni dukan ki jankari bhariye</p>
+        
+        <label class="label-text">Store Name *</label>
+        <input type="text" id="sName" placeholder="e.g. Vikas Fashion Hub">
+        
+        <label class="label-text">Store Bio</label>
+        <textarea id="sBio" placeholder="Aap kya bechte hain?" rows="2"></textarea>
+        
+        <label class="label-text">Logo Image URL</label>
+        <input type="text" id="sLogo" placeholder="https://image-link.jpg">
+
+        <div class="highlight-box">
+            <i class="fas fa-wallet"></i> <b>Payment Info:</b> Isi ID par Admin aapko aapka paisa bhejega.
+        </div>
+        <label class="label-text">Your UPI ID (For Payouts) *</label>
+        <input type="text" id="sUpi" placeholder="e.g. 9044226342@ybl">
+
         <button id="saveBtn">CREATE MY STORE</button>
         <div id="statusMsg"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -44,56 +60,51 @@
         let uid = null;
         const status = document.getElementById('statusMsg');
 
-        // Check if user is logged in
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 uid = user.uid;
+                // Pehle se data hai toh load karo
+                const docRef = doc(db, "seller_identity", uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('sName').value = data.sName || "";
+                    document.getElementById('sBio').value = data.sBio || "";
+                    document.getElementById('sLogo').value = data.sLogo || "";
+                    document.getElementById('sUpi').value = data.sUpi || "";
+                }
                 status.innerText = "System Ready. User: " + user.email;
                 status.style.color = "green";
             } else {
-                status.innerText = "Error: Please login first!";
-                status.style.color = "red";
-                setTimeout(() => window.location.href = 'login.html', 2000);
+                window.location.href = 'login.html';
             }
         });
 
-        // Click Handler (Directly in script to avoid global scope issues)
         document.getElementById('saveBtn').addEventListener('click', async () => {
-            const name = document.getElementById('sName').value;
-            const bio = document.getElementById('sBio').value;
-            const logo = document.getElementById('sLogo').value;
+            const name = document.getElementById('sName').value.trim();
+            const bio = document.getElementById('sBio').value.trim();
+            const logo = document.getElementById('sLogo').value.trim();
+            const upi = document.getElementById('sUpi').value.trim();
 
-            if (!uid) {
-                alert("Login check ho raha hai, rukiye...");
-                return;
-            }
-            if (!name) {
-                alert("Store Name bharna zaroori hai!");
+            if (!name || !upi) {
+                alert("Store Name aur UPI ID bharna zaroori hai!");
                 return;
             }
 
             try {
-                status.innerText = "Saving to Database...";
-                status.style.color = "orange";
-
-                // SAVING DATA
+                status.innerText = "Saving Store Details...";
                 await setDoc(doc(db, "seller_identity", uid), {
                     sName: name,
                     sBio: bio,
                     sLogo: logo,
-                    createdAt: new Date()
-                });
+                    sUpi: upi, // Save UPI for Admin Payouts
+                    updatedAt: new Date()
+                }, { merge: true });
 
-                status.innerText = "Success! Redirecting...";
-                status.style.color = "green";
-                alert("Store Created Successfully!");
+                alert("Store Setup Successful! 🎉");
                 window.location.href = "seller_dashboard.html";
-
             } catch (error) {
-                console.error("FIREBASE ERROR:", error);
-                status.innerText = "Error: " + error.message;
-                status.style.color = "red";
-                alert("Galti: " + error.message);
+                alert("Error: " + error.message);
             }
         });
     </script>
