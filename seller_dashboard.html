@@ -157,3 +157,14 @@
     </script>
 </body>
 </html>
+onAuthStateChanged(auth, (user) => {
+    if (user && user.uid === "Bi31d4QWrdbWsUwhuUgCYLbPnw92") {
+        // Agar aap login hain, to screen par ek hidden Admin button aa jayega
+        let adminBtn = document.createElement("button");
+        adminBtn.innerText = "⭐ Go to Admin Panel";
+        adminBtn.style = "position:fixed; bottom:80px; right:20px; z-index:1000; padding:10px; background:red; color:white; border-radius:5px; border:none; font-weight:bold; cursor:pointer;";
+        adminBtn.onclick = () => window.location.href = 'admin.html';
+        document.body.appendChild(adminBtn);
+    }
+});
+
