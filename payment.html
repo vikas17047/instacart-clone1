@@ -5,50 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #f5f5f5; font-family: 'Inter', sans-serif; margin:0; padding-bottom:100px; }
-        .header { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
-        .pay-option { background: white; padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-        .pay-left { display: flex; align-items: center; gap: 15px; }
-        .btn-place { position: fixed; bottom: 0; left: 0; width: 100%; background: #0c831f; color: white; padding: 18px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; }
-        .success-overlay { position: fixed; inset: 0; background: white; z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        body { background: #f5f5f5; font-family: sans-serif; text-align: center; }
+        .pay-card { background: white; margin: 20px; padding: 20px; border-radius: 12px; }
+        .btn-confirm { background: #0c831f; color: white; width: 90%; padding: 15px; border: none; border-radius: 8px; font-weight: 700; margin-top: 20px; cursor: pointer; }
+        #successScreen { display:none; position:fixed; inset:0; background:white; padding-top:100px; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <div style="font-weight:700;">PAYMENT</div>
-    </div>
-
-    <div style="background:white; padding:20px; text-align:center; margin-bottom:10px;">
-        <div style="color:#666; font-size:0.9rem;">Amount to Pay</div>
-        <div style="font-size:2rem; font-weight:800;" id="finalAmt">₹0</div>
-    </div>
-
-    <div style="padding:15px; font-weight:700; color:#555; font-size:0.8rem;">CHOOSE PAYMENT METHOD</div>
-    
-    <label class="pay-option">
-        <div class="pay-left">
-            <i class="fas fa-money-bill-wave" style="color:green; font-size:1.5rem;"></i>
-            <div>
-                <div style="font-weight:600;">Cash on Delivery</div>
-                <div style="font-size:0.75rem; color:#666;">Pay when you receive</div>
-            </div>
+    <h2>Payment Method</h2>
+    <div class="pay-card">
+        <p>Total to Pay: <b id="finalAmt">₹0</b></p>
+        <hr>
+        <div style="padding:15px; border:1px solid #0c831f; border-radius:8px; color:#0c831f; font-weight:700;">
+            <i class="fas fa-money-bill-wave"></i> Cash on Delivery (Selected)
         </div>
-        <input type="radio" name="pay" checked>
-    </label>
+    </div>
+    <button class="btn-confirm" id="confirmBtn">PLACE ORDER</button>
 
-    <button class="btn-place" id="placeOrderBtn">PLACE ORDER</button>
-
-    <div id="successScreen" class="success-overlay">
-        <div style="width:80px; height:80px; border-radius:50%; background:#4caf50; color:white; display:flex; align-items:center; justify-content:center; font-size:3rem; margin-bottom:20px;">
-            <i class="fas fa-check"></i>
-        </div>
-        <h2>Order Confirmed!</h2>
-        <p style="color:#666; margin-top:10px;">Your order has been sent to the seller.</p>
-        <button onclick="window.location.href='index.html'" style="margin-top:30px; padding:12px 35px; background:black; color:white; border:none; border-radius:30px; font-weight:700;">DONE</button>
+    <div id="successScreen">
+        <i class="fas fa-check-circle" style="font-size:5rem; color:#4caf50;"></i>
+        <h1>Order Placed!</h1>
+        <p>Thank you for shopping with us.</p>
+        <button onclick="window.location.href='index.html'" style="padding:10px 20px; background:black; color:white; border-radius:20px;">Back to Home</button>
     </div>
 
     <script type="module">
@@ -63,47 +42,37 @@
             messagingSenderId: "232217818928",
             appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.onload = function() {
-            let total = localStorage.getItem('cartTotal') || 0;
-            document.getElementById('finalAmt').innerText = "₹" + total;
-        }
+        window.onload = () => {
+            document.getElementById('finalAmt').innerText = "₹" + (localStorage.getItem('cartTotal') || 0);
+        };
 
-        document.getElementById('placeOrderBtn').onclick = async function() {
+        document.getElementById('confirmBtn').onclick = async function() {
             this.disabled = true;
-            this.innerText = "Processing...";
+            this.innerText = "Placing Order...";
 
-            // LocalStorage se data uthayein
             const cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            const customerName = localStorage.getItem('user_name') || "Customer";
-            const address = localStorage.getItem('user_address') || "No Address";
-            const total = localStorage.getItem('cartTotal') || 0;
+            const customerName = localStorage.getItem('user_name');
+            const address = localStorage.getItem('user_address');
+            const phone = localStorage.getItem('user_phone');
 
-            // Har item ke liye alag order create karein (Seller dashboard ke liye asaan hoga)
             try {
-                for (let item of cart) {
+                for(let item of cart) {
                     await addDoc(collection(db, "orders"), {
-                        customerName: customerName,
-                        address: address,
+                        customerName, address, phone,
                         productName: item.name,
-                        productImg: item.img,
+                        productImg: item.image,
                         totalAmount: item.price,
+                        sellerId: item.sellerId,
                         orderDate: new Date().toISOString()
                     });
                 }
-
-                // Success!
                 localStorage.removeItem('myCart');
-                document.getElementById('successScreen').style.display = 'flex';
-            } catch (e) {
-                alert("Error: " + e.message);
-                this.disabled = false;
-                this.innerText = "PLACE ORDER";
-            }
-        }
+                document.getElementById('successScreen').style.display = 'block';
+            } catch (e) { alert("Error: " + e.message); this.disabled = false; }
+        };
     </script>
 </body>
 </html>
