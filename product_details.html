@@ -5,44 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 120px; }
         .nav-header { padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid #eee; }
         .p-main-img { width: 100%; height: 400px; object-fit: cover; }
         .p-info-sec { padding: 20px; }
+        .p-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
         .p-price { font-size: 1.6rem; color: var(--p-color); font-weight: 800; margin: 12px 0; }
         
-        .qty-selector { display: flex; align-items: center; gap: 20px; margin: 20px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; width: fit-content; }
-        .qty-btn { width: 35px; height: 35px; border: 1px solid #ddd; background: white; border-radius: 50%; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
-        .qty-val { font-weight: 800; font-size: 1.1rem; }
+        .qty-label { font-weight: 700; font-size: 0.85rem; color: #666; margin-top: 20px; }
+        .qty-selector { display: flex; align-items: center; gap: 20px; margin: 10px 0 25px; padding: 10px; background: #f9f9f9; border-radius: 8px; width: fit-content; }
+        .qty-btn { width: 35px; height: 35px; border: 1px solid #ddd; background: white; border-radius: 50%; font-size: 1.2rem; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .qty-val { font-weight: 800; font-size: 1.1rem; min-width: 20px; text-align: center; }
 
-        .bottom-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px 20px; gap: 12px; background: var(--bg); border-top: 1px solid #eee; box-sizing: border-box; }
-        .btn-cart { flex: 1; padding: 16px; border: 2px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .btn-buy { flex: 2; padding: 16px; background: var(--p-color); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .p-desc { font-size: 0.9rem; line-height: 1.5; color: #444; margin-top: 20px; }
+
+        .bottom-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px 20px; gap: 12px; background: var(--bg); border-top: 1px solid #eee; box-sizing: border-box; z-index: 1000; }
+        .btn-cart { flex: 1; padding: 16px; border: 2px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem; }
+        .btn-buy { flex: 2; padding: 16px; background: var(--p-color); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem; }
+
+        /* MODERN LOGIN ALERT MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
+        .modal-box { background: white; width: 85%; max-width: 350px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-icon { font-size: 3rem; color: var(--p-color); margin-bottom: 15px; }
+        .modal-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; }
+        .modal-text { color: #666; font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px; }
+        .modal-btn { background: #000; color: #fff; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .modal-cancel { background: transparent; color: #888; border: none; font-size: 0.8rem; cursor: pointer; }
     </style>
 </head>
 <body>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-box">
+            <i class="fas fa-user-circle modal-icon"></i>
+            <div class="modal-title">Login Required</div>
+            <div class="modal-text">Order karne ke liye aapko Google se login karna hoga.</div>
+            <button class="modal-btn" id="confirmLoginBtn">Login with Google</button>
+            <button class="modal-cancel" onclick="closeLoginModal()">Baad mein karenge</button>
+        </div>
+    </div>
+
     <div class="nav-header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <b>Product Details</b>
-        <i class="fas fa-share-alt"></i>
+        <b style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Product Details</b>
+        <i class="fas fa-share-alt" id="shareBtn"></i>
     </div>
     
     <img id="pImg" class="p-main-img" src="">
     
     <div class="p-info-sec">
-        <h1 id="pName">Loading...</h1>
-        <div id="pPrice" class="p-price">₹--</div>
+        <div id="pName" class="p-name">Loading...</div>
+        <div id="pPrice" class="p-price">₹0</div>
         
-        <div style="font-weight: 700; font-size: 0.9rem; color: #666;">SELECT QUANTITY</div>
+        <div class="qty-label">SELECT QUANTITY</div>
         <div class="qty-selector">
-            <button class="qty-btn" onclick="changeQty(-1)">-</button>
+            <button class="qty-btn" onclick="changeQty(-1)"><i class="fas fa-minus"></i></button>
             <span id="qtyDisplay" class="qty-val">1</span>
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
+            <button class="qty-btn" onclick="changeQty(1)"><i class="fas fa-plus"></i></button>
         </div>
 
-        <p id="pDesc">Fetching details...</p>
+        <div style="font-weight: 700; font-size: 0.85rem; color: #666;">DESCRIPTION</div>
+        <div id="pDesc" class="p-desc"></div>
     </div>
 
     <div class="bottom-bar">
@@ -76,11 +102,9 @@
         let currentProduct = null;
         let selectedQty = 1;
         let loggedUser = null;
+        let pendingActionIsBuyNow = null;
 
-        // Login Status Check
-        onAuthStateChanged(auth, (user) => {
-            loggedUser = user;
-        });
+        onAuthStateChanged(auth, (user) => { loggedUser = user; });
 
         async function loadDetails() {
             if(!productId) return;
@@ -91,12 +115,9 @@
                 document.getElementById('pPrice').innerText = "₹" + currentProduct.price;
                 document.getElementById('pImg').src = currentProduct.image;
                 document.getElementById('pDesc').innerText = currentProduct.description || "No description.";
-                
                 if(sellerId) {
                     const dSnap = await getDoc(doc(db, "store_designs", sellerId));
-                    if(dSnap.exists()) {
-                        document.documentElement.style.setProperty('--p-color', dSnap.data().pColor || '#008060');
-                    }
+                    if(dSnap.exists()) document.documentElement.style.setProperty('--p-color', dSnap.data().pColor || '#008060');
                 }
             }
         }
@@ -107,40 +128,43 @@
             document.getElementById('qtyDisplay').innerText = selectedQty;
         }
 
-        // Logic to Handle Login + Cart
+        window.closeLoginModal = () => { document.getElementById('loginModal').style.display = 'none'; };
+
         window.handleCartAction = async (isBuyNow) => {
             if(!currentProduct || !sellerId) return;
 
-            // 1. Agar login nahi hai, toh Google Popup dikhao
             if(!loggedUser) {
-                try {
-                    const result = await signInWithPopup(auth, provider);
-                    loggedUser = result.user;
-                } catch (error) {
-                    alert("Login required to continue!");
-                    return;
-                }
+                pendingActionIsBuyNow = isBuyNow;
+                document.getElementById('loginModal').style.display = 'flex';
+                return;
             }
+            executeAction(isBuyNow);
+        };
 
-            // 2. Login hone ke baad aage badho
+        document.getElementById('confirmLoginBtn').onclick = async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                loggedUser = result.user;
+                closeLoginModal();
+                executeAction(pendingActionIsBuyNow);
+            } catch (error) { console.error("Login failed", error); }
+        };
+
+        function executeAction(isBuyNow) {
             const cartKey = `myCart_${sellerId}`;
-            
             if(isBuyNow) {
-                const singleItem = [{ ...currentProduct, qty: selectedQty, img: currentProduct.image }];
+                const singleItem = [{ ...currentProduct, qty: selectedQty, img: currentProduct.image, sellerId: sellerId }];
                 localStorage.setItem('temp_buy_now', JSON.stringify(singleItem));
                 window.location.href = `checkout.html?seller=${sellerId}&mode=direct`;
             } else {
                 let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
                 const existingIndex = cart.findIndex(item => item.id === currentProduct.id);
-                if (existingIndex > -1) {
-                    cart[existingIndex].qty += selectedQty;
-                } else {
-                    cart.push({ ...currentProduct, qty: selectedQty, img: currentProduct.image });
-                }
+                if (existingIndex > -1) cart[existingIndex].qty += selectedQty;
+                else cart.push({ ...currentProduct, qty: selectedQty, img: currentProduct.image, sellerId: sellerId });
                 localStorage.setItem(cartKey, JSON.stringify(cart));
                 window.location.href = `cart.html?seller=${sellerId}`;
             }
-        };
+        }
 
         loadDetails();
     </script>
