@@ -13,8 +13,8 @@
         .p-info-sec { padding: 20px; }
         .p-price { font-size: 1.6rem; color: var(--p-color); font-weight: 800; margin: 12px 0; }
         .bottom-bar { position: fixed; bottom: 0; width: 100%; display: flex; padding: 15px 20px; gap: 12px; background: var(--bg); border-top: 1px solid #eee; box-sizing: border-box; }
-        .btn-cart { flex: 1; padding: 16px; border: 2px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 12px; font-weight: 800; }
-        .btn-buy { flex: 1; padding: 16px; background: var(--p-color); color: white; border: none; border-radius: 12px; font-weight: 800; }
+        .btn-cart { flex: 1; padding: 16px; border: 2px solid var(--p-color); background: transparent; color: var(--p-color); border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .btn-buy { flex: 1; padding: 16px; background: var(--p-color); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -51,7 +51,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
-        const sellerId = urlParams.get('seller'); // Seller ID from URL
+        const sellerId = urlParams.get('seller'); 
         let currentProduct = null;
 
         async function loadDetails() {
@@ -63,32 +63,40 @@
                 document.getElementById('pPrice').innerText = "₹" + currentProduct.price;
                 document.getElementById('pImg').src = currentProduct.image;
                 document.getElementById('pDesc').innerText = currentProduct.description || "No description.";
+                
+                // Theme Load logic
+                if(sellerId) {
+                    const dSnap = await getDoc(doc(db, "store_designs", sellerId));
+                    if(dSnap.exists()) {
+                        document.documentElement.style.setProperty('--p-color', dSnap.data().pColor || '#008060');
+                    }
+                }
             }
         }
 
         window.addToCart = () => {
-            if(!currentProduct || !sellerId) {
-                alert("Missing product or seller info!");
-                return;
-            }
-            // MULTI-VENDOR LOGIC: Unique key per seller
+            if(!currentProduct || !sellerId) { alert("Error: Missing Product/Seller info"); return; }
+            
             const cartKey = `myCart_${sellerId}`;
             let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
             
-            // Add quantity if not present
-            const productToAdd = {...currentProduct, qty: 1, img: currentProduct.image};
-            cart.push(productToAdd);
+            // Quantity logic: Agar item pehle se hai toh qty barhao
+            const existingIndex = cart.findIndex(item => item.id === currentProduct.id);
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += 1;
+            } else {
+                cart.push({ ...currentProduct, qty: 1, img: currentProduct.image });
+            }
             
             localStorage.setItem(cartKey, JSON.stringify(cart));
-            alert("Added to cart for this store! 🛍️");
+            alert("Added to cart! 🛍️");
             window.location.href = `cart.html?seller=${sellerId}`;
         };
 
         window.buyNow = () => {
             if(!currentProduct || !sellerId) return;
             const cartKey = `myCart_${sellerId}`;
-            const productToAdd = {...currentProduct, qty: 1, img: currentProduct.image};
-            localStorage.setItem(cartKey, JSON.stringify([productToAdd]));
+            localStorage.setItem(cartKey, JSON.stringify([{ ...currentProduct, qty: 1, img: currentProduct.image }]));
             localStorage.setItem('cartTotal', currentProduct.price);
             window.location.href = `checkout.html?seller=${sellerId}`; 
         };
