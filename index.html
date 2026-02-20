@@ -3,48 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instacart - Home</title>
+    <title>Instacart Home</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        <div class="header-container">
-            <h1 class="logo">Instacart</h1>
-            <nav>
-                <ul>
-                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
-                    <li><a href="login.html" id="profile-link"><i class="fas fa-user"></i> My Profile</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <section class="hero">
-        <div class="hero-content">
-            <h2>Shop Directly from Instagram Sellers</h2>
-            <p>Discover unique products and support small businesses.</p>
-        </div>
-    </section>
-
-    <main class="container">
-        <div id="product-container" class="product-grid">
+    <div id="mainContent">
+        <nav class="navbar">
+            <div style="display:flex; align-items:center;">
+                <div class="logo">Instacart</div>
+                <div class="seller-btn" onclick="window.location.href='seller_dashboard.html'">
+                    <i class="fas fa-store-alt"></i> My Store
+                </div>
             </div>
-    </main>
+            <div class="icon-group">
+                <i class="fas fa-bell"></i>
+                <div style="position:relative;" onclick="window.location.href='cart.html'">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span id="cartCount" style="position:absolute; top:-8px; right:-8px; background:red; color:white; font-size:0.7rem; width:15px; height:15px; border-radius:50%; display:none; align-items:center; justify-content:center;">0</span>
+                </div>
+            </div>
+        </nav>
 
-    <script src="script.js"></script>
-    <script>
-        // Profile persistence logic
-        document.addEventListener('DOMContentLoaded', () => {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const profileLink = document.getElementById('profile-link');
-            if (isLoggedIn === 'true') {
-                profileLink.innerHTML = '<i class="fas fa-user-check"></i> My Profile';
-                profileLink.href = "profile-details.html";
-            }
-        });
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search brands, products...">
+        </div>
+
+        <div class="hero">
+            <h2>Mega Fashion Sale</h2>
+            <p>Min 60% Off on Top Brands</p>
+            <button class="btn-shop">Explore</button>
+        </div>
+
+        <div class="section-title">Shop by Category</div>
+        <div class="horizontal-scroll">
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
+            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
+        </div>
+
+        <div class="section-title" id="creatorTitle">Top Creators</div>
+        <div class="creator-grid" id="creatorContainer">
+            </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
+            <div class="nav-item" onclick="window.location.href='profile.html'"><i class="fas fa-user"></i> Profile</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Login check hatane ke baad direct data load kar rahe hain
+        loadRealSellers();
+
+        async function loadRealSellers() {
+            const container = document.getElementById('creatorContainer');
+            try {
+                const snap = await getDocs(collection(db, "seller_identity"));
+                container.innerHTML = "";
+                
+                if(snap.empty) {
+                    container.innerHTML = "<p style='padding:20px; color:#888;'>No creators found.</p>";
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const seller = doc.data();
+                    const sellerId = doc.id;
+                    const followers = (Math.random() * 5 + 1).toFixed(1) + "K"; 
+
+                    container.innerHTML += `
+                        <div class="seller-card" onclick="window.location.href='my_store.html?seller=${sellerId}'">
+                            <img src="${seller.sLogo || 'https://via.placeholder.com/150'}" class="seller-img">
+                            <div class="seller-name">${seller.sName || 'Store'}</div>
+                            <div class="seller-followers">${followers} Followers</div>
+                            <button class="btn-visit">View Store</button>
+                        </div>`;
+                });
+            } catch (err) { console.log(err); }
+        }
     </script>
 </body>
 </html>
