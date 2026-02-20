@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instacart Home</title>
     <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="style.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -41,15 +39,14 @@
 
         <div class="section-title">Shop by Category</div>
         <div class="horizontal-scroll">
-            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
-            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
-            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
-            <div class="scroll-item" onclick="window.location.href='my_store.html?seller=Bi31d4QWrdbWsUwhuUgCYLbPnw92'"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
+            <div class="scroll-item"><img src="https://images.unsplash.com/photo-1488161628813-99425205f28d?w=200" class="scroll-img"><div class="scroll-txt">Men</div></div>
+            <div class="scroll-item"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200" class="scroll-img"><div class="scroll-txt">Women</div></div>
+            <div class="scroll-item"><img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200" class="scroll-img"><div class="scroll-txt">Shoes</div></div>
+            <div class="scroll-item"><img src="https://images.unsplash.com/photo-1524592094765-f5a312d2db1b?w=200" class="scroll-img"><div class="scroll-txt">Watches</div></div>
         </div>
 
         <div class="section-title" id="creatorTitle">Top Creators</div>
-        <div class="creator-grid" id="creatorContainer">
-            </div>
+        <div class="creator-grid" id="creatorContainer"></div>
 
         <div class="bottom-nav">
             <div class="nav-item active" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
@@ -73,7 +70,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Login check hatane ke baad direct data load kar rahe hain
         loadRealSellers();
 
         async function loadRealSellers() {
