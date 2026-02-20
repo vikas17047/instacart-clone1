@@ -3,66 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - Instacart</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>My Orders - Instacart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #f1f3f6; font-family: 'Inter', sans-serif; padding-bottom: 80px; margin: 0; }
-        .profile-card { background: white; padding: 25px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-        .user-img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
+        body { background: #f8f9fa; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 80px; }
+        .header { background: #fff; padding: 20px; text-align: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .container { padding: 15px; }
         
-        .section-title { padding: 15px; font-weight: 700; font-size: 0.9rem; color: #555; }
-        
-        /* ORDER HISTORY STYLE */
-        .history-card {
-            background: white; margin: 0 10px 10px 10px; padding: 15px; border-radius: 10px;
-            display: flex; gap: 12px; align-items: center; border: 1px solid #eee;
-        }
-        .order-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; }
-        .order-details { flex: 1; }
-        .order-name { font-weight: 700; font-size: 0.9rem; }
-        .order-status { color: #0c831f; font-size: 0.75rem; font-weight: 700; margin-top: 3px; }
+        /* Order Card */
+        .order-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .product-info { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+        .product-img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; }
+        .product-details b { font-size: 1rem; display: block; }
+        .product-details span { color: #666; font-size: 0.85rem; }
 
-        .btn-seller-dash {
-            background: linear-gradient(90deg, #11998e, #38ef7d); color: white;
-            padding: 15px; margin: 10px; border-radius: 10px; font-weight: 700;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-        }
+        /* Tracking Timeline Design */
+        .timeline { margin-top: 20px; padding-left: 20px; border-left: 2px solid #ddd; position: relative; }
+        .step { position: relative; padding-bottom: 20px; padding-left: 20px; }
+        .step::before { content: ''; position: absolute; left: -27px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: #ddd; border: 3px solid #fff; }
+        .step.active::before { background: #008060; box-shadow: 0 0 0 4px rgba(0,128,96,0.2); }
+        .step.active { color: #008060; font-weight: 700; }
+        .step-title { font-size: 0.85rem; }
+        .step-desc { font-size: 0.7rem; color: #888; font-weight: 400; margin-top: 2px; }
+
+        .tracking-id { background: #f0f5ff; color: #2c6ecb; padding: 10px; border-radius: 8px; font-size: 0.75rem; margin-top: 15px; display: flex; align-items: center; gap: 10px; }
+        
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; }
+        .nav-item { color: #888; text-decoration: none; font-size: 0.8rem; text-align: center; }
+        .nav-item.active { color: #000; font-weight: 800; }
     </style>
 </head>
 <body>
 
-    <div class="profile-card">
-        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" class="user-img" id="userPhoto">
-        <div>
-            <h2 style="margin:0; font-size:1.2rem;" id="userName">Rahul Kumar</h2>
-            <p style="color:#888; font-size:0.85rem;" id="userPhone">+91 98765 43210</p>
-        </div>
+    <div class="header">
+        <b style="font-size: 1.2rem;">My Orders</b>
     </div>
 
-    <div class="btn-seller-dash" onclick="window.location.href='seller_dashboard.html'">
-        <div>
-            <div>Go to Seller Dashboard</div>
-            <span style="font-size:0.7rem; opacity:0.9;">Manage your own products & orders</span>
-        </div>
-        <i class="fas fa-chevron-right"></i>
-    </div>
-
-    <div class="section-title">MY ORDERS</div>
-    <div id="orderHistoryContainer">
-        <p style="text-align:center; padding:30px; color:#999; font-size:0.8rem;">Loading your orders...</p>
+    <div class="container" id="ordersList">
+        <p style="text-align:center; color:#888;">Checking your orders...</p>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Home</div>
-        <div class="nav-item active"><i class="fas fa-user"></i> Profile</div>
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><br>Home</a>
+        <a href="profile.html" class="nav-item active"><i class="fas fa-user"></i><br>Profile</a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -74,44 +64,64 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Update Profile Info
-                document.getElementById('userName').innerText = user.displayName;
-                document.getElementById('userPhoto').src = user.photoURL;
-                document.getElementById('userPhone').innerText = user.email; // Email as fallback
-                
-                loadUserOrders(user.displayName);
+                loadMyOrders(user.displayName); // Name se fetch kar rahe hain
             } else {
-                window.location.href = 'index.html'; // Login ke liye wapas bhej dena
+                window.location.href = "login.html";
             }
         });
 
-        async function loadUserOrders(name) {
-            const container = document.getElementById('orderHistoryContainer');
-            // Customer ke naam se orders filter karna
-            const q = query(collection(db, "orders"), where("customerName", "==", name));
+        async function loadMyOrders(userName) {
+            const list = document.getElementById('ordersList');
+            // Customer ke naam se saare orders filter karein
+            const q = query(collection(db, "orders"), where("customerName", "==", userName));
             const snap = await getDocs(q);
             
-            container.innerHTML = "";
+            list.innerHTML = "";
             if(snap.empty) {
-                container.innerHTML = "<p style='text-align:center; padding:30px; color:#999;'>No orders yet. Start shopping!</p>";
+                list.innerHTML = "<div style='text-align:center; margin-top:100px;'>Abhi tak koi order nahi kiya gaya hai.</div>";
                 return;
             }
 
             snap.forEach(doc => {
                 const d = doc.data();
-                container.innerHTML += `
-                    <div class="history-card">
-                        <img src="${d.productImg}" class="order-img">
-                        <div class="order-details">
-                            <div class="order-name">${d.productName}</div>
-                            <div style="font-size:0.8rem; color:#666;">Price: ₹${d.totalAmount}</div>
-                            <div class="order-status"><i class="fas fa-truck"></i> Out for Delivery</div>
+                const isShipped = d.status === "Shipped";
+
+                list.innerHTML += `
+                    <div class="order-card">
+                        <div class="product-info">
+                            <img src="${d.productImg || 'https://via.placeholder.com/70'}" class="product-img">
+                            <div class="product-details">
+                                <b>${d.productName}</b>
+                                <span>Amount: ₹${d.totalAmount}</span>
+                            </div>
                         </div>
+
+                        <div class="timeline">
+                            <div class="step active">
+                                <div class="step-title">Order Placed</div>
+                                <div class="step-desc">Aapka order mil gaya hai.</div>
+                            </div>
+                            <div class="step ${isShipped ? 'active' : ''}">
+                                <div class="step-title">${isShipped ? 'Shipped' : 'Processing'}</div>
+                                <div class="step-desc">${isShipped ? 'Saaman dukan se nikal gaya hai.' : 'Seller packing kar raha hai.'}</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-title">Delivered</div>
+                                <div class="step-desc">Jaldi hi aapke ghar pahuchega.</div>
+                            </div>
+                        </div>
+
+                        ${isShipped ? `
+                            <div class="tracking-id">
+                                <i class="fas fa-truck-moving"></i>
+                                <span><b>Tracking:</b> ${d.trackingDetails}</span>
+                            </div>
+                        ` : ''}
                     </div>`;
             });
         }
