@@ -11,8 +11,12 @@
         .admin-header { background: #000; color: white; padding: 20px; text-align: center; }
         .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
         .stat-box { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .order-row { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-row { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .section-tab { display: flex; gap: 10px; padding: 0 15px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; background: #ddd; }
+        .tab-btn.active { background: #000; color: white; }
         .denied-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .seller-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
     </style>
 </head>
 <body>
@@ -34,9 +38,21 @@
             </div>
         </div>
 
+        <div class="section-tab">
+            <button id="orderTab" class="tab-btn active" onclick="switchTab('orders')">Orders</button>
+            <button id="sellerTab" class="tab-btn" onclick="switchTab('sellers')">Sellers List</button>
+        </div>
+
         <div style="padding: 15px;">
-            <h3 style="margin-bottom:15px;">ALL CUSTOMER ORDERS</h3>
-            <div id="masterOrdersList">Loading global data...</div>
+            <div id="ordersSection">
+                <h3 style="margin-bottom:15px;">ALL CUSTOMER ORDERS</h3>
+                <div id="masterOrdersList">Loading global orders...</div>
+            </div>
+
+            <div id="sellersSection" style="display:none;">
+                <h3 style="margin-bottom:15px;">REGISTERED SELLERS</h3>
+                <div id="masterSellersList">Loading sellers...</div>
+            </div>
         </div>
     </div>
 
@@ -45,6 +61,7 @@
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+        //
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
             authDomain: "instacart-clone-91062.firebaseapp.com",
@@ -58,7 +75,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Aapki provided Admin UID
         const ADMIN_UID = "Bi31d4QWrdbWsUwhuUgCYLbPnw92"; 
 
         onAuthStateChanged(auth, (user) => {
@@ -66,6 +82,7 @@
                 document.body.style.display = "block";
                 document.getElementById('adminStatus').innerText = "Vikas Gupta | Admin Mode";
                 loadMasterData();
+                loadSellers();
             } else {
                 document.body.innerHTML = `
                     <div class="denied-screen">
@@ -78,36 +95,63 @@
             }
         });
 
+        window.switchTab = (tab) => {
+            if(tab === 'orders') {
+                document.getElementById('ordersSection').style.display = 'block';
+                document.getElementById('sellersSection').style.display = 'none';
+                document.getElementById('orderTab').classList.add('active');
+                document.getElementById('sellerTab').classList.remove('active');
+            } else {
+                document.getElementById('ordersSection').style.display = 'none';
+                document.getElementById('sellersSection').style.display = 'block';
+                document.getElementById('orderTab').classList.remove('active');
+                document.getElementById('sellerTab').classList.add('active');
+            }
+        }
+
         async function loadMasterData() {
             const list = document.getElementById('masterOrdersList');
-            const snap = await getDocs(collection(db, "orders")); 
+            const snap = await getDocs(collection(db, "orders")); //
             let totalRev = 0;
             let count = 0;
             list.innerHTML = "";
-
-            if(snap.empty) {
-                list.innerHTML = "No orders found in database.";
-                return;
-            }
 
             snap.forEach(doc => {
                 const d = doc.data();
                 count++;
                 totalRev += Number(d.totalAmount || 0);
                 list.innerHTML += `
-                    <div class="order-row">
-                        <div style="font-weight:700; font-size:1.1rem;">${d.customerName || 'Customer'}</div>
-                        <div style="font-size:0.9rem; color:#333; margin:5px 0;">
-                            <b>Product:</b> ${d.productName}<br>
-                            <b>Amount:</b> ₹${d.totalAmount}<br>
-                            <b>Address:</b> ${d.address || 'N/A'}
-                        </div>
-                        <div style="font-size:0.75rem; color:#888;">Order ID: ${doc.id}</div>
+                    <div class="card-row">
+                        <div style="font-weight:700;">${d.customerName}</div>
+                        <div style="font-size:0.85rem; margin:5px 0;">Item: ${d.productName} | Price: ₹${d.totalAmount}</div>
+                        <div style="font-size:0.75rem; color:#666;">Addr: ${d.address}</div>
                     </div>`;
             });
-
             document.getElementById('totalOrders').innerText = count;
             document.getElementById('totalRev').innerText = "₹" + totalRev;
+        }
+
+        async function loadSellers() {
+            const list = document.getElementById('masterSellersList');
+            const snap = await getDocs(collection(db, "seller_identity")); //
+            list.innerHTML = "";
+
+            if(snap.empty) {
+                list.innerHTML = "No sellers registered yet.";
+                return;
+            }
+
+            snap.forEach(doc => {
+                const s = doc.data();
+                list.innerHTML += `
+                    <div class="card-row" style="display:flex; align-items:center;">
+                        <img src="${s.sLogo || 'https://via.placeholder.com/40'}" class="seller-logo">
+                        <div>
+                            <div style="font-weight:700;">${s.sName || 'Store'}</div>
+                            <div style="font-size:0.75rem; color:#666;">UID: ${doc.id.substring(0,10)}...</div>
+                        </div>
+                    </div>`;
+            });
         }
     </script>
 </body>
