@@ -3,120 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Payment - Instacart</title>
+    <title>Payment Summary - Instacart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #f5f5f5; font-family: 'Inter', sans-serif; text-align: center; margin: 0; }
+        body { background: #f9f9f9; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 100px; }
         .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; }
-        .pay-card { background: white; margin: 20px; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .amt-text { font-size: 2.2rem; font-weight: 800; color: #000; margin: 10px 0; }
+        .section-card { background: white; margin: 10px; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .section-title { font-weight: 800; font-size: 0.9rem; text-transform: uppercase; color: #888; margin-bottom: 15px; display: block; }
         
-        .upi-box { 
-            padding: 15px; border: 2px solid #673ab7; border-radius: 12px; 
-            background: #f3e5f5; color: #673ab7; font-weight: 700; 
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .order-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+        .item-qty { color: #666; font-weight: 600; }
         
-        .btn-confirm { 
-            background: #673ab7; color: white; width: 90%; padding: 18px; 
-            border: none; border-radius: 12px; font-weight: 800; font-size: 1rem;
-            margin-top: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(103, 58, 183, 0.3);
-        }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; }
+        .total-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #eee; font-size: 1.1rem; font-weight: 800; }
         
-        #successScreen { display:none; position:fixed; inset:0; background:white; padding-top:100px; z-index: 2000; }
-        .status-msg { color: #666; font-size: 0.9rem; margin-top: 10px; }
+        .address-box { font-size: 0.9rem; line-height: 1.5; color: #444; }
+        
+        .footer-pay { position: fixed; bottom: 0; width: 100%; background: white; padding: 20px; border-top: 1px solid #eee; box-sizing: border-box; }
+        .btn-confirm { background: #000; color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
-        <b style="text-transform: uppercase;">Payment</b>
+        <div style="font-weight:700;">PAYMENT SUMMARY</div>
     </div>
 
-    <div class="pay-card">
-        <div style="color: #666; font-size: 0.9rem;">Amount to Pay</div>
-        <div class="amt-text" id="finalAmt">₹0</div>
-        
-        <div class="upi-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" width="60">
-            <span>Pay via UPI (GPay, PhonePe, Paytm)</span>
-        </div>
-        <p class="status-msg">Click below to open UPI apps on your phone.</p>
+    <div class="section-card">
+        <span class="section-title">Order Items</span>
+        <div id="orderItemsList"></div>
     </div>
 
-    <button class="btn-confirm" id="confirmBtn">PAY & PLACE ORDER</button>
-
-    <div id="successScreen">
-        <div style="width:100px; height:100px; background:#4caf50; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:4rem; margin: 0 auto 20px;">
-            <i class="fas fa-check"></i>
+    <div class="section-card">
+        <span class="section-title">Delivery To</span>
+        <div class="address-box">
+            <b id="dispName">User Name</b><br>
+            <span id="dispAddr">Address line, Pincode</span><br>
+            <span id="dispPhone">Phone Number</span>
         </div>
-        <h1>Payment Successful!</h1>
-        <p>Aapka order successfully place ho gaya hai.</p>
-        <button onclick="window.location.href='index.html'" style="margin-top:30px; padding:12px 40px; background:black; color:white; border:none; border-radius:30px; font-weight:700;">DONE</button>
+    </div>
+
+    <div class="section-card">
+        <span class="section-title">Price Details</span>
+        <div class="price-row">
+            <span>Price (<span id="totalItemsCount">0</span> Items)</span>
+            <span id="basePrice">₹0</span>
+        </div>
+        <div class="price-row">
+            <span>Delivery Charges</span>
+            <span id="deliveryPrice" style="color: #008060;">₹0</span>
+        </div>
+        <div class="total-row">
+            <span>Total Amount</span>
+            <span id="finalPay">₹0</span>
+        </div>
+    </div>
+
+    <div class="footer-pay">
+        <button class="btn-confirm" onclick="completeOrder()">Pay & Place Order</button>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        const urlParams = new URLSearchParams(window.location.search);
+        const sellerId = urlParams.get('seller');
+        const cartKey = sellerId ? `myCart_${sellerId}` : 'myCart';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-            authDomain: "instacart-clone-91062.firebaseapp.com",
-            projectId: "instacart-clone-91062",
-            storageBucket: "instacart-clone-91062.firebasestorage.app",
-            messagingSenderId: "232217818928",
-            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const total = localStorage.getItem('cartTotal') || 0;
-        document.getElementById('finalAmt').innerText = "₹" + total;
-
-        // 🚨 APNI UPI ID YAHA DALO
-        const MY_UPI_ID = "9044226342@ybl"; 
-        const MY_NAME = "Vikas Gupta";
-
-        document.getElementById('confirmBtn').onclick = function() {
-            // UPI Payment URL (Intent)
-            const upiUrl = `upi://pay?pa=${MY_UPI_ID}&pn=${encodeURIComponent(MY_NAME)}&am=${total}&cu=INR`;
-            
-            // Payment App kholne ki koshish
-            window.location.href = upiUrl;
-
-            // Chote se delay ke baad Firebase mein order save kar do
-            // Note: Real world mein iske liye webhook lagta hai, par abhi hum assume kar rahe hain customer pay karega.
-            setTimeout(async () => {
-                if(confirm("Agar aapne payment kar diya hai, toh 'OK' dabayein order confirm karne ke liye.")) {
-                    placeOrderInFirebase();
-                }
-            }, 3000);
+        window.onload = () => {
+            loadSummary();
         };
 
-        async function placeOrderInFirebase() {
-            const cart = JSON.parse(localStorage.getItem('myCart')) || [];
-            const customerName = localStorage.getItem('user_name');
-            const address = localStorage.getItem('user_address');
+        function loadSummary() {
+            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            const shipping = Number(localStorage.getItem('shipping_charge')) || 0;
+            const name = localStorage.getItem('user_name');
+            const addr = localStorage.getItem('user_address');
             const phone = localStorage.getItem('user_phone');
 
-            try {
-                for(let item of cart) {
-                    await addDoc(collection(db, "orders"), {
-                        customerName, address, phone,
-                        productName: item.name,
-                        productImg: item.image,
-                        totalAmount: item.price,
-                        sellerId: item.sellerId,
-                        paymentMethod: "UPI Online",
-                        orderDate: new Date().toISOString()
-                    });
-                }
-                localStorage.removeItem('myCart');
-                document.getElementById('successScreen').style.display = 'block';
-            } catch (e) { alert("Error: " + e.message); }
+            let itemsCount = 0;
+            let itemsTotal = 0;
+            const listContainer = document.getElementById('orderItemsList');
+            listContainer.innerHTML = "";
+
+            cart.forEach(item => {
+                const qty = item.qty || 1;
+                itemsCount += qty;
+                const subTotal = item.price * qty;
+                itemsTotal += subTotal;
+
+                listContainer.innerHTML += `
+                    <div class="order-item">
+                        <span>${item.name} <span class="item-qty">x${qty}</span></span>
+                        <span>₹${subTotal}</span>
+                    </div>`;
+            });
+
+            // Update UI
+            document.getElementById('totalItemsCount').innerText = itemsCount;
+            document.getElementById('basePrice').innerText = "₹" + itemsTotal;
+            document.getElementById('deliveryPrice').innerText = "₹" + shipping;
+            document.getElementById('finalPay').innerText = "₹" + (itemsTotal + shipping);
+            
+            document.getElementById('dispName').innerText = name;
+            document.getElementById('dispAddr').innerText = addr;
+            document.getElementById('dispPhone').innerText = phone;
         }
+
+        window.completeOrder = () => {
+            // Yahan aap payment gateway ya order confirmation logic dal sakte hain
+            alert("Order Placed Successfully! 🎉");
+            
+            // Order ke baad cart clear karein (Sirf usi seller ka)
+            localStorage.removeItem(cartKey);
+            localStorage.removeItem('shipping_charge');
+            
+            window.location.href = "index.html"; 
+        };
     </script>
 </body>
 </html>
