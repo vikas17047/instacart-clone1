@@ -10,7 +10,7 @@
         :root { --p-color: #008060; --bg: #ffffff; --text: #000000; }
         body { margin:0; background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding-bottom: 80px; transition: 0.3s; }
 
-        /* Store Branding UI */
+        /* Store Header UI */
         .ann-bar { background: var(--p-color); color: white; text-align: center; padding: 10px; font-size: 0.8rem; font-weight: 700; }
         .hero { height: 180px; background-size: cover; background-position: center; position: relative; background-color: #eee; }
         .hero-overlay { position: absolute; inset:0; background: rgba(0,0,0,0.3); }
@@ -34,24 +34,30 @@
         .p-price { font-weight: 800; font-size: 1.1rem; color: var(--p-color); }
         .tap-msg { font-size: 0.6rem; color: #999; margin-top: 5px; font-weight: 600; }
 
-        /* Floating Cart Button & Share Button */
-        .bottom-actions { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        /* MODERN FLOATING BUTTONS */
+        .floating-actions { position: fixed; bottom: 30px; right: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
         
+        /* Modern Cart Icon */
         .cart-fab { 
-            background: #000; color: white; border: none; width: 60px; height: 60px; 
+            background: #000; color: white; border: none; width: 55px; height: 55px; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 1.5rem; cursor: pointer; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 1.3rem; cursor: pointer; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: 0.3s;
         }
+        .cart-fab:active { transform: scale(0.9); }
         .cart-badge { 
-            position: absolute; top: -5px; right: -5px; background: red; color: white; 
-            font-size: 0.75rem; width: 22px; height: 22px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;
+            position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; 
+            font-size: 0.7rem; min-width: 20px; height: 20px; border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid #fff;
         }
         
+        /* Modern Share Button with Text */
         .share-fab { 
-            background: var(--p-color); color: white; border: none; padding: 10px 20px; 
-            border-radius: 50px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            background: var(--p-color); color: white; border: none; padding: 12px 20px; 
+            border-radius: 50px; font-weight: 800; font-size: 0.85rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -59,13 +65,11 @@
 
     <div class="ann-bar" id="annDisplay">WELCOME TO OUR STORE</div>
 
-    <div class="hero" id="bannerDisplay">
-        <div class="hero-overlay"></div>
-    </div>
+    <div class="hero" id="bannerDisplay"><div class="hero-overlay"></div></div>
 
     <div class="profile-sec">
         <img id="logoDisplay" src="" class="store-logo" style="display: none;">
-        <div class="store-name" id="nameDisplay">Loading...</div>
+        <div class="store-name" id="nameDisplay">Loading Store...</div>
         <div class="store-bio" id="bioDisplay"></div>
     </div>
 
@@ -78,9 +82,9 @@
 
     <div class="p-grid" id="mainGrid"></div>
 
-    <div class="bottom-actions">
+    <div class="floating-actions">
         <button id="shareStoreBtn" class="share-fab">
-            <i class="fas fa-share-alt"></i> Share
+            <i class="fas fa-share-alt"></i> Share Store
         </button>
         <button class="cart-fab" id="cartBtn">
             <i class="fas fa-shopping-bag"></i>
@@ -106,28 +110,25 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const sellerId = urlParams.get('seller');
-
         let allProducts = [];
 
         async function initStore() {
-            if(!sellerId) {
-                document.getElementById('nameDisplay').innerText = "Store Not Found";
-                return;
-            }
+            if(!sellerId) return;
 
-            // Update Cart Badge for this specific seller
+            // 1. Update Cart Badge (Dynamic for each seller)
             updateCartBadge();
 
-            // Cart Button click logic
+            // 2. Cart Redirection
             document.getElementById('cartBtn').onclick = () => {
                 window.location.href = `cart.html?seller=${sellerId}`;
             };
 
+            // 3. Load Store Branding & Design
             try {
                 const idSnap = await getDoc(doc(db, "seller_identity", sellerId));
                 if(idSnap.exists()) {
                     const d = idSnap.data();
-                    document.getElementById('nameDisplay').innerText = d.sName || "Shop Name";
+                    document.getElementById('nameDisplay').innerText = d.sName || "Shop";
                     document.getElementById('bioDisplay').innerText = d.sBio || "";
                     if(d.sLogo) {
                         document.getElementById('logoDisplay').src = d.sLogo;
@@ -144,6 +145,7 @@
                     if(s.sBanner) document.getElementById('bannerDisplay').style.backgroundImage = `url('${s.sBanner}')`;
                 }
 
+                // 4. Load Products
                 const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
                 const prodSnap = await getDocs(q);
                 allProducts = [];
@@ -152,7 +154,7 @@
                 });
                 displayProducts(allProducts);
 
-            } catch (err) { console.error("Store Init Error:", err); }
+            } catch (err) { console.error(err); }
         }
 
         function updateCartBadge() {
@@ -186,10 +188,12 @@
             displayProducts(cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat));
         };
 
+        // Share Store logic with custom text
         document.getElementById('shareStoreBtn').onclick = async () => {
-            const shareText = `Checkout this amazing store! 🛍️\nLink: ${window.location.href}`;
+            const storeName = document.getElementById('nameDisplay').innerText;
+            const shareText = `Check out this amazing store: ${storeName} 🛍️\nShop here: ${window.location.href}`;
             if (navigator.share) {
-                await navigator.share({ title: 'Instacart Store', text: shareText, url: window.location.href });
+                await navigator.share({ title: 'Share Store', text: shareText, url: window.location.href });
             } else {
                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
             }
