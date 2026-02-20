@@ -3,133 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Instacart</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Checkout - Confirm Address</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #f6f6f7; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding-bottom: 30px; }
-        .container { padding: 15px; max-width: 500px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
-        .total { font-weight: 800; font-size: 1.1rem; border-top: 1px solid #eee; pt: 10px; }
-        .pay-btn { width: 100%; background: #008060; color: white; border: none; padding: 16px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 1rem; }
-        #shippingStatus { font-size: 0.75rem; color: #008060; font-weight: 600; }
+        body { background: #f5f5f5; font-family: 'Inter', sans-serif; padding-bottom: 120px; margin:0; }
+        .header { background: white; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee; }
+        .form-box { background: white; padding: 20px; margin-top: 10px; }
+        .inp-label { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; display: block; color: #555; }
+        .inp-field { width: 100%; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; border-radius: 4px; font-family: 'Inter'; box-sizing: border-box; }
+        .summary-box { padding: 20px; background: white; margin-top: 10px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .btn-pay { position: fixed; bottom: 0; left: 0; width: 100%; background: black; color: white; padding: 15px; border: none; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; }
+        .required { color: red; }
+        
+        /* Shipping calculation status text */
+        #shipStatus { font-size: 0.75rem; color: #008060; font-weight: 700; margin-top: -10px; margin-bottom: 10px; display: block; }
+
+        /* MODAL STYLE (Restored) */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
+        .modal-box { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out; }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .modal-icon { font-size: 3rem; color: #ff3b30; margin-bottom: 15px; }
+        .modal-btn { background: #000; color: #fff; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h3 style="margin-bottom: 20px;"><i class="fas fa-shopping-bag"></i> Checkout</h3>
-
-    <div class="card">
-        <b style="font-size: 0.9rem;">Shipping Address</b>
-        <input type="text" id="custName" placeholder="Full Name">
-        <input type="number" id="custPhone" placeholder="Mobile Number">
-        <textarea id="custAddr" rows="3" placeholder="Flat no, Street, City, State, Pincode" oninput="calculateShipping()"></textarea>
-        <div id="shippingStatus">Enter address with 6-digit pincode for delivery rate...</div>
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-box">
+            <i class="fas fa-exclamation-circle modal-icon"></i>
+            <div class="modal-title" style="font-weight:800; margin-bottom:10px;">Details Missing!</div>
+            <div class="modal-text" id="alertMsg" style="color:#666; font-size:0.9rem; margin-bottom:20px;">Kripya saari details bhariye.</div>
+            <button class="modal-btn" onclick="closeAlert()">Sahi Hai</button>
+        </div>
     </div>
 
-    <div class="card">
-        <b style="font-size: 0.9rem; display: block; margin-bottom: 15px;">Order Summary</b>
-        <div class="row"><span>Item Total</span><span id="itemTotal">₹0.00</span></div>
-        <div class="row"><span>Shipping Charges</span><span id="shipCharge">₹0.00</span></div>
-        <div class="row total"><span>Grand Total</span><span id="grandTotal">₹0.00</span></div>
+    <div class="header">
+        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <div style="font-weight:700; text-transform:uppercase;">Confirm Address</div>
     </div>
 
-    <button class="pay-btn" onclick="placeOrder()">PAY & PLACE ORDER</button>
-</div>
+    <div class="form-box">
+        <label class="inp-label">Full Name <span class="required">*</span></label>
+        <input type="text" id="custName" class="inp-field" placeholder="Full Name">
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        <label class="inp-label">Phone Number <span class="required">*</span></label>
+        <input type="text" id="custPhone" class="inp-field" placeholder="Mobile Number">
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
-        authDomain: "instacart-clone-91062.firebaseapp.com",
-        projectId: "instacart-clone-91062",
-        storageBucket: "instacart-clone-91062.firebasestorage.app",
-        messagingSenderId: "232217818928",
-        appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
-    };
+        <label class="inp-label">House No. / Building / Area <span class="required">*</span></label>
+        <input type="text" id="addrLine1" class="inp-field" placeholder="Building name or House number">
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+        <label class="inp-label">Street / Landmark / City <span class="required">*</span></label>
+        <textarea id="addrLine2" class="inp-field" rows="2" placeholder="Street name, landmark, city"></textarea>
 
-    let cartTotal = 0;
-    let currentWeight = 500; // Default weight
-    let sellerPincode = "";
+        <label class="inp-label">Pincode <span class="required">*</span></label>
+        <input type="number" id="pincode" class="inp-field" placeholder="6-digit Pincode" oninput="fetchLiveShipping()">
+        <span id="shipStatus"></span>
+    </div>
 
-    // 🚀 Shiprocket Credentials
-    const API_USER = "vikas17047@gmail.com";
-    const API_PASS = "&Ot0^Vbz#9ccEKK8p6S^lrDgA*et17g1";
+    <div class="summary-box">
+        <div class="row"><b>Items Total</b> <span id="itemPrice">₹0</span></div>
+        <div class="row"><b>Shipping Charges</b> <span id="shipPrice">₹0</span></div>
+        <div class="row" style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+            <b>To Pay</b> <span id="payAmt" style="font-weight:700; color:#008060; font-size:1.1rem;">₹0</span>
+        </div>
+    </div>
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            loadCartData();
-        } else { window.location.href = 'login.html'; }
-    });
+    <button class="btn-pay" onclick="validateAndProceed()">PROCEED TO PAYMENT</button>
 
-    async function loadCartData() {
-        // Logic to get cart from LocalStorage/Firebase
-        const cart = JSON.parse(localStorage.getItem('instacart_cart')) || [];
-        cartTotal = cart.reduce((sum, item) => sum + Number(item.price), 0);
-        document.getElementById('itemTotal').innerText = `₹${cartTotal}`;
-        document.getElementById('grandTotal').innerText = `₹${cartTotal}`;
-        
-        // Load first item's weight & seller details
-        if(cart.length > 0) {
-            const prodSnap = await getDoc(doc(db, "products", cart[0].id));
-            if(prodSnap.exists()) currentWeight = prodSnap.data().weight || 500;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-            const sellerSnap = await getDoc(doc(db, "seller_identity", cart[0].sellerId));
-            if(sellerSnap.exists()) sellerPincode = sellerSnap.data().sPin;
-        }
-    }
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
+            authDomain: "instacart-clone-91062.firebaseapp.com",
+            projectId: "instacart-clone-91062",
+            storageBucket: "instacart-clone-91062.firebasestorage.app",
+            messagingSenderId: "232217818928",
+            appId: "1:232217818928:web:e05efedfda36263f6cfaf5"
+        };
 
-    // 🚚 REAL-TIME SHIPPING RATE
-    window.calculateShipping = async () => {
-        const addr = document.getElementById('custAddr').value;
-        const pinMatch = addr.match(/\b\d{6}\b/);
-        
-        if (pinMatch && sellerPincode) {
-            const destPin = pinMatch[0];
-            document.getElementById('shippingStatus').innerText = "Calculating delivery rate...";
-            
-            try {
-                // 1. Get Token
-                const authRes = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: API_USER, password: API_PASS })
-                });
-                const authData = await authRes.json();
-                const token = authData.token;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-                // 2. Get Rate
-                const rateRes = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/serviceability?pickup_postcode=${sellerPincode}&delivery_postcode=${destPin}&weight=${currentWeight/1000}&cod=0`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const rateData = await rateRes.json();
-                
-                if(rateData.status === 200) {
-                    const rate = rateData.data.available_courier_companies[0].rate;
-                    document.getElementById('shipCharge').innerText = `₹${rate}`;
-                    document.getElementById('grandTotal').innerText = `₹${Number(cartTotal) + Number(rate)}`;
-                    document.getElementById('shippingStatus').innerText = "Delivery rate updated! ✅";
-                }
-            } catch (e) { 
-                document.getElementById('shippingStatus').innerText = "Error calculating rate.";
+        let cartTotal = Number(localStorage.getItem('cartTotal')) || 0;
+        let sellerPin = "";
+        let prodWeight = 500; // Grams mein
+
+        // 🚀 Shiprocket Details
+        const API_USER = "vikas17047@gmail.com";
+        const API_PASS = "&Ot0^Vbz#9ccEKK8p6S^lrDgA*et17g1";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('custName').value = user.displayName || "";
+                await loadOrderDetails();
+            }
+        });
+
+        async function loadOrderDetails() {
+            const cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            document.getElementById('itemPrice').innerText = "₹" + cartTotal;
+            document.getElementById('payAmt').innerText = "₹" + cartTotal;
+
+            if(cart.length > 0) {
+                // Seller ka pincode aur Product ka weight nikalna
+                const pSnap = await getDoc(doc(db, "products", cart[0].id));
+                if(pSnap.exists()) prodWeight = pSnap.data().weight || 500;
+
+                const sSnap = await getDoc(doc(db, "seller_identity", cart[0].sellerId));
+                if(sSnap.exists()) sellerPin = sSnap.data().sPin;
             }
         }
-    };
 
-    window.placeOrder = async () => {
-        // Purana order placing logic yahan add karein
-        alert("Redirecting to Payment...");
-    };
-</script>
+        window.fetchLiveShipping = async () => {
+            const pin = document.getElementById('pincode').value;
+            if(pin.length === 6 && sellerPin) {
+                document.getElementById('shipStatus').innerText = "Checking delivery rate...";
+                try {
+                    // Get Shiprocket Token
+                    const login = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: API_USER, password: API_PASS })
+                    });
+                    const authData = await login.json();
+                    
+                    // Get Rate
+                    const rateRes = await fetch(`https://apiv2.shiprocket.in/v1/external/courier/serviceability?pickup_postcode=${sellerPin}&delivery_postcode=${pin}&weight=${prodWeight/1000}&cod=0`, {
+                        headers: {'Authorization': `Bearer ${authData.token}`}
+                    });
+                    const rateData = await rateRes.json();
+                    
+                    if(rateData.status === 200) {
+                        const charge = rateData.data.available_courier_companies[0].rate;
+                        document.getElementById('shipPrice').innerText = "₹" + charge;
+                        document.getElementById('payAmt').innerText = "₹" + (cartTotal + Number(charge));
+                        document.getElementById('shipStatus').innerText = "Live shipping rate applied! ✅";
+                        localStorage.setItem('shipping_charge', charge);
+                    }
+                } catch (e) { document.getElementById('shipStatus').innerText = "Rate not available for this PIN."; }
+            }
+        }
+
+        window.showAlert = () => document.getElementById('customAlert').style.display = 'flex';
+        window.closeAlert = () => document.getElementById('customAlert').style.display = 'none';
+
+        window.validateAndProceed = function() {
+            const pin = document.getElementById('pincode').value;
+            if(!document.getElementById('custName').value || !pin || pin.length < 6) {
+                showAlert();
+                return;
+            }
+            // Save address and proceed
+            localStorage.setItem('user_pincode', pin);
+            window.location.href = 'payment.html';
+        }
+    </script>
 </body>
 </html>
