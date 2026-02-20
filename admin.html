@@ -7,46 +7,43 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body { display: none; background: #f5f7fa; } 
         .admin-header { background: #000; color: white; padding: 20px; text-align: center; }
         .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
         .stat-box { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .stat-box h3 { font-size: 1.5rem; margin-top: 5px; }
-        
-        .admin-section { padding: 15px; }
         .order-row { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .cust-name { font-weight: 700; color: #000; }
-        .order-meta { font-size: 0.8rem; color: #666; margin-top: 5px; }
-        .badge { background: #e8f5e9; color: #2ecc71; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+        .denied-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="admin-header">
-        <h2 style="letter-spacing: 2px;">SUPER ADMIN PANEL</h2>
-        <p style="font-size: 0.8rem; opacity: 0.7;">Project: Instacart | Central Control</p>
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-box">
-            <small>TOTAL ORDERS</small>
-            <h3 id="totalOrders">0</h3>
+    <div id="adminContent">
+        <div class="admin-header">
+            <h2 style="letter-spacing: 2px;">SUPER ADMIN PANEL</h2>
+            <p id="adminStatus" style="font-size: 0.8rem; opacity: 0.7;"></p>
         </div>
-        <div class="stat-box">
-            <small>TOTAL REVENUE</small>
-            <h3 id="totalRev">₹0</h3>
-        </div>
-    </div>
 
-    <div class="admin-section">
-        <div class="section-title">ALL CUSTOMER ORDERS</div>
-        <div id="masterOrdersList">
-            <p style="text-align:center; padding:20px;">Fetching global data...</p>
+        <div class="stats-container">
+            <div class="stat-box">
+                <small>TOTAL ORDERS</small>
+                <h3 id="totalOrders">0</h3>
+            </div>
+            <div class="stat-box">
+                <small>TOTAL REVENUE</small>
+                <h3 id="totalRev">₹0</h3>
+            </div>
+        </div>
+
+        <div style="padding: 15px;">
+            <h3 style="margin-bottom:15px;">ALL CUSTOMER ORDERS</h3>
+            <div id="masterOrdersList">Loading global data...</div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqh5b-p5dsiU6AtkWRbyD0rSUD62Izqeg",
@@ -59,18 +56,37 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Aapki provided Admin UID
+        const ADMIN_UID = "Bi31d4QWrdbWsUwhuUgCYLbPnw92"; 
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.uid === ADMIN_UID) {
+                document.body.style.display = "block";
+                document.getElementById('adminStatus').innerText = "Vikas Gupta | Admin Mode";
+                loadMasterData();
+            } else {
+                document.body.innerHTML = `
+                    <div class="denied-screen">
+                        <i class="fas fa-user-shield" style="font-size: 4rem; color: red; margin-bottom:15px;"></i>
+                        <h1>Access Denied</h1>
+                        <p>Sirf Vikas Gupta hi is page ko access kar sakte hain.</p>
+                        <button onclick="window.location.href='index.html'" style="margin-top:20px; padding:12px 25px; background:black; color:white; border:none; border-radius:30px; font-weight:700;">Back to Home</button>
+                    </div>`;
+                document.body.style.display = "block";
+            }
+        });
 
         async function loadMasterData() {
             const list = document.getElementById('masterOrdersList');
-            // Admin query: Bina kisi 'where' filter ke saare orders uthayega
             const snap = await getDocs(collection(db, "orders")); 
-            
-            list.innerHTML = "";
             let totalRev = 0;
             let count = 0;
+            list.innerHTML = "";
 
             if(snap.empty) {
-                list.innerHTML = "<p>No orders found in database.</p>";
+                list.innerHTML = "No orders found in database.";
                 return;
             }
 
@@ -78,28 +94,21 @@
                 const d = doc.data();
                 count++;
                 totalRev += Number(d.totalAmount || 0);
-
                 list.innerHTML += `
                     <div class="order-row">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <div class="cust-name">${d.customerName}</div>
-                                <div class="order-meta"><i class="fas fa-shopping-cart"></i> ${d.productName}</div>
-                                <div class="order-meta"><i class="fas fa-map-marker-alt"></i> ${d.address}</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div style="font-weight:800;">₹${d.totalAmount}</div>
-                                <span class="badge">PAID</span>
-                            </div>
+                        <div style="font-weight:700; font-size:1.1rem;">${d.customerName || 'Customer'}</div>
+                        <div style="font-size:0.9rem; color:#333; margin:5px 0;">
+                            <b>Product:</b> ${d.productName}<br>
+                            <b>Amount:</b> ₹${d.totalAmount}<br>
+                            <b>Address:</b> ${d.address || 'N/A'}
                         </div>
+                        <div style="font-size:0.75rem; color:#888;">Order ID: ${doc.id}</div>
                     </div>`;
             });
 
             document.getElementById('totalOrders').innerText = count;
             document.getElementById('totalRev').innerText = "₹" + totalRev;
         }
-
-        loadMasterData();
     </script>
 </body>
 </html>
