@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory - Instacart</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Inventory Management - Instacart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --shopify-green: #008060; --bg-gray: #f6f6f7; --card-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -12,34 +12,33 @@
         .header { background: #1a1c1d; color: white; padding: 15px 20px; display: flex; align-items: center; gap: 10px; }
         .container { padding: 15px; }
 
-        /* Dashboard Add Box */
         .add-listing-card { background: white; border: 2px dashed #008060; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; margin-bottom: 25px; }
         .icon-sq { width: 45px; height: 45px; background: #f1f8f5; color: var(--shopify-green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 
-        /* 📱 Grid View with 2 Items Per Row */
-        .section-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: #000; }
         .p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .p-card { background: white; border-radius: 12px; padding: 10px; box-shadow: var(--card-shadow); position: relative; }
         .p-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
         
-        /* 🛠️ Edit & Delete Icons on Top of Image */
         .p-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; }
         .p-actions i { background: white; color: #333; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
 
         .p-name { font-weight: 700; font-size: 0.85rem; margin: 8px 0 2px; color: #202223; }
         .p-price { color: var(--shopify-green); font-weight: 800; font-size: 0.9rem; }
 
-        /* Modal & Form */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; padding: 20px; overflow-y: auto; }
         .modal-content { background: white; border-radius: 20px; padding: 25px; max-width: 420px; margin: auto; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        
+        /* 🚚 RESTORED SHIPPING BOX WITH ALL FIELDS */
+        .ship-details { background: #f0f7ff; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #cce3ff; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .save-btn { width: 100%; background: var(--shopify-green); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <i class="fas fa-arrow-left" onclick="window.history.back()"></i>
+        <i class="fas fa-arrow-left" onclick="window.location.href='seller_dashboard.html'"></i>
         <div style="font-weight:800;">Inventory Management</div>
     </div>
 
@@ -49,18 +48,18 @@
             <div><b style="font-size:1rem;">Add Product Listing</b><br><small style="color:#6d7175;">Update store inventory</small></div>
         </div>
 
-        <div class="section-title">Product Grid</div>
+        <div class="section-title" style="font-weight:800; margin-bottom:15px;">Product Grid</div>
         <div class="p-grid" id="inventoryList"></div>
     </div>
 
     <div id="pModal" class="modal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 id="modalTitle">Add New Product</h3>
                 <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer;"></i>
             </div>
 
-            <label style="font-size:0.75rem; font-weight:800; color:#888;">CHOOSE QUICK PRODUCT</label>
+            <label style="font-size:0.75rem; font-weight:800; color:#888;">QUICK PRODUCT</label>
             <select id="pCat" onchange="autoFillImage()">
                 <option value="">-- Manual Entry --</option>
                 <option value="Shoes">Shoes</option>
@@ -79,9 +78,14 @@
             <input type="number" id="pPrice" placeholder="Price (₹)">
             <input type="text" id="pImg" placeholder="Image URL">
 
-            <div style="background:#f0f7ff; padding:12px; border-radius:10px; border:1px solid #cce3ff; margin-top:10px;">
-                <b style="font-size:0.75rem; color:#2c6ecb;">Shipping Details</b>
+            <div class="ship-details">
+                <b style="font-size: 0.75rem; color: #2c6ecb;"><i class="fas fa-truck"></i> Shipping Weight & Size</b>
                 <input type="number" id="pWeight" placeholder="Weight (Grams)">
+                <div class="grid-3">
+                    <input type="number" id="pL" placeholder="L(cm)">
+                    <input type="number" id="pW" placeholder="W(cm)">
+                    <input type="number" id="pH" placeholder="H(cm)">
+                </div>
             </div>
 
             <button class="save-btn" id="mainActionBtn" onclick="saveProduct()">SAVE PRODUCT</button>
@@ -114,7 +118,6 @@
             else { window.location.href = "login.html"; }
         });
 
-        // 🟢 AUTO IMAGE LOGIC
         window.autoFillImage = () => {
             const cat = document.getElementById('pCat').value;
             const imgInput = document.getElementById('pImg');
@@ -140,7 +143,6 @@
             list.innerHTML = "";
             snap.forEach(product => {
                 const d = product.data();
-                // 🛠️ GRID VIEW WITH EDIT/DELETE ICONS
                 list.innerHTML += `
                     <div class="p-card">
                         <div class="p-actions">
@@ -168,22 +170,28 @@
             document.getElementById('pName').value = data.name;
             document.getElementById('pPrice').value = data.price;
             document.getElementById('pImg').value = data.image || data.img;
+            document.getElementById('pWeight').value = data.weight || "";
+            document.getElementById('pL').value = data.length || "";
+            document.getElementById('pW').value = data.width || "";
+            document.getElementById('pH').value = data.height || "";
             document.getElementById('pModal').style.display = 'block';
         };
 
         window.saveProduct = async () => {
-            const name = document.getElementById('pName').value;
-            const price = document.getElementById('pPrice').value;
-            const img = document.getElementById('pImg').value;
-            const weight = document.getElementById('pWeight').value;
-
-            if(!name || !price) return alert("Fill Name and Price!");
-
-            const productData = { name, price: Number(price), image: img, weight, sellerId, updatedAt: new Date() };
-
+            const data = {
+                name: document.getElementById('pName').value,
+                price: Number(document.getElementById('pPrice').value),
+                image: document.getElementById('pImg').value,
+                weight: document.getElementById('pWeight').value,
+                length: document.getElementById('pL').value,
+                width: document.getElementById('pW').value,
+                height: document.getElementById('pH').value,
+                sellerId, updatedAt: new Date()
+            };
+            if(!data.name || !data.price) return alert("Name & Price required!");
             try {
-                if(editId) { await updateDoc(doc(db, "products", editId), productData); }
-                else { await addDoc(collection(db, "products"), productData); }
+                if(editId) { await updateDoc(doc(db, "products", editId), data); }
+                else { await addDoc(collection(db, "products"), data); }
                 closeModal();
                 fetchProducts();
             } catch (e) { alert(e.message); }
@@ -201,7 +209,10 @@
             document.getElementById('pName').value = "";
             document.getElementById('pPrice').value = "";
             document.getElementById('pImg').value = "";
-            document.getElementById('pCat').value = "";
+            document.getElementById('pWeight').value = "";
+            document.getElementById('pL').value = "";
+            document.getElementById('pW').value = "";
+            document.getElementById('pH').value = "";
         };
     </script>
 </body>
